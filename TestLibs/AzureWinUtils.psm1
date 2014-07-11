@@ -119,7 +119,6 @@ function GetTestSummary($testCycle, [DateTime] $StartTime, [string] $xmlFilename
     $strHtml += "<br /><br/> <a href='\\${currentNWPath}\TestResults\" + $xmlFilename + "-" + $StartTime.ToString("yyyyMMdd-HHmmss") + "'>Logs can be found here </a><br /><br />"
     $strHtml += "</body></Html>"
 
-	Set-Content ".\temp\CI\index.html" $strHtml
 	return $plainTextSummary, $strHtml
 }
 

@@ -1,9 +1,15 @@
 <!--#This list contains packages tobe installed separate each package name with space or tab or multiple number of spaces.-->
 <setup>
-	<packages>iperf vim mysql-client mysql python-argparse gcc bind bind-utils bind-libs  tcpdump nfs-client nfs-kernel-server</packages>
-	<waLinuxAgent_link>https://raw.githubusercontent.com/Azure/WALinuxAgent/2.0/waagent</waLinuxAgent_link>
-	<rpm_link = "iperf">ftp://ftp.pbone.net/mirror/ftp.freshrpms.net/pub/freshrpms/pub/dag/fedora/5/en/x86_64/RPMS.dries/iperf-2.0.4-1.fc5.rf.x86_64.rpm</rpm_link>
-	<rpm_link = "python-argparse">ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/dassit:/opsi:/opsi4/RedHat_RHEL-6/x86_64/python-argparse-1.2.1-36.1.x86_64.rpm</rpm_link>
-	<rpm_link = "python-crypto">http://www.convirture.com/repos/deps/SLES/11.x/x86_64/python-crypto-2.0.1-199.12.x86_64.rpm</rpm_link>
-	<rpm_link = "python-paramiko">ftp://195.220.108.108/linux/opensuse/ports/armv7hl/distribution/12.3/repo/oss/suse/noarch/python-paramiko-1.9.0-2.1.1.noarch.rpm</rpm_link>
+    <branch target="cloud">
+	    <packages>iperf vim mysql-client mysql python-argparse gcc bind bind-utils bind-libs tcpdump nfs-client nfs-kernel-server</packages>
+	    <waLinuxAgent_link>https://raw.githubusercontent.com/Azure/WALinuxAgent/2.0/waagent</waLinuxAgent_link>
+	    <rpm_link name="iperf">ftp://ftp.pbone.net/mirror/ftp.freshrpms.net/pub/freshrpms/pub/dag/fedora/5/en/x86_64/RPMS.dries/iperf-2.0.4-1.fc5.rf.x86_64.rpm</rpm_link>
+	    <rpm_link name="python-argparse">ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/dassit:/opsi:/opsi4/RedHat_RHEL-6/x86_64/python-argparse-1.2.1-36.1.x86_64.rpm</rpm_link>
+	    <rpm_link name="python-crypto">http://www.convirture.com/repos/deps/SLES/11.x/x86_64/python-crypto-2.0.1-199.12.x86_64.rpm</rpm_link>
+	    <rpm_link name="python-paramiko">ftp://195.220.108.108/linux/opensuse/ports/armv7hl/distribution/12.3/repo/oss/suse/noarch/python-paramiko-1.9.0-2.1.1.noarch.rpm</rpm_link>
+    </branch>
+    <branch target="FCRDOS">
+	    <packages>git python-pyasn1 net-tools python-setuptools at dos2unix</packages>
+	    <waLinuxAgent_link>https://raw.githubusercontent.com/Azure/WALinuxAgent/2.0/waagent</waLinuxAgent_link>
+    </branch>
 </setup>
