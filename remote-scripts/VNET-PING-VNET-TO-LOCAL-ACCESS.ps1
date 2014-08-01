@@ -64,10 +64,6 @@ if($isDeployed)
 	{
 #region CONFIGURE VNET VMS AND MAKE THEM READY FOR VNET TEST EXECUTION...
 
-#region Configure VNET VMS.. [edit resolv.conf file and edit hosts files]
-		ConfigureVNETVms -SSHDetails $SSHDetails	
-#endregion
-
 #region DEFINE LOCAL NET VMS
 		$dnsServer = CreateVMNode -nodeIp "192.168.3.120" -nodeSshPort 22 -user "root" -password "redhat"
 		$nfsServer = CreateVMNode -nodeIp "192.168.3.125" -nodeSshPort 22 -user "root" -password "redhat"
@@ -77,14 +73,21 @@ if($isDeployed)
 #region DEFINE A INTERMEDIATE VM THAT WILL BE USED FOR ALL OPERATIONS DONE ON THE LOCAL NET VMS [DNS SERVER, NFSSERVER, MYSQL SERVER]
 		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1.IpAddress -nodeHostname $hs1vm1Hostname
 #endregion
-
 #region Upload all files to VNET VMS.. [All files are uploaded at once, to minimise re-upload process, at the execution time of every child method]
 		$currentWindowsfiles = $currentTestData.files
 		UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $currentWindowsfiles 
 #Make python files executable
 		RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *.py"
 #endregion
-
+#region Configure VNET VMS.. [edit resolv.conf file and edit hosts files]
+        if($EconomyMode -and $vnetIsAllConfigured)
+        {
+            $isAllConfigured = "True"
+        }
+        else
+        {
+		ConfigureVNETVms -SSHDetails $SSHDetails	
+#endregion
 #region Upload all files to LOCAL NET VMS.. [All files are uploaded to minimise reupload process at the execution of every child method]
 		$currentLinuxFiles = ConvertFileNames -ToLinux -currentWindowsFiles $currentTestData.files -expectedLinuxPath "/home/$user"
         #Assuming that all files will be available at VNET VMS..
@@ -103,6 +106,8 @@ if($isDeployed)
 #endregion
 
 		$isAllConfigured = "True"
+        $vnetIsAllConfigured = $true
+        }
 #endregion
 	}
 	catch

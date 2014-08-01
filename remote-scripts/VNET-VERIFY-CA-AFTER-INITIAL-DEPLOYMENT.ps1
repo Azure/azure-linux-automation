@@ -36,7 +36,6 @@ if($isDeployed)
 	{
 		try
 		{
-			ConfigureVNETVMs -SSHDetails $SSHDetails
 			UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails  -files ".\remote-scripts\temp.txt"
 			$testResult = VerifyDIPafterInitialDeployment -DeployedServices $isDeployed
 			if ($testResult -eq "True")

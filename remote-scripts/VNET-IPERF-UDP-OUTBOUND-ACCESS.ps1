@@ -6,6 +6,7 @@ $result = ""
 $testResult = ""
 $resultArr = @()
 $isDeployed = DeployVMS -setupType $currentTestData.setupType -Distro $Distro -xmlConfig $xmlConfig
+
 if($isDeployed)
 {
 #region EXTRACT ALL INFORMATION ABOUT DEPLOYED VMs
@@ -77,22 +78,26 @@ if($isDeployed)
 		$externalServerURL = $xmlConfig.config.Azure.Deployment.Data.ExternalPingServer.Url
 
 #endregion
-        
-#region DEFINE A INTERMEDIATE VM THAT WILL BE USED FOR ALL OPERATIONS DONE ON THE LOCAL NET VMS [DNS SERVER, NFSSERVER, MYSQL SERVER]
-		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1.IpAddress -nodeHostname $hs1vm1Hostname
-#endregion
-
-		ConfigureVNETVMs -SSHDetails $SSHDetails
-
 #region Upload all files to VNET VMS.. [All files are uploaded at once, to minimise re-upload process, at the execution time of every child method]
 		$currentWindowsfiles = $currentTestData.files
 		UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $currentWindowsfiles
 
 #Make python files executable
-		RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *"
+		RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *.py"
 
 #endregion
 
+        if($EconomyMode -and $vnetIsAllConfigured)
+        {
+            $isAllConfigured = "True"
+        }
+        else
+        {
+#region DEFINE A INTERMEDIATE VM THAT WILL BE USED FOR ALL OPERATIONS DONE ON THE LOCAL NET VMS [DNS SERVER, NFSSERVER, MYSQL SERVER]
+		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1.IpAddress -nodeHostname $hs1vm1Hostname
+#endregion
+
+		ConfigureVNETVMs -SSHDetails $SSHDetails
 #region Upload all files to LOCAL NET VMS.. [All files are uploaded to minimise reupload process at the execution of every child method]
 
 #Assuming that all files will be available at VNET VMS..
@@ -117,6 +122,8 @@ if($isDeployed)
         ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
 #endregion
 		$isAllConfigured = "True"
+        $vnetIsAllConfigured = $true
+        }
 #endregion
 	}
 	catch

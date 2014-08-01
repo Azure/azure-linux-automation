@@ -15,7 +15,7 @@ if($isDeployed)
 	try
 	{
         # NO PRECONFIGURATION NEEDED FOR THIS TEST.
-        $tmp = ConfigureVNETVMs -SSHDetails $SSHDetails
+        #$tmp = ConfigureVNETVMs -SSHDetails $SSHDetails
 		$isAllConfigured = "True"
 	}
 	catch
@@ -31,6 +31,11 @@ if($isDeployed)
 	{
 		try
 		{
+            $randomFileName = [System.IO.Path]::GetRandomFileName()
+            $randomFilePath = "$LogDir\$randomFileName"
+            Set-Content -Value "Temporary random file." -Path $randomFilePath | Out-Null
+            UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $randomFilePath
+            Remove-Item $randomFilePath | Out-Null
 			$testResultBeforeReboot = VerifyDIPafterInitialDeployment -DeployedServices $isDeployed
 # Now Reboot all the deployments..
 			if ($testResultBeforeReboot -eq "True")
