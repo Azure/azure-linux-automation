@@ -176,7 +176,7 @@ Function InstallPackages ($VMIpAddress, $VMSshPort, $VMUserName, $VMPassword)
 			}
 			else
 			{
-				Write-Host "Package : $currentPackageName : Installation failed."
+				LogErr "Package : $currentPackageName : Installation failed."
 				$installError=$installError+1
 			}
 
@@ -186,7 +186,7 @@ Function InstallPackages ($VMIpAddress, $VMSshPort, $VMUserName, $VMPassword)
 		{
 			LogMsg "Uploading install file : $currentPackageFile..."
 
-			RemoteCopy -upload -uploadTo $VMIpAddress -port $VMSshPort -username $VMUserName -password $VMPassword -files ".\SetupScripts\Packages\$currentPackageFile"
+			RemoteCopy -upload -uploadTo $VMIpAddress -port $VMSshPort -username $VMUserName -password $VMPassword -files ".\tools\Packages\$currentPackageFile"
 
 #LogMsg "Invoking command : /root/packageInstall.sh -install $currentPackageName -isLocal yes -file $currentPackageFile"
 			if ($currentDistroPackageData.supportingFiles)
@@ -194,7 +194,7 @@ Function InstallPackages ($VMIpAddress, $VMSshPort, $VMUserName, $VMPassword)
 				foreach ($supprotFile in ($currentDistroPackageData.supportingFiles).Split(",") )
 				{
 					LogMsg "Uploading support file - $supprotFile .. "
-					RemoteCopy -upload -uploadTo $VMIpAddress -port $VMSshPort -username $VMUserName -password $VMPassword -files ".\SetupScripts\Packages\$supprotFile"
+					RemoteCopy -upload -uploadTo $VMIpAddress -port $VMSshPort -username $VMUserName -password $VMPassword -files ".\tools\Packages\$supprotFile"
 				}
 			}
 			$out = RunLinuxCmd -username $VMUserName -password $VMPassword -ip $VMIpAddress -port $VMSshPort -command "./packageInstall.sh -install $currentPackageName -isLocal yes -file $currentPackageFile" -runAsSudo
@@ -205,7 +205,7 @@ Function InstallPackages ($VMIpAddress, $VMSshPort, $VMUserName, $VMPassword)
 			}
 			else
 			{
-				Write-Host "Package : $currentPackageName : Installation failed."
+				LogErr "Package : $currentPackageName : Installation failed."
 				$installError=$installError+1
 			}
 
@@ -220,7 +220,7 @@ Function InstallPackages ($VMIpAddress, $VMSshPort, $VMUserName, $VMPassword)
 
 	if ($installError -gt 0)
 	{
-		Write-Host "$installError out of $installCount packages failed to install"
+		LogErr "$installError out of $installCount packages failed to install"
 		$retValue=$false
 	}
 	else
@@ -651,7 +651,7 @@ Function CreateAllDeployments($setupType, $xmlConfig, $Distro){
 						}
 						else
 						{
-							Write-Host "Unable to Deploy one or more VM's"
+							LogMsg "Unable to Deploy one or more VM's"
 							$retryDeployment = $retryDeployment + 1
 							$retValue = "False"
 							$isServiceDeployed = "False"
@@ -659,7 +659,7 @@ Function CreateAllDeployments($setupType, $xmlConfig, $Distro){
 					}
 					else
 					{
-						Write-Host "Unable to Add certificate to $serviceName"
+						LogMsg "Unable to Add certificate to $serviceName"
 						$retryDeployment = $retryDeployment + 1
 						$retValue = "False"
 						$isServiceDeployed = "False"
@@ -668,7 +668,7 @@ Function CreateAllDeployments($setupType, $xmlConfig, $Distro){
 				}
 				else
 				{
-					Write-Host "Unable to create $serviceName"
+					LogMsg "Unable to create $serviceName"
 					$retryDeployment = $retryDeployment + 1
 					$retValue = "False"
 					$isServiceDeployed = "False"
@@ -676,7 +676,7 @@ Function CreateAllDeployments($setupType, $xmlConfig, $Distro){
 			}    
 			else
 			{
-				Write-Host "Unable to delete existing service - $serviceName"
+				LogMsg "Unable to delete existing service - $serviceName"
 				$retryDeployment = 3
 				$retValue = "False"
 				$isServiceDeployed = "False"
@@ -706,7 +706,7 @@ Function VerifyAllDeployments($servicesToVerify)
 		}
 		else
 		{
-			Write-Host "$serviceName Failed.."
+			LogMsg "$serviceName Failed.."
 			$retValue = "False"
 		}
 	}
@@ -869,20 +869,20 @@ Function DeployVMs ($xmlConfig, $setupType, $Distro)
 		            }
 		            else
 		            {
-			            Write-Host "Unable to connect Some/All SSH ports.."
+			            LogMsg "Unable to connect Some/All SSH ports.."
 			            $retValue = $NULL  
 		            }
 	            }
 	            else
 	            {
-		            Write-Host "Provision Failed for one or more VMs"
+		            LogMsg "Provision Failed for one or more VMs"
 		            $retValue = $NULL
 	            }
 
             }
             else
             {
-	            Write-Host "One or More Deployments are Failed..!"
+	            LogMsg "One or More Deployments are Failed..!"
 	            $retValue = $NULL
             }
         }
@@ -890,11 +890,11 @@ Function DeployVMs ($xmlConfig, $setupType, $Distro)
         {
 		    if ($position -eq 0)
 		    {
-			    Write-Host "Failed to execute Get-AzureService. Source : DeployVMs()"
+			    LogMsg "Failed to execute Get-AzureService. Source : DeployVMs()"
 		    }
 		    else
 		    {
-			    Write-Host "Exception detected. Source : DeployVMs()"
+			    LogMsg "Exception detected. Source : DeployVMs()"
 		    }
         $retValue = $NULL
         }
@@ -1273,13 +1273,13 @@ Function RemoteCopy($uploadTo, $downloadFrom, $downloadTo, $port, $files, $usern
                     if($usePrivateKey)
                     {
 					    LogMsg "Uploading $testFile to $uploadTo, port $port using PrivateKey authentication"
-					    echo y | bin\pscp -i .\ssh\$sshKey -q -P $port $testFile $username@${uploadTo}:
+					    echo y | tools\pscp -i .\ssh\$sshKey -q -P $port $testFile $username@${uploadTo}:
                         $returnCode = $LASTEXITCODE
 					}
                     else
                     {
 					    LogMsg "Uploading $testFile to $uploadTo, port $port using Password authentication"
-					    echo y | bin\pscp -pw $password -q -P $port $testFile $username@${uploadTo}:
+					    echo y | tools\pscp -pw $password -q -P $port $testFile $username@${uploadTo}:
                         $returnCode = $LASTEXITCODE
                     }
                     if(($returnCode -ne 0) -and ($retry -ne $maxRetry))
@@ -1382,7 +1382,7 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
         $linuxCommand = "`"$command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
         $logCommand = "`"$command`""
     }
-	LogMsg ".\bin\plink.exe -t -pw $password -P $port $username@$ip $logCommand"
+	LogMsg ".\tools\plink.exe -t -pw $password -P $port $username@$ip $logCommand"
 	$returnCode = 1
     $attempts = 0
     $notExceededTimeLimit = $true
@@ -1393,8 +1393,8 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
         { `
             $username = $args[1]; $password = $args[2]; $ip = $args[3]; $port = $args[4]; $jcommand = $args[5]; `
             cd $args[0]; `
-            Write-Host ".\bin\plink.exe -t -C -v -pw $password -P $port $username@$ip $jcommand";`
-            .\bin\plink.exe -t -C -v -pw $password -P $port $username@$ip $jcommand;`
+            Write-Host ".\tools\plink.exe -t -C -v -pw $password -P $port $username@$ip $jcommand";`
+            .\tools\plink.exe -t -C -v -pw $password -P $port $username@$ip $jcommand;`
         } `
         -ArgumentList $currentDir, $username, $password, $ip, $port, $linuxCommand
         $RunLinuxCmdOutput = ""
