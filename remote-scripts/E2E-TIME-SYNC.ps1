@@ -5,6 +5,7 @@ $result = ""
 $testResult = ""
 $resultArr = @()
 $isDeployed = DeployVMS -setupType $currentTestData.setupType -Distro $Distro -xmlConfig $xmlConfig
+
 if($isDeployed)
 {  
     $testServiceData = Get-AzureService -ServiceName $isDeployed
@@ -53,7 +54,7 @@ if($isDeployed)
                 $ntpdcOutputCommand = "ntpdc -p"
                 $ntpdcServiceName = "ntp"
             }
-            "CENT"
+            "CENTOS"
             {
                 $ntpdcOutputCommand = "ntpdc -p"
                 $ntpdcServiceName = "ntp"
@@ -111,7 +112,7 @@ if($isDeployed)
                 return $ntpdcOutput
             }
             $ntpdcOutput =  CheckNtpdOutput -detectedDistro $DetectedDistro
-            $synchedLine = $ntpdcOutput-imatch "\*"
+            $synchedLine =  $ntpdcOutput.split("`n") -imatch "\*"
             if ($synchedLine)
             {
                 $FirstChek = $true

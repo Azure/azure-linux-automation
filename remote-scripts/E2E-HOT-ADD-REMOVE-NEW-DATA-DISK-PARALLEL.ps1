@@ -9,6 +9,7 @@ $SmallVMLUNs = 2
 $MediumVMLUNs = 4
 $LargeVMLUNs = 8
 $ExtraLargeVMLUNs= 16
+$diskResult = New-Object -TypeName System.Object
 foreach ($newSetupType in $currentTestData.SubtestValues.split(","))
 {
     #Deploy A new VM..
@@ -18,7 +19,7 @@ foreach ($newSetupType in $currentTestData.SubtestValues.split(","))
     {
 #region COLLECTE DEPLOYED VM DATA
         $testServiceData = Get-AzureService -ServiceName $isDeployed
-
+        Add-Member -InputObject $diskResult -MemberType MemberSet -Name $newSetupType
         #Get VMs deployed in the service..
         $testVMsinService = $testServiceData | Get-AzureVM
 
@@ -62,7 +63,7 @@ foreach ($newSetupType in $currentTestData.SubtestValues.split(","))
                 $testLUNs = $ExtraLargeVMLUNs
             }
         }
-
+        
 #region HOT ADD / REMOVE DISKS..
             $testTasks = ("Add","Remove")
             $HotAddDiskParallelCoammnd =  "DoHotAddNewDataDiskTestParallel -testVMObject `$testVMObject -TotalLuns `$testLUNs"
@@ -83,7 +84,24 @@ foreach ($newSetupType in $currentTestData.SubtestValues.split(","))
                     }
 
                     #Execute Test Here
-                    $testResult = Invoke-Expression $testCommand
+                    if ($newTask -eq "Remove")
+                    {
+                        if($diskResult.$newSetupType.Add -eq "PASS")
+                        {
+                            $testResult = Invoke-Expression $testCommand
+                        }
+                        else
+                        {
+                            LogErr "Not executing remove disk test because Add Disk test was failed."
+                            $testResult = "FAIL"
+                        }
+                    }
+                    else
+                    {
+                        $testResult = Invoke-Expression $testCommand
+                    }
+                    
+                    Add-Member -InputObject $diskResult.$newSetupType -NotePropertyName $newTask -NotePropertyValue $testResult
                     #$testResult = "PASS"
                 }
                 catch
