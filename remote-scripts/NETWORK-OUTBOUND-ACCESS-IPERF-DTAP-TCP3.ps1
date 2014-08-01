@@ -32,7 +32,7 @@ $hs1vm1udpport = GetPort -Endpoints $hs1vm1Endpoints -usage udp
 $dtapServerUdpport = "990"
 $hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh
 $dtapServerSshport = "22"
-$dtapServerIp="131.107.220.167"
+$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 
 <#------------End-----------------------#>
 
@@ -59,11 +59,11 @@ try
 
 	LogMsg "Startin iperf Server...on $dtapServerIp"
 	RunLinuxCmd -username $user -password $password -ip $dtapServerIp -port $dtapServerSshport -command "./start-server.py -i1 -p $dtapServerTcpport && mv Runtime.log start-server.py.log -f" -runAsSudo
-	RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/start-server.py.log" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
+	RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/start-server.py.log" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
 #Get-Content $LogDir\start-server.py.log | Set-Content $($currentTestData.testName).log -PassThru
 #>>>Verify, if server started...
 	LogMsg "Verifying if server is started or not.."
-	RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/isServerStarted.txt" -downloadTo .\temp -port $dtapServerSshport -username $user -password $password
+	RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/isServerStarted.txt" -downloadTo .\temp -port $dtapServerSshport -username $user -password $password
 	$isServerStarted = Get-Content .\temp\isServerStarted.txt
 
 	if($isServerStarted -eq "yes")
@@ -73,12 +73,12 @@ try
 		LogMsg "Startin iperf client and trying to connect to port $dtapServerTcpport..."
 		RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./start-client.py -c $dtapServerIp -i1 -p $dtapServerTcpport -t20" -runAsSudo
 		RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "mv Runtime.log start-client.py.log -f" -runAsSudo
-		RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/start-client.py.log, /home/test/iperf-client.txt" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
+		RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/start-client.py.log, /home/$user/iperf-client.txt" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
 #Get-Content $LogDir\start-client.py.log | Set-Content $($currentTestData.testName).log -PassThru
 
 #>>>Verify client...
-		RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo .\temp -port $hs1vm1sshport -username $user -password $password
-		RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "rm -rf /home/test/state.txt /home/test/Summary.log" -runAsSudo
+		RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo .\temp -port $hs1vm1sshport -username $user -password $password
+		RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "rm -rf /home/$user/state.txt /home/$user/Summary.log" -runAsSudo
 		$clientState = Get-Content .\temp\state.txt
 		$clientSummary = Get-Content .\temp\Summary.log
 
@@ -91,8 +91,8 @@ try
 
 #>>>Now we know that our client was connected. Let's go and check the server now...
 			RunLinuxCmd -username $user -password $password -ip $dtapServerIp -port $dtapServerSshport -command "./check-server.py && mv Runtime.log check-server.py.log -f" -runAsSudo
-			RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/check-server.py.log, /home/test/iperf-server.txt" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
-			RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo .\temp -port $dtapServerSshport -username $user -password $password
+			RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/check-server.py.log, /home/$user/iperf-server.txt" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
+			RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo .\temp -port $dtapServerSshport -username $user -password $password
 			$serverState = Get-Content .\temp\state.txt
 			$serverSummary =  Get-Content .\temp\Summary.log
 

@@ -49,15 +49,6 @@ if($isDeployed)
 	$hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh
 	$hs1vm2sshport = GetPort -Endpoints $hs1vm2Endpoints -usage ssh
 
-
-	<#------------End-----------------------#>
-
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-
 	<#------------PUSH all files in all VMs-----------------#>
 	foreach ($mode in $currentTestData.TestMode.Split(",")){ 
 
@@ -67,35 +58,19 @@ if($isDeployed)
 
 			RemoteCopy -uploadTo $hs1VIP -port $hs1vm1sshport -files $currentTestData.files -username $user -password $password -upload
 			RemoteCopy -uploadTo $hs1VIP -port $hs1vm2sshport -files $currentTestData.files -username $user -password $password -upload
-			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "chmod +x *" -runAsSudo
-			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "chmod +x *" -runAsSudo
+			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "chmod +x * && rm -rf *.txt *.log" -runAsSudo
+			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "chmod +x * && rm -rf *.txt *.log" -runAsSudo
 			<#------------End-----------------#>
-
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-
-			<#---------------------start the test now-------------------#>
-
-# Roles :
-# #      iperf server : VM1
-# #      Details - VIP : $hs1VIP, sshport : $hs1vm1sshport, tcp port : $hs1vm1tcpport
-#
-# #      iperf client : VM2
-# #      Details - VIP : $hs1VIP, sshport : $hs1vm2sshport, tcp port : $hs1vm2tcpport
-
 #>>>Start server...
 			LogMsg "Starting the test in $mode mode.."
 			mkdir $LogDir\$mode -ErrorAction SilentlyContinue | out-null
 			LogMsg "Starting iperf Server..."
 			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./start-server.py -i1 -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f" -runAsSudo
-			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/start-server.py.log" -downloadTo $LogDir\$mode  -port $hs1vm1sshport -username $user -password $password
-#Get-Content $LogDir\start-server.py.log | Set-Content $($currentTestData.testName).log -PassThru
+			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/start-server.py.log" -downloadTo $LogDir\$mode  -port $hs1vm1sshport -username $user -password $password
+            
 #>>>Verify, if server started...
 			LogMsg "Verifying if server is started or not.."
-			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/isServerStarted.txt" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
+			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/isServerStarted.txt" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
 			$isServerStarted = Get-Content $LogDir\isServerStarted.txt
 
 			if($isServerStarted -eq "yes")
@@ -110,12 +85,12 @@ if($isDeployed)
 					$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "./start-client.py -c $hs1vm1Hostname -i1 -p $hs1vm1udpport -t10 -u yes " -runAsSudo
 				}
 				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "mv Runtime.log start-client.py.log -f" -runAsSudo
-				RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/start-client.py.log, /home/test/iperf-client.txt" -downloadTo $LogDir\$mode  -port $hs1vm2sshport -username $user -password $password
-#Get-Content $LogDir\start-client.py.log | Set-Content $($currentTestData.testName).log -PassThru
+				RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/start-client.py.log, /home/$user/iperf-client.txt" -downloadTo $LogDir\$mode  -port $hs1vm2sshport -username $user -password $password
+                
 
 #>>>Verify client...
-				RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo $LogDir -port $hs1vm2sshport -username $user -password $password
-				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "rm -rf /home/test/state.txt /home/test/Summary.log" -runAsSudo
+				RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo $LogDir -port $hs1vm2sshport -username $user -password $password
+				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "rm -rf /home/$user/state.txt /home/$user/Summary.log" -runAsSudo
 				$clientState = Get-Content $LogDir\state.txt
 				$clientSummary = Get-Content $LogDir\Summary.log
 
@@ -128,8 +103,8 @@ if($isDeployed)
 
 #>>>Now we know that our client was connected. Let's go and check the server now...
 					$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./check-server.py && mv Runtime.log check-server.py.log -f" -runAsSudo
-					RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/check-server.py.log, /home/test/iperf-server.txt" -downloadTo $LogDir\$mode  -port $hs1vm1sshport -username $user -password $password
-					RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
+					RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/check-server.py.log, /home/$user/iperf-server.txt" -downloadTo $LogDir\$mode  -port $hs1vm1sshport -username $user -password $password
+					RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
 					$serverState = Get-Content $LogDir\state.txt
 					$serverSummary =  Get-Content $LogDir\Summary.log
 
@@ -157,6 +132,7 @@ if($isDeployed)
 					$testResult = "FAIL"
 
 				}
+                LogMsg "$mode : $testResult"
 			}
 
 			else

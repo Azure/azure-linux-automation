@@ -37,8 +37,17 @@ if($isDeployed)
 	$vm1 = CreateIdnsNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -logDir $LogDir -nodeDip $hs1vm1IP -nodeUrl $hs1ServiceUrl -nodeDefaultHostname $hs1vm1Hostname -nodeNewHostname $hs1vm1NewHostname
 	$vm2 = CreateIdnsNode -nodeIp $hs1VIP -nodeSshPort $hs1vm2sshport -user $user -password $password -logDir $LogDir -nodeDip $hs1vm2IP -nodeUrl $hs1ServiceUrl -nodeDefaultHostname $hs1vm2Hostname -nodeNewHostname $hs1vm2NewHostname
     $retryInterval = 30
-    $waitAfterChangingHostname = 240
+    $waitAfterChangingHostname = 180
 	$resultArr = @()
+    $vm1DefaultFqdn = $null 
+    $vm2DefaultFqdn =$null
+    $filesUploaded = $false
+    $uploadFiles = 
+    {
+            RemoteCopy -upload -uploadTo $vm1.ip -port $vm1.SShport -username $vm1.user -password $vm1.password -files .\remote-scripts\temp.txt
+			RemoteCopy -upload -uploadTo $vm2.ip -port $vm2.SShport -username $vm2.user -password $vm2.password -files .\remote-scripts\temp.txt
+            $filesUploaded = $true
+    }
 	foreach ($mode in $currentTestData.TestMode.Split(","))
 	{
 		LogMsg "Starting test for : $mode.."
@@ -47,13 +56,27 @@ if($isDeployed)
 		$vm2.logDir = "$LogDir\$mode"
 		try
 		{
-            $testResult = ""
-            RemoteCopy -upload -uploadTo $vm1.ip -port $vm1.SShport -username $vm1.user -password $vm1.password -files .\remote-scripts\temp.txt
-			RemoteCopy -upload -uploadTo $vm2.ip -port $vm2.SShport -username $vm2.user -password $vm2.password -files .\remote-scripts\temp.txt
-            if(!$vm1.fqdn -and !$vm2.fqdn)
+            if(!$filesUploaded)
             {
-                RetryOperation -operation  {$vm1.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"} -maxRetryCount 15 -retryInterval 3
-                RetryOperation -operation  {$vm2.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "hostname --fqdn"} -maxRetryCount 15 -retryInterval 3
+                Invoke-Command -ScriptBlock $uploadFiles
+            }
+            $testResult = ""
+            if(!$vm1DefaultFqdn -and !$vm2DefaultFqdn)
+            {
+                $vm1DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"
+                $vm2DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "hostname --fqdn"
+                $vm1.hostname = $hs1vm1Hostname
+                $vm2.hostname = $hs1vm2Hostname
+                $vm1.fqdn = $vm1DefaultFqdn
+                $vm2.fqdn = $vm2DefaultFqdn
+                $vm1Default = $vm1
+                $vm2Default = $vm2
+                $vm1DefaultHostname =  $hs1vm1Hostname
+                $vm1NewHostname = "$vm1DefaultHostname-New"
+                $vm2DefaultHostname = $hs1vm2Hostname
+                $vm2NewHostname = "$vm2DefaultHostname-New"
+                $vm1NewFqdn = $vm1DefaultFqdn.Replace($vm1DefaultHostname, $vm1NewHostname) 
+                $vm2NewFqdn = $vm2DefaultFqdn.Replace($vm2DefaultHostname, $vm2NewHostname) 
             }
             $out = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "rm -rf *.txt *.log" -runAsSudo 
             $out = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "rm -rf *.txt *.log" -runAsSudo 
@@ -62,7 +85,10 @@ if($isDeployed)
 				"VerifyDefaultHostname" {
                     do
 					{
+                        $vm1.hostname = $hs1vm1Hostname
 						$vm2.hostname = $hs1vm2Hostname
+                        $vm1Default = $vm1
+                        $vm2Default = $vm2
 					    $nslookupResult1 = DoNslookupTest -vm1 $vm1 -vm2 $vm2
                         $digResult1 = DoDigTest -vm1 $vm1 -vm2 $vm2
 						if(($nslookupResult1 -imatch "FAIL") -or ($digResult1 -imatch "FAIL"))
@@ -101,6 +127,11 @@ if($isDeployed)
 
 				"VerifyChangedHostname" {
 
+                    $vm1.hostname = $vm1NewHostname
+                    $vm2.hostname = $vm2NewHostname
+                    $vm1.fqdn = $vm1NewFqdn
+                    $vm2.fqdn = $vm2NewFqdn
+
 					LogMsg "Changing the hostname of VM2"
 					$suppressedOut = RunLinuxCmd -username $vm2.user -password $vm2.password -ip $vm2.Ip -port $vm2.SshPort -command "hostname $hs1vm2NewHostname" -runAsSudo
 #it takes approximately 5 minutes [calculated after 5 dry runs] to reflect the changed host name..
@@ -108,20 +139,14 @@ if($isDeployed)
 					WaitFor -seconds $waitAfterChangingHostname
 					$counter = 1 
 					do
-					{
-                        $vm2new = $vm2
-                        $vm2Oldhostname = $vm2.hostname
-                        $vm2new.hostname = $hs1vm2NewHostname
-                        $vm2OldFqdn = $vm2.fqdn
-                        $vm2NewFqdn = $vm2OldFqdn.Replace($vm2Oldhostname,$hs1vm2NewHostname)  
-                        $vm2new.fqdn = $vm2NewFqdn      
-                        LogMsg "VM2 New hostname : $($vm2new.hostname)"
-                        LogMsg "VM2 New fqdn : $($vm2new.fqdn)"
+					{    
+                        LogMsg "VM2 New hostname : $($vm2.hostname)"
+                        LogMsg "VM2 New fqdn : $($vm2.fqdn)"
 
 						$nslookupResult = ""
                         $digResult = ""
-                        $nslookupResult2 = DoNslookupTest -vm1 $vm1 -vm2 $vm2new
-                        $digResult2 = DoDigTest -vm1 $vm1 -vm2 $vm2new
+                        $nslookupResult2 = DoNslookupTest -vm1 $vm1 -vm2 $vm2
+                        $digResult2 = DoDigTest -vm1 $vm1 -vm2 $vm2
 						if(($nslookupResult2 -ne "PASS") -or ($digResult2 -ne "PASS"))
 						{
 							LogMsg "Try $($counter+1). Waiting 30 seconds more.."
@@ -147,10 +172,12 @@ if($isDeployed)
 				}
 
 				"VerifyDefaultHostnameNotAccessible" {
+                    $vm1.hostname = $vm1DefaultHostname
+                    $vm2.hostname = $vm2DefaultHostname
+                    $vm1.fqdn = $vm1DefaultFqdn
+                    $vm2.fqdn = $vm2DefaultFqdn
                     do
 					{
-                        $vm2.hostname = $vm2Oldhostname
-                        $vm2.fqdn = $vm2OldFqdn
 						LogMsg "VM2 Default hostname : $($vm2.hostname)"
                         LogMsg "VM2 Default fqdn : $($vm2.fqdn)"
 					    $nslookupResult3 = DoNslookupTest -vm1 $vm1 -vm2 $vm2
@@ -204,7 +231,10 @@ if($isDeployed)
                     #it takes approximately 5 minutes [calculated after 5 dry runs] to reflect the changed host name..
                     #So, Let's wait for 5 minutes.. There is no point to check whether hostname is changed or not in every 1 minute..
 					WaitFor -seconds $waitAfterChangingHostname                   
-
+                    $vm1.hostname = $vm1DefaultHostname
+                    $vm2.hostname = $vm2DefaultHostname
+                    $vm1.fqdn = $vm1DefaultFqdn
+                    $vm2.fqdn = $vm2DefaultFqdn
 					$counter = 0 
 					do
 					{

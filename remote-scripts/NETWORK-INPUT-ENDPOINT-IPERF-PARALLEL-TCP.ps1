@@ -41,6 +41,7 @@ if($isDeployed)
 		mkdir $LogDir\$Value -ErrorAction SilentlyContinue | out-null
 		foreach ($mode in $currentTestData.TestMode.Split(","))
         {    #.1............ Added foreach for modes...
+            $testResult = ""
 			try{
                 RemoteCopy -uploadTo $hs1VIP -port $hs1vm1sshport -username $user -password $password -files $currentTestData.files -upload
                 RemoteCopy -uploadTo $dtapServerIp -port $dtapServerSshport -files $currentTestData.files -username $user -password $password -upload

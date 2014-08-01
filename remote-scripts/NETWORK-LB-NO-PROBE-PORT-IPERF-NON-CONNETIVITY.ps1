@@ -44,7 +44,7 @@ if ($isDeployed)
 	$hs1vm1tcpport = $hs1vm1tcpport + 25
 	$hs1vm2tcpport = $hs1vm2tcpport + 25
 	$dtapServerTcpport = $dtapServerTcpport + 25
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 	$wait=30
 
 	$cmd1="./start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
@@ -124,7 +124,7 @@ if ($isDeployed)
 				else 
 				{
 					LogMsg "No connection logs observed on client.."
-					RemoteCopy -download -downloadFrom $server1.ip -files "/home/test/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
+					RemoteCopy -download -downloadFrom $server1.ip -files "/home/$user/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
 					LogMsg "Test Finished..!"
 					$testResult = "PASS"
 				}
@@ -132,8 +132,8 @@ if ($isDeployed)
 			else	
 			{
 				LogErr "Unable to start iperf-server. Aborting test."
-				RemoteCopy -download -downloadFrom $server1.ip -files "/home/test/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
-				RemoteCopy -download -downloadFrom $server2.ip -files "/home/test/iperf-server.txt" -downloadTo $server2.LogDir -port $server2.sshPort -username $server2.user -password $server2.password
+				RemoteCopy -download -downloadFrom $server1.ip -files "/home/$user/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
+				RemoteCopy -download -downloadFrom $server2.ip -files "/home/$user/iperf-server.txt" -downloadTo $server2.LogDir -port $server2.sshPort -username $server2.user -password $server2.password
 				$testResult = "Aborted"
 			}
 

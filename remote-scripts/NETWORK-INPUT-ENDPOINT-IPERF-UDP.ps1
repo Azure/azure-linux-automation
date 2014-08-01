@@ -26,7 +26,7 @@ if ($isDeployed)
 	$dtapServerUdpport = "990"
 	$hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh	
 	$dtapServerSshport = "22"
-    #$dtapServerIp="131.107.220.167"
+    #$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 	$server = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeUdpPort $dtapServerUdpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 	$client = CreateIperfNode -nodeIp $dtapServerIp  -nodeSshPort $dtapServerSshport -nodeudpPort $hs1vm1udpport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 

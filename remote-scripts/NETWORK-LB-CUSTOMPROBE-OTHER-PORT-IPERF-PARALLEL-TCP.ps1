@@ -41,7 +41,7 @@ if($isDeployed)
 	$dtapServerTcpport = "750"
 	$dtapServerUdpport = "990"
 	$dtapServerSshport = "22"
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 
 	$cmd1="./start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
 	$cmd2="./start-server.py -p $hs1vm2tcpport && mv Runtime.log start-server.py.log -f"
@@ -194,8 +194,8 @@ if($isDeployed)
 #    #Analyse CustomProbe on Other CP Port
 	if ($testResult -eq "PASS")
 	{
-		RemoteCopy -download -downloadFrom $server1.ip -files "/home/test/iperf-probe.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
-		RemoteCopy -download -downloadFrom $server2.ip -files "/home/test/iperf-probe.txt" -downloadTo $server2.LogDir -port $server2.sshPort -username $server2.user -password $server2.password
+		RemoteCopy -download -downloadFrom $server1.ip -files "/home/$user/iperf-probe.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
+		RemoteCopy -download -downloadFrom $server2.ip -files "/home/$user/iperf-probe.txt" -downloadTo $server2.LogDir -port $server2.sshPort -username $server2.user -password $server2.password
 		$server1CpLog= $server1.LogDir + "\iperf-probe.txt"
 		$server2CpLog= $server2.LogDir + "\iperf-probe.txt"
 		If (( IsCustomProbeMsgsPresent -logFile $server1CpLog) -and (IsCustomProbeMsgsPresent -logFile $server2CpLog))
@@ -267,7 +267,7 @@ else
 else 
 {
 	LogErr "Failured detected in client connection."
-	RemoteCopy -download -downloadFrom $server1.ip -files "/home/test/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
+	RemoteCopy -download -downloadFrom $server1.ip -files "/home/$user/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
 	LogMsg "Test Finished..!"
 	$testResult = "FAIL"
 }
@@ -275,8 +275,8 @@ else
 else
 {
 	LogMsg "Unable to start iperf-server. Aborting test."
-	RemoteCopy -download -downloadFrom $server1.ip -files "/home/test/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
-	RemoteCopy -download -downloadFrom $server2.ip -files "/home/test/iperf-server.txt" -downloadTo $server2.LogDir -port $server2.sshPort -username $server2.user -password $server2.password
+	RemoteCopy -download -downloadFrom $server1.ip -files "/home/$user/iperf-server.txt" -downloadTo $server1.LogDir -port $server1.sshPort -username $server1.user -password $server1.password
+	RemoteCopy -download -downloadFrom $server2.ip -files "/home/$user/iperf-server.txt" -downloadTo $server2.LogDir -port $server2.sshPort -username $server2.user -password $server2.password
 	$testResult = "Aborted"
 }
 LogMsg "Test Finished for Parallel Connections $Value, result is $testResult"

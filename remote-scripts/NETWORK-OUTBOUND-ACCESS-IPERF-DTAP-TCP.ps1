@@ -29,7 +29,7 @@ if ($isDeployed)
 		$dtapServerUdpport = "990"
 		$hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh	
 		$dtapServerSshport = "22"
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
         
 	    RemoteCopy -uploadTo $hs1VIP -port $hs1vm1sshport -files $currentTestData.files -username $user -password $password -upload
 	    RemoteCopy -uploadTo $dtapServerIp -port $dtapServerSshport -files $currentTestData.files -username $user -password $password -upload

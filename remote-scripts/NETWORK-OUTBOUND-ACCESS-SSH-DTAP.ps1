@@ -32,7 +32,7 @@ if ($isDeployed)
 		$dtapServerUdpport = "990"
 		$hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh	
 		$dtapServerSshport = "22"
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 
 #Install Paramiko package
 		LogMsg "Installing Paramiko packege.."

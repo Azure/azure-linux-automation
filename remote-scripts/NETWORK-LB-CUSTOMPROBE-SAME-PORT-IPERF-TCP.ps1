@@ -40,7 +40,7 @@ if ($isDeployed)
 	$dtapServerTcpport = "750"
 	$dtapServerUdpport = "990"
 	$dtapServerSshport = "22"
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 	$wait=30
 
 	$cmd1="./start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
