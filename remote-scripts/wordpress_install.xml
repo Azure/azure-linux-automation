@@ -1,6 +1,0 @@
-#all the IPs should be Internal ips 
-<back_endVM_ip>100.82.134.8</back_endVM_ip>
-<front_endVM_ips>100.82.88.54 100.82.68.56 100.82.68.74</front_endVM_ips>
-<front_endVM_username>test</front_endVM_username>
-<front_endVM_password>Redhat.Redhat.777</front_endVM_password>
-

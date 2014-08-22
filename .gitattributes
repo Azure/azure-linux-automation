@@ -1,3 +1,0 @@
-# .gitattributes
-remote-scripts/*.py eol=lf
-remote-scripts/*.sh eol=lf
