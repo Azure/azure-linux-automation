@@ -31,6 +31,7 @@ if ($isDeployed)
 
 	foreach ($mode in $currentTestData.TestMode.Split(","))
 	{
+        $testResult = ""
 		try
 		{
 			mkdir $LogDir\$mode -ErrorAction SilentlyContinue | out-null

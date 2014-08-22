@@ -149,6 +149,7 @@
       </Data>
 
       <PublicEndpoint>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -178,6 +179,7 @@
         </HostedService>
       </PublicEndpoint>
       <InternalEndpoint>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -285,6 +287,7 @@
       </InternalEndpoint>
 
       <IEndpointSingleHS>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -340,6 +343,7 @@
       </IEndpointSingleHS>
 
       <E2ESingleVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -385,6 +389,7 @@
       </E2ESingleVM>
 
       <ExtraSmallVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -400,6 +405,7 @@
         </HostedService>
       </ExtraSmallVM>
       <SmallVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -415,6 +421,7 @@
         </HostedService>
       </SmallVM>
       <MediumVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -430,6 +437,7 @@
         </HostedService>
       </MediumVM>
       <LargeVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -445,6 +453,7 @@
         </HostedService>
       </LargeVM>
       <ExtraLargeVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -461,6 +470,7 @@
       </ExtraLargeVM>
 
       <E2EFourVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -610,6 +620,7 @@
       </E2EFourVM>
 
       <VNETVM>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VnetName>VNet</VnetName>
           <DnsServerIP>"192.168.3.120"</DnsServerIP>
@@ -725,6 +736,7 @@
       </VNETVM>
 
       <VNETVMPR>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VnetName>VNet</VnetName>
           <DnsServerIP>"192.168.3.120"</DnsServerIP>
@@ -840,6 +852,7 @@
       </VNETVMPR>
 
       <IEndpointTwoHS>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>
@@ -897,6 +910,7 @@
       </IEndpointTwoHS>
 
       <LoadBalancedNoCP>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VnetName></VnetName>
 
@@ -942,6 +956,7 @@
       </LoadBalancedNoCP>
 
       <CustomProbeSamePort>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VnetName></VnetName>
 
@@ -1003,6 +1018,7 @@
       </CustomProbeSamePort>
 
       <CustomProbeOtherPort>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VnetName></VnetName>
 
@@ -1064,6 +1080,7 @@
       </CustomProbeOtherPort>
 
       <BVTDeployment>
+	  <isDeployed>NOT_DEPLOYED_YET</isDeployed>
         <HostedService>
           <VirtualMachine>
             <state></state>

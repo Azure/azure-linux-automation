@@ -32,7 +32,7 @@ $hs1vm2ProbePort = GetProbePort -Endpoints $hs1vm2Endpoints -usage TCPtest
 $dtapServerTcpport = "750"
 $dtapServerUdpport = "990"
 $dtapServerSshport = "22"
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 $cmd1="./start-server.py -p $hs1vm1ProbePort && mv Runtime.log start-server.py.log -f"
 $cmd2="./start-server.py -p $hs1vm2ProbePort && mv Runtime.log start-server.py.log -f"
 

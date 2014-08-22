@@ -88,7 +88,7 @@ foreach ($newSetupType in $currentTestData.SubtestValues.split(","))
                 {
                     
                     $testVMObject.Lun = $newLUN
-
+                    $testResult = ""
                     if ($newTask -eq "Add")
                     {
                         $testCommand = $HotAddDiskCommand

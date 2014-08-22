@@ -30,7 +30,7 @@ if($isDeployed)
 	$dtapServerUdpport = "990"
 	$hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh	
 	$dtapServerSshport = "22"
-#$dtapServerIp="131.107.220.167"
+#$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 	$cmd1="./start-server.py -p $dtapServerUDPport -u yes && mv Runtime.log start-server.py.log -f"
 	$cmd2="./start-client.py -c $dtapServerIp -p $dtapServerUDPport -t20 -P1 -u yes"
 

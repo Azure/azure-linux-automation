@@ -69,11 +69,19 @@ if($isDeployed)
 		$dnsServer = CreateVMNode -nodeIp '192.168.3.120' -nodeSshPort 22 -user root -password "redhat" -nodeHostname "ubuntudns"
 		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1IP -nodeHostname $hs1vm1Hostname
 		$externalServer = CreateVMNode -nodeIp $externalServerIP -nodeSshPort $externalServerSSHport -user $externalServerUser -password $externalServerPass
-		ConfigureVNETVms -SSHDetails $SSHDetails
 		UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $currentTestData.files
 		RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *"
-		ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
-		$isAllConfigured = "True"
+        if($EconomyMode -and $vnetIsAllConfigured)
+        {
+            $isAllConfigured = "True"
+        }
+        else
+        {
+		    ConfigureVNETVms -SSHDetails $SSHDetails
+		    ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
+		    $isAllConfigured = "True"
+            $vnetIsAllConfigured = $true
+        }
 	}
 	catch
 	{

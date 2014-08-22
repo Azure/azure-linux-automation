@@ -51,7 +51,7 @@ if($isDeployed)
                 $ntpdcOutputCommand = "ntpdc -p"
                 $ntpdcServiceName = "ntp"
             }
-            "CENT"
+            "CENTOS"
             {
                 $ntpdcOutputCommand = "ntpdc -p"
                 $ntpdcServiceName = "ntp"
@@ -123,7 +123,7 @@ if($isDeployed)
                 return $ntpdcOutput
             }
             $ntpdcOutput =  CheckNtpdOutput -detectedDistro $DetectedDistro
-            $synchedLine = $ntpdcOutput-imatch "\*"
+            $synchedLine = $ntpdcOutput.Split("`n") -imatch "\*"
             if ($synchedLine)
             {
                 $FirstChek = $true

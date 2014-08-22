@@ -4,6 +4,7 @@ $result = ""
 $testResult = ""
 $resultArr = @()
 $isDeployed = DeployVMS -setupType $currentTestData.setupType -Distro $Distro -xmlConfig $xmlConfig
+#$isDeployed = "ICA-IEndpointTwoHS-SLES12B9-7-10-9-49-41^ICA-IEndpointTwoHS-SLES12B9-7-10-9-51-15"
 if($isDeployed)
 {
 	$hsNames = $isDeployed
@@ -46,8 +47,8 @@ if($isDeployed)
 		$suppressedOut = RunLinuxCmd -username $vm1.user -password $vm1.password -ip $vm1.Ip -port $vm1.SshPort -command "chmod +x *" -runAsSudo
         if(!$vm1.fqdn -and !$vm2.fqdn)
         {
-            RetryOperation -operation  {$vm1.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"} -maxRetryCount 15 -retryInterval 3
-            RetryOperation -operation  {$vm2.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs2VIP -port $hs2vm1sshport -command "hostname --fqdn"} -maxRetryCount 15 -retryInterval 3
+            $vm1.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"
+            $vm2.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs2VIP -port $hs2vm1sshport -command "hostname --fqdn"
         }
 
 		$vm1.hostname = $vm1.fqdn

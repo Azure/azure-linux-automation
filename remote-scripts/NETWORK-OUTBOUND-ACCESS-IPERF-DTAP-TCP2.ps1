@@ -28,7 +28,7 @@ $hs1vm1udpport = GetPort -Endpoints $hs1vm1Endpoints -usage udp
 $dtapServerUdpport = "990"
 $hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh	
 $dtapServerSshport = "22"
-$dtapServerIp="131.107.220.167"
+$dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 
 $cmd1="./start-server.py -i1 -p $dtapServerTcpport && mv Runtime.log start-server.py.log -f"
 $cmd2="./start-client.py -c $dtapServerIp -i1 -p $dtapServerTcpport -t20"

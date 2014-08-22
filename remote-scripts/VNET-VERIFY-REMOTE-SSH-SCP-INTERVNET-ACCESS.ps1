@@ -89,12 +89,20 @@ if($isDeployed)
 	{
 		$dnsServer = CreateVMNode -nodeIp '192.168.3.120' -nodeSshPort 22 -user root -password "redhat" -nodeHostname "ubuntudns"
 		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1IP -nodeHostname $hs1vm1Hostname
-		ConfigureVNETVms -SSHDetails $SSHDetails
-		# NO DNS PRECONFIGURATION NEEDED FOR THIS TEST.
-		#UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $currentTestData.files
-		#RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *.py"
-		#ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
-		$isAllConfigured = "True"
+        if($EconomyMode -and $vnetIsAllConfigured)
+        {
+            $isAllConfigured = "True"
+        }
+        else
+        {
+		    ConfigureVNETVms -SSHDetails $SSHDetails
+		    # NO DNS PRECONFIGURATION NEEDED FOR THIS TEST.
+		    #UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $currentTestData.files
+		    #RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *.py"
+		    #ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
+		    $isAllConfigured = "True"
+            $vnetIsAllConfigured = $true
+        }
 	}
 	catch
 	{
@@ -226,7 +234,6 @@ $result = GetFinalResultHeader -resultarr $resultArr
 #endregion
 
 #Clean up the setup
-DoTestCleanUp -result $result -testName $currentTestData.testName -deployedServices $isDeployed
-
+DoTestCleanUp -result $result -testName $currentTestData.testName -deployedServices $isDeployed 
 #Return the result and summery to the test suite script..
 return $result, $resultSummary

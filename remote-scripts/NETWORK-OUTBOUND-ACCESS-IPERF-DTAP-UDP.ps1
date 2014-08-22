@@ -32,10 +32,10 @@ if ($isDeployed)
         #Start server...
 		LogMsg "Startin iperf Server...on $dtapServerIp"
 		$suppressedOut = RunLinuxCmd -username $user -password $password -ip $dtapServerIp -port $dtapServerSshport -command "./start-server.py -i1 -p $dtapServerUDPport -u yes && mv Runtime.log start-server.py.log -f" -runAsSudo
-		RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/start-server.py.log" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
+		RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/start-server.py.log" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
         #Verify, if server started...
 		LogMsg "Verifying if server is started or not.."
-		RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/isServerStarted.txt" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
+		RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/isServerStarted.txt" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
 		$isServerStarted = Get-Content $LogDir\isServerStarted.txt
 		if($isServerStarted -eq "yes")
 		{
@@ -44,9 +44,9 @@ if ($isDeployed)
 			LogMsg "Startin iperf client and trying to connect to port $dtapServerTcpport..."
 			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./start-client.py -c $dtapServerIp -i1 -p $dtapServerUDPport -t20 -u yes" -runAsSudo
 			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "mv Runtime.log start-client.py.log -f" -runAsSudo
-			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/start-client.py.log, /home/test/iperf-client.txt" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
-			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
-			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "rm -rf /home/test/state.txt /home/test/Summary.log" -runAsSudo
+			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/start-client.py.log, /home/$user/iperf-client.txt" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
+			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
+			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "rm -rf /home/$user/state.txt /home/$user/Summary.log" -runAsSudo
 			$clientState = Get-Content $LogDir\state.txt
 			$clientSummary = Get-Content $LogDir\Summary.log
 			Remove-Item $LogDir\state.txt -Force
@@ -56,8 +56,8 @@ if ($isDeployed)
 			{
                 #Now we know that our client was connected. Let's go and check the server now...
 				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $dtapServerIp -port $dtapServerSshport -command "./check-server.py && mv Runtime.log check-server.py.log -f" -runAsSudo
-				RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/check-server.py.log, /home/test/iperf-server.txt" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
-				RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
+				RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/check-server.py.log, /home/$user/iperf-server.txt" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
+				RemoteCopy -download -downloadFrom $dtapServerIp -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo $LogDir -port $dtapServerSshport -username $user -password $password
 				$serverState = Get-Content $LogDir\state.txt
 				$serverSummary =  Get-Content $LogDir\Summary.log
 				Remove-Item $LogDir\state.txt -Force

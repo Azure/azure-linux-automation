@@ -71,18 +71,23 @@ if($isDeployed)
 		$nfsServer = CreateVMNode -nodeIp "192.168.3.125" -nodeSshPort 22 -user "root" -password "redhat"
 		$mysqlServer = CreateVMNode -nodeIp "192.168.3.127" -nodeSshPort 22 -user "root" -password "redhat"
 #endregion
-
-#region DEFINE A INTERMEDIATE VM THAT WILL BE USED FOR ALL OPERATIONS DONE ON THE LOCAL NET VMS [DNS SERVER, NFSSERVER, MYSQL SERVER]
-		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1.IpAddress -nodeHostname $hs1vm1Hostname
-#endregion
-
 #region Upload all files to VNET VMS.. [All files are uploaded at once, to minimise re-upload process, at the execution time of every child method]
-		ConfigureVNETVMs -SSHDetails $SSHDetails
 		$currentWindowsfiles = $currentTestData.files
 		UploadFilesToAllDeployedVMs -SSHDetails $SSHDetails -files $currentWindowsfiles 
 #Make python files executable
 		RunLinuxCmdOnAllDeployedVMs -SSHDetails $SSHDetails -command "chmod +x *"
 #endregion
+        if($EconomyMode -and $vnetIsAllConfigured)
+        {
+            $isAllConfigured = "True"
+        }
+        else
+        {
+#region DEFINE A INTERMEDIATE VM THAT WILL BE USED FOR ALL OPERATIONS DONE ON THE LOCAL NET VMS [DNS SERVER, NFSSERVER, MYSQL SERVER]
+		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1.IpAddress -nodeHostname $hs1vm1Hostname
+#endregion
+
+		ConfigureVNETVMs -SSHDetails $SSHDetails
 
 #region Upload all files to LOCAL NET VMS.. [All files are uploaded to minimise reupload process at the execution of every child method]
 
@@ -104,6 +109,8 @@ if($isDeployed)
 		ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
 #endregion
 		$isAllConfigured = "True"
+        $vnetIsAllConfigured = $true
+        }
 #endregion
 	}
 	catch

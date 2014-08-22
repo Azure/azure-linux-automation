@@ -75,7 +75,7 @@ if ($isDeployed)
 		$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./start-server.py -i1 -p $hs1vm1udpport -u yes" -runAsSudo
 
 #>>>Verify, if server started...
-		RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/isServerStarted.txt" -downloadTo .\temp -port $hs1vm1sshport -username $user -password $password
+		RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/isServerStarted.txt" -downloadTo .\temp -port $hs1vm1sshport -username $user -password $password
 		$isServerStarted = Get-Content .\temp\isServerStarted.txt
 
 		if($isServerStarted -eq "yes")
@@ -85,8 +85,8 @@ if ($isDeployed)
 			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "./start-client.py -c $($hs1vm1.IpAddress) -i1 -p $hs1vm1udpport -t10 -u yes" -runAsSudo
 
 #>>>Verify client...
-			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo .\temp -port $hs1vm2sshport -username $user -password $password
-			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "rm -rf /home/test/state.txt /home/test/Summary.log" -runAsSudo
+			RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo .\temp -port $hs1vm2sshport -username $user -password $password
+			$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "rm -rf /home/$user/state.txt /home/$user/Summary.log" -runAsSudo
 			$clientState = Get-Content .\temp\state.txt
 			$clientSummary = Get-Content .\temp\Summary.log
 
@@ -99,7 +99,7 @@ if ($isDeployed)
 
 #>>>Now we know that our client was connected. Let's go and check the server now...
 				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./check-server.py" -runAsSudo
-				RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log" -downloadTo .\temp -port $hs1vm1sshport -username $user -password $password
+				RemoteCopy -download -downloadFrom $hs1VIP -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo .\temp -port $hs1vm1sshport -username $user -password $password
 				$serverState = Get-Content .\temp\state.txt
 				$serverSummary =  Get-Content .\temp\Summary.log
 

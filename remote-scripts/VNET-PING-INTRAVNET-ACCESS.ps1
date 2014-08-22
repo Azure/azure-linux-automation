@@ -64,10 +64,6 @@ if($isDeployed)
 	{
 #region CONFIGURE VNET VMS AND MAKE THEM READY FOR VNET TEST EXECUTION...
 
-#region Configure VNET VMS.. [edit resolv.conf file and edit hosts files]
-		ConfigureVNETVms -SSHDetails $SSHDetails	
-#endregion
-
 #region DEFINE LOCAL NET VMS
 		$dnsServer = CreateVMNode -nodeIp "192.168.3.120" -nodeSshPort 22 -user "root" -password "redhat"
 		$nfsServer = CreateVMNode -nodeIp "192.168.3.125" -nodeSshPort 22 -user "root" -password "redhat"
@@ -79,7 +75,13 @@ if($isDeployed)
 		$intermediateVM = CreateVMNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -user $user -password $password -nodeDip $hs1vm1.IpAddress -nodeHostname $hs1vm1Hostname
 
 #endregion
-
+        if($EconomyMode -and $vnetIsAllConfigured)
+        {
+            $isAllConfigured = "True"
+        }
+        else
+        {
+        ConfigureVNETVMs -SSHDetails $SSHDetails
 #region Upload all files to VNET VMS.. [All files are uploaded at once, to minimise re-upload process, at the execution time of every child method]
 
 		$currentWindowsfiles = $currentTestData.files
@@ -107,6 +109,8 @@ if($isDeployed)
 		ConfigureDnsServer -intermediateVM $intermediateVM -DnsServer $dnsServer -HostnameDIPDetails $HostnameDIPDetails
 #endregion
 		$isAllConfigured = "True"
+        $vnetIsAllConfigured = $true
+        }
 #endregion
 	}
 	catch

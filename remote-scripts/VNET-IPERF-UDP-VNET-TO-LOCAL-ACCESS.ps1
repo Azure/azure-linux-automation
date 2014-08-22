@@ -6,6 +6,7 @@ $result = ""
 $testResult = ""
 $resultArr = @()
 $isDeployed = DeployVMS -setupType $currentTestData.setupType -Distro $Distro -xmlConfig $xmlConfig
+
 if($isDeployed)
 {
 #region EXTRACT ALL INFORMATION ABOUT DEPLOYED VMs
