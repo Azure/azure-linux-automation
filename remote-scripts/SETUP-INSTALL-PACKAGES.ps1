@@ -26,11 +26,27 @@ if ($isDeployed)
 
 
         RemoteCopy -uploadTo $hs1VIP -port $hs1vm1sshport -files $currentTestData.files -username $user -password $password -upload
+		
+		# Get testType (Cloud or FCRDOS) as target. Default is 'cloud'
+		$testType = $currentTestData.TestType.Tostring().trim().ToLower()
+		if ($testType -eq "")
+		{
+			$testType = "cloud"
+		}
+		
+		# For FCRDOS image preparation, upload a script named 'report_ip.sh'.
+		if ($testType -eq "fcrdos")
+		{
+			$rods_scrpts = "remote-scripts\report_ip.sh"
+			LogMsg "Uploading a script named 'report_ip.sh' for FCRDOS image preparation"
+			RemoteCopy -uploadTo $hs1VIP -port $hs1vm1sshport -files $rods_scrpts -username $user -password $password -upload
+		}
+		
         RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "chmod +x *" -runAsSudo
 
-
         LogMsg "Executing : $($currentTestData.testScript)"
-        $output = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./$($currentTestData.testScript) -e $hs1vm1Hostname" -runAsSudo
+        $script_command = "./$($currentTestData.testScript) $testType -e $hs1vm1Hostname"
+        $output = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command $script_command -runAsSudo
         #RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "mv Runtime.log $($currentTestData.testScript).log" -runAsSudo
         #RemoteCopy -download -downloadFrom $hs1VIP -files "/home/test/state.txt, /home/test/Summary.log, /home/test/$($currentTestData.testScript).log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
         #$testResult = Get-Content $LogDir\Summary.log
@@ -48,7 +64,23 @@ if ($isDeployed)
         $NewImageName = $isDeployed + '-prepared'
         $tmp = Save-AzureVMImage -ServiceName $isDeployed -Name $hs1vm1Hostname -NewImageName $NewImageName -NewImageLabel $NewImageName
         LogMsg "Successfully captured VM image : $NewImageName"
-
+        
+        # Capture the prepared image names
+        $PreparedImageInfoLogPath = "$pwd\PreparedImageInfoLog.xml"
+        if((Test-Path $PreparedImageInfoLogPath) -eq $False)
+        {
+            $PreparedImageInfoLog = New-Object -TypeName xml
+            $root = $PreparedImageInfoLog.CreateElement("PreparedImages")
+            $content = "<PreparedImageName></PreparedImageName>"
+            $root.set_InnerXML($content)
+            $PreparedImageInfoLog.AppendChild($root)
+            $PreparedImageInfoLog.Save($PreparedImageInfoLogPath)
+        }
+        [xml]$xml = Get-Content $PreparedImageInfoLogPath
+        $xml.PreparedImages.PreparedImageName = $NewImageName
+        $xml.Save($PreparedImageInfoLogPath)
+        
+        
         if ($testStatus -eq "TestCompleted")
         {
             LogMsg "Test Completed"
@@ -69,7 +101,11 @@ if ($isDeployed)
         }
         $resultArr += $testResult
 #$resultSummary +=  CreateResultSummary -testResult $testResult -metaData $metaData -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName# if you want to publish all result then give here all test status possibilites. if you want just failed results, then give here just "FAIL". You can use any combination of PASS FAIL ABORTED and corresponding test results will be published!
-    }   
+    
+        # Remove the Cloud Service
+        LogMsg "Executing: Remove-AzureService -ServiceName $isDeployed -Force"
+        Remove-AzureService -ServiceName $isDeployed -Force
+    }
 }
 
 else
