@@ -1510,6 +1510,7 @@ Function SetStopWatch()
 
 Function GetStopWatchElapasedTime([System.Diagnostics.Stopwatch]$sw, [string] $format)
 {
+	$sw.Stop()
 	if ($format -eq "ss")
 	{
 		$num=$sw.Elapsed.TotalSeconds

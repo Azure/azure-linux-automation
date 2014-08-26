@@ -18,6 +18,7 @@ rpm_links = {}
 tar_link = {}
 current_distro = "unknown"
 packages_list_xml = "./packages.xml"
+target = "cloud"
 
 def file_get_contents(filename):
     with open(filename) as f:
@@ -110,7 +111,7 @@ def aptget_package_install(package):
         #package installation failed due to server unavailability
         elif (re.match(r'E: Unable to fetch some archives', line, re.M|re.I)):
             break
-
+	
     #Consider package installation failed if non of the above matches.
     RunLog.info(package + ": package installation failed!\n")
     RunLog.info("Error log: "+output)
@@ -137,7 +138,7 @@ def zypper_package_install(package):
     RunLog.info("Installing Package: " + package+" from rpmlink")
     if package in rpm_links:
         if download_url(rpm_links.get(package), "/tmp/"):
-            if install_rpm("/tmp/"+re.split("/",rpm_links.get(package))[-1]):
+            if install_rpm("/tmp/"+re.split("/",rpm_links.get(package))[-1],package):
                 return True
 
     #Consider package installation failed if non of the above matches.
@@ -331,7 +332,7 @@ def exec_multi_cmds_local_sudo(cmd_list):
 	f = open('/tmp/temp_script.sh','w')
 	f.write("export PATH=$PATH:/sbin:/usr/sbin"+'\n') 
 	for line in cmd_list:
-		f.write(line+'\n') 
+		f.write(line+'\n')
 	f.close()
 	Run ("chmod +x /tmp/temp_script.sh")
 	Run ("echo '"+sudo_password+"' | sudo -S /tmp/temp_script.sh 2>&1 > /tmp/exec_multi_cmds_local_sudo.log")
@@ -352,7 +353,7 @@ def deprovision():
 
 	output = exec_multi_cmds_local_sudo(deprovision_commands)
 	outputlist = re.split("\n", output)
-
+	
 	for line in outputlist:
 		if (re.match(r'WARNING!.*account and entire home directory will be deleted', line, re.M|re.I)):
 			#RunLog.info ("'waagent -deprovision+user' command succesful\n")
@@ -369,7 +370,7 @@ def deprovision():
 		#RunLog.info ("'waagent -deprovision+user' command failed\nCould not delete '/home/test1/'")
 		print ("'waagent -deprovision+user' command failed\nCould not delete '/home/test1/'")
 		success = False
-
+	
 	return success
 
 def RunTest():
@@ -382,23 +383,77 @@ def RunTest():
 #		print "Aborting test as this VM doesn't have internet connectivity."
 #		exit()
 
+
     #Reading packages names from "packages.xml" file
     output = Run("cat "+packages_list_xml)
     outputlist = re.split("\n", output)
     packages_list = []
-    for line in outputlist:
-        if "</packages>" in line:
-            matchObj = re.match( r'<packages>(.*)</packages>', line, re.M|re.I)
-            packages_list = str.split( matchObj.group(1))
-            
-        elif "</rpm_link>" in line:
-            matchObj = re.match( r'<rpm_link = "(.*)">(.*)</rpm_link>', line, re.M|re.I)
-            rpm_links[matchObj.group(1)] = matchObj.group(2)
-			
-        elif "</tar_link>" in line:
-            matchObj = re.match( r'<tar_link = "(.*)">(.*)</tar_link>', line, re.M|re.I)
-            tar_link[matchObj.group(1)] = matchObj.group(2)
+    	
+    try:
+        import xml.etree.cElementTree as ET
+    except ImportError:
+        import xml.etree.ElementTree as ET
 
+    # Parse the packages.xml file into memory
+    packages_xml_file = ET.parse(packages_list_xml)
+    xml_root = packages_xml_file.getroot()
+
+    # Get the target (cloud or FCRDOS) from command-line arguments. Default target is 'cloud'.
+    target = sys.argv[1]
+	
+    parse_success = False
+	
+    for branch in xml_root:
+        partten = r'^' + branch.attrib["target"] + r'$'
+        if re.match(partten, target, re.I):
+            parse_success = True
+            for node in branch:
+                if node.tag == "packages":
+                    packages_list = node.text.split(" ")
+                elif node.tag == "waLinuxAgent_link":
+                    # print "waLinuxAgent_link: ", node.text
+					pass
+                elif node.tag == "rpm_link":
+                    rpm_links[node.attrib["name"]] = node.text
+                elif node.tag == "tar_link":
+                    tar_link[node.attrib["name"]] = node.text
+
+    if parse_success is False:
+        RunLog.info("No target named " + target + " (cloud or FCRDOS)")
+		
+	
+    # For FCRDOS, a sricpt named 'report_ip.sh' has been uploaded into '/home/test/'. 
+    # Then add an record of its script-path into /etc/rc.local and /etc/rc.d/rc.local.
+    if target == "fcrdos":
+        import fileinput
+        report_ip_path = '''echo "/home/test/report_ip.sh 10.172.6.185 root lisa_id_rsa >> /root/report_ip.log" | at now+1min\n'''
+
+        # Add report_ip.sh into /etc/rc.local
+        rc_file_path = "/etc/rc.local"
+        if os.path.exists(rc_file_path) is True:
+            lineNo = 0
+            for line in fileinput.input(rc_file_path, inplace=1):
+                line = line.strip()
+                if lineNo == 1:
+                    print report_ip_path, line
+                else:
+                    print line
+                lineNo += 1
+
+        # Add report_ip.sh into /etc/rc.d/rc.local only if /etc/rc.d/rc.local is NOT a symbolic file of /etc/ec.local
+        rc_symbol_file_path = "/etc/rc.d/rc.local"
+        if os.path.exists(rc_symbol_file_path) is True:
+            if os.path.islink(rc_symbol_file_path) is False:
+                lineNo = 0
+                for line in fileinput.input(rc_symbol_file_path, inplace=1):
+                    line = line.strip()
+                    if lineNo == 1:
+                        print report_ip_path, line
+                    else:
+                        print line
+                    lineNo += 1
+		
+		
     #Dtecting the linux distribution
     distro = DetectLinuxDistro()
     if (distro[0]):
@@ -410,7 +465,12 @@ def RunTest():
                 success = False
                 
     success = ConfigFilesUpdate()
-    success = deprovision()
+    if target == "cloud":
+        success = deprovision()
+        
+    # For FCRODS, set the root password
+    Run("echo \"" + sudo_password + "\" | " + "passwd --stdin root")
+    
     if success == True:
         ResultLog.info('PASS')
     else:
