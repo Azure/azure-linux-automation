@@ -16,6 +16,7 @@ Set-Variable -Name user -Value $user -Scope Global
 Set-Variable -Name password -Value $password -Scope Global
 $dtapServerIp = $xmlConfig.config.Azure.Deployment.Data.DTAP.IP
 
+Import-Module .\TestLibs\UtilLibs.psm1 -Force
 Import-Module .\TestLibs\RDFELibs.psm1 -Force
 Import-Module .\TestLibs\DataBase\DataBase.psm1 -Force
 Import-Module .\TestLibs\PerfTest\PerfTest.psm1 -Force
@@ -109,6 +110,15 @@ Function RunTestsOnCycle ($cycleName , $xmlConfig, $Distro )
 	$testSuiteResultDetails=@{"totalTc"=0;"totalPassTc"=0;"totalFailTc"=0;"totalAbortedTc"=0}
 	$id = ""
 	
+	# Start JUnit XML report logger.
+	$reportFolder = "$pwd/report"
+    if(!(Test-Path $reportFolder))
+    {
+        New-Item -ItemType "Directory" $reportFolder
+    }
+	StartLogReport("$reportFolder/report_$($testCycle.cycleName).xml")
+	$testsuite = StartLogTestSuite "CloudTesting"
+	
 	foreach($test in $currentCycleData.test)
 	{
 		$currentTestData = GetCurrentTestData -xmlConfig $xmlConfig -testName $test.Name
@@ -165,6 +175,7 @@ Function RunTestsOnCycle ($cycleName , $xmlConfig, $Distro )
 				
 		if ($currentTestData)
 		{
+			$testcase = StartLogTestCase $testsuite "$($test.Name)" "CloudTesting.$($testCycle.cycleName)"
 			$testSuiteResultDetails.totalTc = $testSuiteResultDetails.totalTc +1
 			$stopWatch = SetStopWatch
 			mkdir $testDir\$($test.Name) -ErrorAction SilentlyContinue | out-null
@@ -205,16 +216,19 @@ Function RunTestsOnCycle ($cycleName , $xmlConfig, $Distro )
 					{
 						$testSuiteResultDetails.totalPassTc = $testSuiteResultDetails.totalPassTc +1
 						$testResultRow = "<span style='color:green;font-weight:bolder'>PASS</span>"
+						FnishLogTestCase $testcase
 					}
 					elseif($testResult -imatch "FAIL")
 					{
 						$testSuiteResultDetails.totalFailTc = $testSuiteResultDetails.totalFailTc +1
 						$testResultRow = "<span style='color:red;font-weight:bolder'>FAIL</span>"
+						FnishLogTestCase $testcase "FAIL" "$($test.Name) fail"
 					}
 					elseif($testResult -imatch "ABORTED")
 					{
 						$testSuiteResultDetails.totalAbortedTc = $testSuiteResultDetails.totalAbortedTc +1
 						$testResultRow = "<span style='background-color:yellow;font-weight:bolder'>ABORT</span>"
+						FnishLogTestCase $testcase "ERROR" "$($test.Name) abort"
 					}
 					$testCycle.htmlSummary += "<tr><td>	$($currentTestData.testName) </td><td> $testResultRow </td></tr>"
 		  			LogMsg "~~~~~~~~~~~~~~~TEST END : $($currentTestData.testName)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -265,14 +279,17 @@ Function RunTestsOnCycle ($cycleName , $xmlConfig, $Distro )
 					if($testResult[0] -imatch "PASS")
 					{
 						$testSuiteResultDetails.totalPassTc = $testSuiteResultDetails.totalPassTc +1
+						FnishLogTestCase $testcase
 					}
 					elseif($testResult[0] -imatch "FAIL")
 					{
 						$testSuiteResultDetails.totalFailTc = $testSuiteResultDetails.totalFailTc +1
+						FnishLogTestCase $testcase "FAIL" "$($test.Name) fail"
 					}
 					elseif($testResult[0] -imatch "ABORTED")
 					{
 						$testSuiteResultDetails.totalAbortedTc = $testSuiteResultDetails.totalAbortedTc +1
+						FnishLogTestCase $testcase "ERROR" "$($test.Name) abort"
 					}
 				} 
 				
@@ -294,6 +311,8 @@ Function RunTestsOnCycle ($cycleName , $xmlConfig, $Distro )
 	LogMsg "Cycle Finished.. $($CycleName.ToUpper())"
 	$EndTime =  [Datetime]::Now.ToUniversalTime()
 	
+	FinishLogTestSuite($testsuite)
+	FinishLogReport
 #	$now = [Datetime]::Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss")
 #	$testSuiteRunObj.endTime=$now
 #	UpdateTestSuiteEndTime -conn $conn -testSuiteObj $testSuiteRunObj
