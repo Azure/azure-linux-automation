@@ -1,89 +1,183 @@
 #!/usr/bin/python
-
 import re
+import time
 import imp
 import sys
 from azuremodules import *
 
-
-daytrader_db_root_password = "root"
+#OS independent variables
+daytrader_db_root_password = "wordpress_root_password"
 daytrader_db_name	= "tradedb"
 daytrader_db_hostname = "localhost" 
 daytrader_db_username = "trade"
 daytrader_db_password = "trade"
-
+front_endVM_ips	= "unknown"
 vm_username		= "unknown"
 vm_password		= "unknown"
-
-front_endVM_ips = "unknown"
+common_packages_list = ["php","at","php-mysql","wget","libstdc++*","libstdc++.so.5","elfutils.x86_64","libstdc++33","compat-libstdc++-296","libXp.x86_64","compat-libstdc++-33.x86_64","compat-db.x86_64","libXmu.x86_64","gtk2.x86_64","pam.x86_64","libXft.x86_64","libXtst.x86_64","gtk2-engines.x86_64","elfutils.x86_64","elfutils-libs","ksh","bc","xauth"]
 
 #OS dependent variables
-pexpect_pkg_name        = "unknown"
-current_distro          = "unknown"
-service_httpd_name      = "unknown"
-service_mysqld_name		= "unknown"
+pexpect_pkg_name	= "unknown"
+mysql_pkg_name		= "unknown"
+current_distro		= "unknown"
+distro_version		= "unknown"
+service_httpd_name	= "unknown"
+service_mysqld_name	= "unknown"
+service_command		= "unknown"
+frontend_packages_list = "unknown"
+singlevm_packages_list = "unknown"
 startup_file			= "/etc/rc.local"
 
+def DetectDistro():
+	distribution = 'unknown'
+	version = 'unknown'
+	
+	RunLog.info("Detecting Distro ")
+	output = Run("echo '"+vm_password+"' | sudo -S cat /etc/*-release")
+	outputlist = re.split("\n", output)
+	
+	for line in outputlist:
+		line = re.sub('"', '', line)
+		if (re.match(r'^ID=(.*)',line,re.M|re.I) ):
+			matchObj = re.match( r'^ID=(.*)', line, re.M|re.I)
+			distribution  = matchObj.group(1)
+		elif (re.match(r'^VERSION_ID=(.*)',line,re.M|re.I) ):
+			matchObj = re.match( r'^VERSION_ID=(.*)', line, re.M|re.I)
+			version = matchObj.group(1)
+	
+	if(distribution == 'unknown'):
+		# Finding the Distro
+		for line in outputlist:
+			if (re.match(r'.*Ubuntu.*',line,re.M|re.I) ):
+				distribution = 'ubuntu'
+				break
+			elif (re.match(r'.*SUSE Linux.*',line,re.M|re.I)):
+				distribution = 'SUSE Linux'
+				break
+			elif (re.match(r'.*openSUSE.*',line,re.M|re.I)):
+				distribution = 'openSUSE'
+				break
+			elif (re.match(r'.*centos.*',line,re.M|re.I)):
+				distribution = 'centos'
+				break
+			elif (re.match(r'.*Oracle.*',line,re.M|re.I)):
+				distribution = 'Oracle'
+				break		
+	return [distribution, version]
+
+def set_variables_OS_dependent():
+	global current_distro
+	global distro_version
+	global pexpect_pkg_name
+	global mysql_pkg_name
+	global service_httpd_name
+	global service_mysqld_name
+	global service_command
+	global common_packages_list
+	global frontend_packages_list
+	global singlevm_packages_list
+	global startup_file
+	
+	[current_distro, distro_version] = DetectDistro()
+	print  "current_distro:  " +current_distro
+	if(current_distro == "unknown"):
+		RunLog.info("ERROR: Unknown linux distro...\nExiting the Wordpress installation\n")
+		end_the_script("ERROR: Unknown linux distro...\nExiting the Wordpress installation\n")
+	else:
+		service_command		= "service "  #space character after service is mandatory here.
+
+	# Identify the Distro to Set OS Dependent Variables
+	if (current_distro == "Oracle"):
+		pexpect_pkg_name	= "pexpect"
+		service_httpd_name	= "httpd"
+		service_mysqld_name = "mysqld"
+		mysql_pkg_name		= "mysql-server"
+		frontend_packages_list = common_packages_list + ["mysql.x86_64","mysql-client","httpd"]
+	elif ((current_distro == "centos")):
+		pexpect_pkg_name	= "pexpect"
+		service_httpd_name	= "httpd"
+		service_mysqld_name = "mysqld"
+		mysql_pkg_name		= "mysql-server"
+		frontend_packages_list = common_packages_list + ["mysql.x86_64","mysql-client","httpd"]
+		if(distro_version == "7" or "7.0"):
+			service_mysqld_name	= "mariadb"
+			mysql_pkg_name		= "mariadb-server"
+			frontend_packages_list = common_packages_list + ["mariadb","httpd"]
+	elif (current_distro == "ubuntu"):
+		pexpect_pkg_name	= "python-pexpect"
+		service_httpd_name	= "apache2"
+		service_mysqld_name	= "mysql"
+		mysql_pkg_name		= "mysql-server"
+		frontend_packages_list = common_packages_list + ["mysql-client","php5","php5-mysql","libstdc++6","mysql","libapache2-mod-php5","apache2"]
+	elif (current_distro == "openSUSE"):
+		pexpect_pkg_name	= "python-pexpect"
+		service_httpd_name	= "apache2"
+		service_mysqld_name	= "mysql"
+		mysql_pkg_name		= "mysql-community-server"
+		service_command = "/etc/init.d/"
+		startup_file			= "/etc/init.d/boot.local"
+		frontend_packages_list = common_packages_list + ["mysql-community-server-client","php5", "php5-mysql","apache2-mod_php5","apache2"]
+	elif (current_distro == "SUSE Linux"):
+		pexpect_pkg_name	= "python-pexpect"					 
+		service_httpd_name	= "apache2"
+		service_mysqld_name	= "mysql"
+		mysql_pkg_name		= "mysql"
+		service_command = "/etc/init.d/"
+		startup_file			= "/etc/init.d/boot.local"
+		frontend_packages_list = common_packages_list + ["mysql-client","php5","php5-mysql","php53","php53-mysql","apache2-mod_php5","apache2"]
+	elif (current_distro == "sles"):
+		pexpect_pkg_name	= "python-pexpect"					 
+		service_httpd_name	= "apache2"
+		service_mysqld_name	= "mysql"
+		mysql_pkg_name		= "mysql"
+		startup_file			= "/etc/init.d/boot.local"
+		frontend_packages_list = common_packages_list + ["mysql-client","php5","php5-mysql","php53","php53-mysql","apache2-mod_php5","apache2"]
+		if(distro_version == "12"):
+			service_mysqld_name	= "mysql"
+			mysql_pkg_name		= "mariadb"
+			frontend_packages_list = common_packages_list + ["mariadb-client","php5","php5-mysql","php53","php53-mysql","apache2-mod_php5","apache2"]
+	elif ((current_distro == "Red Hat") or (current_distro == "rhel")):
+		pexpect_pkg_name	= "pexpect"					 
+		service_httpd_name	= "httpd"
+		service_mysqld_name	= "mysql"
+		mysql_pkg_name		= "mysql-server"
+		frontend_packages_list = common_packages_list + ["mysql.x86_64","httpd"]
+		if(distro_version == "7.0"):
+			service_mysqld_name	= "mariadb"
+			mysql_pkg_name		= "mariadb-server"
+			frontend_packages_list = common_packages_list + ["mariadb","httpd"]
+
+	singlevm_packages_list = frontend_packages_list + [mysql_pkg_name]
+	RunLog.info( "set_variables_OS_dependent .. [done]")
+
+def end_the_script():	
+	print file_get_contents("/home/"+vm_username+"/Runtime.log")
+	exit()
+	
 def file_get_contents(filename):
     with open(filename) as f:
         return f.read()
 
-def detect_distro():
-	output = Run("echo '"+vm_password+"' | sudo -S cat /etc/*-release")
-	outputlist = re.split("\n", output)
+def exec_multi_cmds_local_sudo(cmd_list):
+	f = open('/tmp/temp_script.sh','w')
+	for line in cmd_list:
+		f.write(line+'\n') 
+	f.close()
+	Run ("chmod +x /tmp/temp_script.sh")
+	Run ("echo '"+vm_password+"' | sudo -S /tmp/temp_script.sh 2>&1 > /tmp/exec_multi_cmds_local_sudo.log")
+	return file_get_contents("/tmp/exec_multi_cmds_local_sudo.log")
 	
-	# Finding the distribution of the Linux 
-	for line in outputlist:
-		if (re.match(r'.*Ubuntu.*', line, re.M|re.I) ):
-			return 'Ubuntu'
-		elif (re.match(r'.*SUSE Linux.*', line, re.M|re.I)):
-			return 'SUSE Linux'
-		elif (re.match(r'.*openSUSE.*', line, re.M|re.I)):
-			return 'openSUSE'
-		elif (re.match(r'.*CentOS.*', line, re.M|re.I)):
-			return 'CentOS'
-		elif (re.match(r'.*Oracle.*', line, re.M|re.I)):
-			return 'Oracle'
-			
-	return "unknown"
-	
-			
-def set_variables_OS_dependent():
-	RunLog.info( "\nset_variables_OS_dependent ..")
-	global current_distro
-	global pexpect_pkg_name
-	global service_httpd_name
-	global service_mysqld_name
-	global startup_file
-
-	current_distro = detect_distro()
-	# Identify the Distro to Set OS Dependent Variables
-	if ((current_distro == "Oracle") or (current_distro == "CentOS")):
-		pexpect_pkg_name        = "pexpect"
-		service_httpd_name      = "httpd"
-		service_mysqld_name 	= "mysqld"
-	elif (current_distro == "Ubuntu"):
-		pexpect_pkg_name        = "python-pexpect"
-		service_httpd_name      = "apache2"
-		service_mysqld_name		= "mysql"
-	elif ((current_distro == "openSUSE") or (current_distro == "SUSE Linux")):
-		pexpect_pkg_name        = "python-pexpect"                     #check package name for suse
-		service_httpd_name      = "apache2"
-		service_mysqld_name		= "mysql"
-		startup_file			= "/etc/init.d/boot.local"
-	RunLog.info( "set_variables_OS_dependent .. [done]")
-
 def update_repos():
 	RunLog.info( "\nUpdating the repositoriy information...")
-	if ((current_distro == "Ubuntu") or (current_distro == "Debian")):
+	if ((current_distro == "ubuntu") or (current_distro == "Debian")):
 		Run("echo '"+vm_password+"' | sudo -S apt-get update")
-	elif ((current_distro == "RedHat") or (current_distro == "Oracle") or (current_distro == 'CentOS')):
+	elif ((current_distro == "rhel") or (current_distro == "Oracle") or (current_distro == 'centos')):
 		Run("echo '"+vm_password+"' | sudo -S yum -y update")
-	elif (current_distro == "openSUSE") or (current_distro == "SUSE Linux"):
+	elif (current_distro == "openSUSE") or (current_distro == "SUSE Linux") or (current_distro == "sles"):
 		Run("echo '"+vm_password+"' | sudo -S zypper --non-interactive --gpg-auto-import-keys update")
 	else:
 		RunLog.error(("Repo upgradation failed on:"+current_distro))
-		#exit ()
+	
 	RunLog.info( "Updating the repositoriy information... [done]")
 
 def disable_selinux():
@@ -99,14 +193,44 @@ def disable_selinux():
 
 def disable_iptables():
 	RunLog.info( "\n Disabling ip-tables..")
-	if (current_distro == 'Ubuntu'):
-		ufw = Run ("echo '"+vm_password+"' | sudo -S ufw disable")
-		print ufw
+	if (current_distro == 'ubuntu'):
+		ufw = Run ("echo '"+vm_password+"' | sudo -S ufw disable")		
+	elif(current_distro == 'rhel'):
+		cmds = ("service iptables save","service iptables stop","chkconfig iptables off","service ip6tables save","service ip6tables stop","chkconfig ip6tables off")
+		output = exec_multi_cmds_local_sudo(cmds)
+		output = Run("echo '"+vm_password+"' | sudo -S service iptables status")
+		
+		if(output.find('dead') != -1):
+			RunLog.info( "Diasabling iptables..[done]")
+		else:
+			RunLog.info( "Diasabling iptables..[failed]")
+	elif((current_distro == 'SUSE Linux')or(current_distro == 'sles')):
+		cmds = ("/sbin/yast2 firewall startup manual","/sbin/rcSuSEfirewall2 stop","chkconfig SuSEfirewall2_setup off")
+		output = exec_multi_cmds_local_sudo(cmds)
+		output = Run("echo '"+vm_password+"' | sudo -S /sbin/rcSuSEfirewall2 status")
+		if((output.find('unused') != -1) or (output.find('dead') != -1)):
+			RunLog.info( "Diasabling iptables..[done]")
+		else:
+			RunLog.info( "Diasabling iptables..[failed]")
 	else:
 		Run ("echo '"+vm_password+"' | sudo -S chkconfig iptables off")
 		Run ("echo '"+vm_password+"' | sudo -S chkconfig ip6tables off")
-		RunLog.info( "Diasabling iptables..[done]")
+		RunLog.info( "Disabling iptables..[done]")
 
+def easy_install( module):
+	RunLog.info( "Installing pexpect using easy_install..")
+	output = Run ("echo '"+vm_password+"' | sudo -S easy_install '"+module+"'")
+	if(output.rfind('Installed /usr/lib/python2.7')or output.rfind('Finished processing')):
+		RunLog.info( " '"+module+"' module installation [done]..")
+	else:
+		RunLog.info( " '"+module+"' module installation [failed]..")
+		RunLog.info( "Installing pexpect from source..")
+		update_python_and_install_pexpect()
+		RunLog.info( "\n\nInvoking the script with new python:....")
+		RunLog.info( Run("python "+__file__+" "+' '.join(sys.argv[1:])))
+		end_the_script()
+		
+		
 def yum_package_install(package):
 	RunLog.info(("\nyum_package_install: " + package))
 	output = Run("echo '"+vm_password+"' | sudo -S yum install -y "+package)
@@ -136,12 +260,11 @@ def yum_package_install(package):
 	return False
 
 def aptget_package_install(package):
-	
 	RunLog.info("Installing Package: " + package)
 	# Identify the package for Ubuntu	
 	# We Haven't installed mysql-secure_installation for Ubuntu Distro
 	if (package == 'mysql-server'):
-		RunLog.info( "apt-get function package:" + package)
+		RunLog.info( "apt-get function package:" + package) 
 		
 		cmds = ("export DEBIAN_FRONTEND=noninteractive","echo mysql-server mysql-server/root_password select " + daytrader_db_root_password + " | debconf-set-selections", "echo mysql-server mysql-server/root_password_again select " + daytrader_db_root_password  + "| debconf-set-selections", "echo '"+vm_password+"' | sudo -S apt-get install -y  --force-yes mysql-server")
 		output = exec_multi_cmds_local_sudo(cmds)
@@ -221,7 +344,10 @@ def install_deb(file_path):
 
 def install_rpm(file_path):
 	RunLog.info( "\nInstalling package: "+file_path)
-	output = Run("echo '"+vm_password+"' | sudo -S rpm -ivh "+file_path+" 2>&1")
+	if((current_distro == "SUSE Linux") or (current_distro == "openSUSE") or (current_distro == "sles")):
+		output = Run("echo '"+vm_password+"' | sudo -S rpm -ivh --nodeps "+file_path+" 2>&1")
+	else:
+		output = Run("echo '"+vm_password+"' | sudo -S rpm -ivh --nodeps "+file_path+" 2>&1")
 	RunLog.info( output)
 	outputlist = re.split("\n", output)
 	package = re.split("/", file_path )[-1]
@@ -240,7 +366,6 @@ def install_rpm(file_path):
 	RunLog.info(file_path+": Installation failed"+output)
 	return False
 		
-#needed to be generic
 def yum_package_uninstall(package):
 	RunLog.info( "\nRemoving package: "+package)
 	output = Run ("echo '"+vm_password+"' | sudo -S yum remove -y "+package)
@@ -258,11 +383,11 @@ def aptget_package_uninstall(package):
 	
 def install_package(package):
 	RunLog.info( "\nInstall_package: "+package)
-	if ((current_distro == "Ubuntu") or (current_distro == "Debian")):
+	if ((current_distro == "ubuntu") or (current_distro == "Debian")):
 		return aptget_package_install(package)
-	elif ((current_distro == "RedHat") or (current_distro == "Oracle") or (current_distro == 'CentOS')):
+	elif ((current_distro == "rhel") or (current_distro == "Oracle") or (current_distro == 'centos')):
 		return yum_package_install(package)
-	elif (current_distro == "SUSE Linux") or (current_distro == "openSUSE"):
+	elif (current_distro == "SUSE Linux") or (current_distro == "openSUSE") or (current_distro == "sles"):
 		return zypper_package_install(package)
 	else:
 		RunLog.error((package + ": package installation failed!"))
@@ -271,11 +396,11 @@ def install_package(package):
 
 def install_package_file(file_path):
 	RunLog.info( "\n Install_package_file: "+file_path)
-	if ((current_distro == "Ubuntu") or (current_distro == "Debian")):
+	if ((current_distro == "ubuntu") or (current_distro == "Debian")):
 		return install_deb(file_path)
-	elif ((current_distro == "RedHat") or (current_distro == "Oracle") or (current_distro == 'CentOS')):
+	elif ((current_distro == "rhel") or (current_distro == "Oracle") or (current_distro == 'centos')):
 		return install_rpm(file_path)
-	elif (current_distro == "SUSE Linux") or (current_distro == "openSUSE"):
+	elif (current_distro == "SUSE Linux") or (current_distro == "openSUSE") or (current_distro == "sles"):
 		return install_rpm(file_path)
 	else:
 		RunLog.error((package + ": package installation failed!"))
@@ -284,11 +409,11 @@ def install_package_file(file_path):
 
 def uninstall_package(package):
 	RunLog.info( "\nUninstall package: "+package)
-	if ((current_distro == "Ubuntu") or (current_distro == "Debian")):
+	if ((current_distro == "ubuntu") or (current_distro == "Debian")):
 		return aptget_package_uninstall(package)
-	elif ((current_distro == "RedHat") or (current_distro == "Oracle") or (current_distro == 'CentOS')):
+	elif ((current_distro == "rhel") or (current_distro == "Oracle") or (current_distro == 'centos')):
 		return yum_package_uninstall(package)
-	elif (current_distro == "SUSE Linux") or (current_distro == "openSUSE"):
+	elif (current_distro == "SUSE Linux") or (current_distro == "openSUSE") or (current_distro == "sles"):
 		return zypper_package_uninstall(package)
 	else:
 		RunLog.error((package + ": package installation failed!"))
@@ -297,16 +422,8 @@ def uninstall_package(package):
 
 def install_packages_singleVM():
 	RunLog.info( "\nInstall packages singleVM ..")
-	# Install the packages as per Distro
-	if ((current_distro == "openSUSE") or (current_distro == "SUSE Linux")):
-		packages_list = ("mysql-community-server","mysql","mysql-client","at","php5", "php5-mysql","php53","php53-mysql", "apache2","wget", "bc","xauth","libstdc++*","libstdc++.so.5","libstdc++33", "elfutils.x86_64", "libXp.x86_64","compat-libstdc++-33.x86_64", "compat-db.x86_64", "libXmu.x86_64","gtk2.x86_64", "pam.x86_64","libXft.x86_64", "libXtst.x86_64","gtk2-engines.x86_64", "elfutils-libs", "ksh", "compat-libstdc++-296")
-	elif (current_distro == "Ubuntu"):
-		packages_list = ("mysql-server","mysql-client", "mysql","php5", "php5-mysql","libstdc++6","elfutils","gtk2-engines", "mysql", "at", "mysql-libs", "mysql-devel", "php", "php-mysql", "libstdc++*", "compat-libstdc++-33.x86_64", "ksh", "bc", "xauth")
-	else:
-		packages_list = ("mysql-server", "mysql","at", "mysql-libs" "mysql-devel", "php", "php-mysql", "libstdc++*", "elfutils.x86_64", "libXp.x86_64", "compat-libstdc++-33.x86_64","bc","xauth", "compat-db.x86_64", "libXmu.x86_64", "gtk2.x86_64", "pam.x86_64", "libXft.x86_64", "libXtst.x86_64", "gtk2-engines.x86_64","elfutils-libs", "ksh", "compat-libstdc++-296")
 	
-	#print packages_list
-	for package in packages_list:
+	for package in singlevm_packages_list:
 		if(install_package(package)):
 			RunLog.info( package + ": installed successfully")
 		else:
@@ -316,46 +433,23 @@ def install_packages_singleVM():
 	return True
 	
 def install_packages_backend():
-	# Installing mysql package in OpenSUSE
-	if (current_distro == "openSUSE"):
-		packages_list = ("mysql-community-server","at","mysql-community-server-client","php5", "php5-mysql","php","php-mysql""apache2-mod_php5","apache2","wget","bc","xauth","libstdc++*","libstdc++.so.5", "elfutils.x86_64", "libXp.x86_64","compat-libstdc++-33.x86_64", "compat-db.x86_64", "libXmu.x86_64","gtk2.x86_64","pam.x86_64","libXft.x86_64", "libXtst.x86_64","gtk2-engines.x86_64", "elfutils-libs", "ksh", "compat-libstdc++-296")
-
-	# Installing mysql package in SUSE Linux
-	if (current_distro == "SUSE Linux"):
-		packages_list = ("mysql","mysql-community-server-client","at","php53", "php53-mysql","apache2-mod_php5","apache2","wget","bc","xauth","libstdc++*","libstdc++33", "elfutils.x86_64", "libXp.x86_64","compat-libstdc++-33.x86_64", "compat-db.x86_64", "libXmu.x86_64","gtk2.x86_64","pam.x86_64","libXft.x86_64", "libXtst.x86_64","gtk2-engines.x86_64", "elfutils-libs", "ksh", "compat-libstdc++-296")
-
-	# Installing mysql package in Ubuntu r Oracle or CentOS Distro
-	if ((current_distro == "Ubuntu") or (current_distro == "Oracle") or (current_distro == "CentOS")):
-		packages_list = ("mysql-server","mysql-client", "mysql","php5", "php5-mysql","libstdc++6","elfutils","gtk2-engines","mysql.x86_64","php","at", "php-mysql", "httpd" , "wget","libstdc++*","libstdc++.so.5", "elfutils.x86_64", "compat-libstdc++-296", "libXp.x86_64", "compat-libstdc++-33.x86_64", "compat-db.x86_64", "libXmu.x86_64", "gtk2.x86_64", "pam.x86_64", "libXft.x86_64", "libXtst.x86_64", "gtk2-engines.x86_64", "elfutils.x86_64", "elfutils-libs", "ksh", "compat-libstdc++-296")
-
+	RunLog.info("Installing Packages in Backend VM ")
 	#Identify the packages list from "packages_list"
-	for package in packages_list:
+	for package in singlevm_packages_list:
 		if(install_package(package)):
 			RunLog.info( package + ": installed successfully")
 		else:
-			RunLog.error( package + ": installation Failed")
-			#return False
-		
+			RunLog.error( package + ": installation Failed")		
 	return True
 
 def install_packages_frontend():
-	# Detect the Distro's -> OpenSUSE/SUSE Linux/Ubuntu and Ubuntu 
-	if ((current_distro == "openSUSE") or (current_distro == "SUSE Linux")):
-		packages_list = ("mysql-community-server-client","mysql-client","at","php5","php5-mysql","php53","php53-mysql","apache2-mod_php5","apache2","wget","bc","xauth","libstdc++*","libstdc++33","libstdc++.so.5","elfutils.x86_64", "libXp.x86_64","compat-libstdc++-33.x86_64", "compat-db.x86_64", "libXmu.x86_64","gtk2.x86_64","pam.x86_64","libXft.x86_64", "libXtst.x86_64","gtk2-engines.x86_64", "elfutils-libs", "ksh", "compat-libstdc++-296")
-	elif (current_distro == "Ubuntu"):
-		packages_list = ("mysql-client", "mysql","php5", "php5-mysql","libstdc++6","elfutils","gtk2-engines","mysql-client-core-5.5","at","libapache2-mod-php5","apache2","wget","php", "php-mysql", "libstdc++*","libstdc++.so.5", "compat-libstdc++-33.x86_64", "ksh", "bc", "xauth")
-		
-	# Detect the Distro's -> Oracle Redhat or Unbreakable / CentOS
-	if ((current_distro == "Oracle") or (current_distro == "CentOS")):
-		packages_list = ("mysql.x86_64","php","at","php-mysql", "httpd" , "wget","libstdc++*","libstdc++.so.5", "elfutils.x86_64", "compat-libstdc++-296", "libXp.x86_64", "compat-libstdc++-33.x86_64", "compat-db.x86_64", "libXmu.x86_64", "gtk2.x86_64", "pam.x86_64", "libXft.x86_64", "libXtst.x86_64", "gtk2-engines.x86_64", "elfutils.x86_64", "elfutils-libs", "ksh", "compat-libstdc++-296")
-
+	RunLog.info("Installing Packages in LoadBalancer Frontend VM")
 	#Identify the packages list from "packages_list"
-	for package in packages_list:
+	for package in frontend_packages_list:
 		if(install_package(package)):
-			RunLog.info( package + ": installed successfully")
+			RunLog.info(package + ": installed successfully")
 		else:
-			RunLog.error( package + ": installation Failed")
-
+			RunLog.info(package + ": installation Failed")			
 	RunLog.info( "Install packages singleVM ..[done]")
 	return True
 
@@ -366,15 +460,6 @@ def exec_multi_cmds_local(cmd_list):
 	f.close()
 	Run ("bash /tmp/temp_script.sh 2>&1 > /tmp/exec_multi_cmds_local.log")
 	return file_get_contents("/tmp/exec_multi_cmds_local.log")
-
-def exec_multi_cmds_local_sudo(cmd_list):
-	f = open('/tmp/temp_script.sh','w')
-	for line in cmd_list:
-		f.write(line+'\n') 
-	f.close()
-	Run ("chmod +x /tmp/temp_script.sh")
-	Run ("echo '"+vm_password+"' | sudo -S /tmp/temp_script.sh 2>&1 > /tmp/exec_multi_cmds_local_sudo.log")
-	return file_get_contents("/tmp/exec_multi_cmds_local_sudo.log")
 
 def set_javapath():
 	RunLog.info( "\nSetting Java path")
@@ -450,13 +535,13 @@ def mvn_install():
 	if mvn_install_status == False:
 		RunLog.error( "Installing Maven..  [failed]")
 		print Run ("echo '"+vm_password+"\' | sudo -S cat /tmp/mvn.log")
-		exit()
+		end_the_script()
 
 def setup_websphere():
 	RunLog.info( "\nSetting up Websphere ..")
 	RunLog.info( "Extracting /tmp/IBMWebSphere.tar.gz")
-	JustRun ("echo '"+vm_password+"' | sudo -S tar -xvf IBMWebSphere.tar.gz -C /root")
-	if (current_distro == "Ubuntu"):
+	JustRun ("echo '"+vm_password+"' | sudo -S tar -xvf /tmp/IBMWebSphere.tar.gz -C /root")
+	if (current_distro == "ubuntu"):
 		install_package_file("/root/IBMWebSphere/ibm-java-x86-64-sdk_6.0-10.1_amd64.deb")
 	else:
 		install_package_file("/root/IBMWebSphere/ibm-java-x86_64-sdk-6.0-9.1.x86_64.rpm")
@@ -505,18 +590,18 @@ def create_db(db_name, db_root_password):
 	RunLog.info( "\nCreating a database on MySQL with name "+db_name)
 	child = pexpect.spawn ('mysql -uroot -p'+db_root_password)
 
-		#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	#wait till expected pattern is found
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ('CREATE DATABASE '+db_name+";")
 		RunLog.info( "'CREATE DATABASE' command successful\n"+child.before)
 		#wait till expected pattern is found -> Show Databases
-		i = child.expect (['mysql>', pexpect.EOF])
+		i = child.expect (['m*>', pexpect.EOF])
 		if (i == 0):
 			child.sendline ("show databases;")      #send y
 		RunLog.info( "'show databases' command successful\n"+child.before)
 		#wait till expected pattern is found -> exit
-		i = child.expect (['mysql>', pexpect.EOF])
+		i = child.expect (['m*>', pexpect.EOF])
 		if (i == 0):
 			child.sendline ("exit")
 		
@@ -531,37 +616,37 @@ def create_user_db(db_name, db_root_password, db_hostname, db_username, db_passw
 	child = pexpect.spawn ('mysql -uroot -p'+db_root_password)
 
 	#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ('CREATE USER '+db_username+"@"+db_hostname+";") #send y
 		RunLog.info( "'CREATE USER' command successful\n"+child.before)
 
 	#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ("GRANT ALL PRIVILEGES ON "+db_name+".* TO '"+db_username+"'@'"+db_hostname+"' IDENTIFIED by '"+db_password+"' WITH GRANT OPTION;")
 		RunLog.info( "'GRANT ALL PRIVILEGES' command successful\n"+child.before)
 
 	#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ("FLUSH PRIVILEGES;")    #send y
 		RunLog.info( "'FLUSH PRIVILEGES' command successful\n"+child.before)
 
 	#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ("show databases;")      #send y
 		RunLog.info( "'show databases' command successful\n"+child.before)
 
 	#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ("select host,user from mysql.user;")    #send y
 		RunLog.info( "'select user' command successful\n"+child.before)
 
 	#wait till expected pattern is found
-	i = child.expect (['mysql>', pexpect.EOF])
+	i = child.expect (['m*>', pexpect.EOF])
 	if (i == 0):
 		child.sendline ("exit") #send y
 		RunLog.info( "'CREATE USER' command successful\n"+child.before)
@@ -569,31 +654,29 @@ def create_user_db(db_name, db_root_password, db_hostname, db_username, db_passw
 	RunLog.info( "Creating user with username: "+db_username+", on MySQL database name: "+db_name+"...[done]")
 	
 def get_services_status(service):
+	RunLog.info("Acquiring the status of services")
 	current_status = "unknown"
-	if ((detect_distro() == 'SUSE Linux') or (detect_distro() == 'openSUSE')):
-		service_command = "/etc/init.d/"
-	else:
-		service_command = "service "  #space character after service is mandatory here.
-		
-	RunLog.info( "get service func : " + service)
+
+	RunLog.info("get service func : " + service)
 	output = Run("echo '"+vm_password+"' | sudo -S "+service_command+service+" status")
 	outputlist = re.split("\n", output)
-	 
+
 	for line in outputlist:
 		#start condition
 		if (re.match(re.escape(service)+r'.*start\/running', line, re.M|re.I) or \
-			re.match(re.escape(service)+r'.*is running.*', line, re.M|re.I) or \
+			re.match(r'.*'+re.escape(service)+r'.*is running.*', line, re.M|re.I) or \
 			re.match(r'Starting.*'+re.escape(service)+r'.*OK',line,re.M|re.I) or \
-			re.match(r'.*'+re.escape(service)+r'.*running.*', line, re.M|re.I) or \
+			re.match(r'^Checking for.*running', line, re.M|re.I) or \
 			re.match(r'.*active \(running\).*', line, re.M|re.I)):
-			RunLog.info((service+": service is running\n"+line))
+			RunLog.info(service+": service is running\n"+line)
 			current_status = "running"
-			
+
 		if (re.match(re.escape(service)+r'.*Stopped.*',line,re.M|re.I) or \
+			re.match(r'.*'+re.escape(service)+r'.*is not running.*', line, re.M|re.I) or \
 			re.match(re.escape(service)+r'.*stop\/waiting', line, re.M|re.I) or \
-			re.match(r'.*'+re.escape(service)+r'.*unused.*', line, re.M|re.I) or \
+			re.match(r'^Checking for.*unused', line, re.M|re.I) or \
 			re.match(r'.*inactive \(dead\).*', line, re.M|re.I)):
-			RunLog.info((service+": service is stopped\n"+line))
+			RunLog.info(service+": service is stopped\n"+line)
 			current_status = "stopped"
 	
 	if(current_status == "unknown"):
@@ -604,35 +687,32 @@ def get_services_status(service):
 			current_status = "running"
 		else:
 			RunLog.info("No instances of service: "+service+" are running.")
-			RunLog.info(service+": service is stopped\n")
+			RunLog.info(service+": service is not running\n")
 			current_status = "stopped"
-	
+
 	return (current_status)
 
 def set_services_status(service, status):
+	RunLog.info("Setting service status")
 	current_status = "unknown"
 	set_status = False
 
-	RunLog.info( "service :" + service)
-	if ((detect_distro() == 'SUSE Linux') or (detect_distro() == 'openSUSE')):
-		service_command = "/etc/init.d/"
-	else:
-		service_command = "service "  #space character after service is mandatory here.
-
-	RunLog.info( "service status:"+ status)
+	RunLog.info("service :" + service)
+	
+	RunLog.info("service status:"+ status)
 	output = Run("echo '"+vm_password+"' | sudo -S "+service_command+service+" "+status)
 	current_status = get_services_status(service)
-	RunLog.info( "current_status -:" + current_status)
-	
+	RunLog.info("current_status -:" + current_status)
+
 	if((current_status == "running") and (status == "restart" or status == "start" )):
 		set_status = True
 	elif((current_status == "stopped") and (status == "stop")):
 		set_status = True
 	else:
-		RunLog.error( "set_services_status failed\nError log: \n" + output)
+		RunLog.info("set_services_status failed\nError log: \n" + output)
 
 	return (set_status, current_status)
-
+	
 def deploy_daytrader():
 	cmds = ("export CLASSPATH=/root/IBMWebSphere/mysql-connector-java-5.1.18/mysql-connector-java-5.1.18.jar", \
 	"export PATH=$PATH:/root/IBMWebSphere/apache-maven-2.2.1/bin",\
@@ -641,14 +721,17 @@ def deploy_daytrader():
 	"echo $PATH","echo $JAVA_HOME", \
 	"/opt/IBM/WebSphere/AppServerCommunityEdition/bin/deploy.sh --user system --password manager deploy /root/IBMWebSphere/daytrader-2.2.1-source-release/assemblies/javaee/daytrader-ear/target/daytrader-ear-2.2.1.ear  /root/IBMWebSphere/daytrader-2.2.1-source-release/assemblies/javaee/plans/target/classes/daytrader-mysql-xa-plan.xml")
 	output = exec_multi_cmds_local_sudo(cmds)
-	if(output.rfind == "TradeJMS"):
+	if(output.rfind("TradeJMS")!= -1):
 		RunLog.info('** Daytrader setup is completed succesfully **\n ' + output)
+		out = exec_multi_cmds_local_sudo(["/opt/IBM/WebSphere/AppServerCommunityEdition/bin/deploy.sh --user system --password manager redeploy /root/IBMWebSphere/daytrader-2.2.1-source-release/assemblies/javaee/daytrader-ear/target/daytrader-ear-2.2.1.ear  /root/IBMWebSphere/daytrader-2.2.1-source-release/assemblies/javaee/plans/target/classes/daytrader-mysql-xa-plan.xml"])
 	else:
 		RunLog.error('** Daytrader setup is not completed succesfully **\n ' + output)
 	return output
 
 def start_ibm_websphere():
 	RunLog.info( "\nStarting websphere..")
+	set_services_status(service_httpd_name, "stop")
+	Run("echo '"+vm_password+"' | sudo -S chkconfig '"+service_httpd_name+"' off")
 	output = Run("echo '"+vm_password+"' | sudo -S /opt/IBM/WebSphere/AppServerCommunityEdition/bin/startup.sh")
 	if "Exception" in output:
 		RunLog.error("Failure Starting IBM Websphere")
@@ -680,14 +763,14 @@ def install_ibm_mySql_connector():
 		RunLog.info( "Mysql connector java jar installed successfully.")
 	else:
 		RunLog.error( "Mysql connector java jar installation failed")
-		exit()
+		end_the_script()
 		
 	RunLog.info( "Installing MySQL Java connector.. [done]")
 
 def setup_daytrader():
 	RunLog.info( "\nSetting up daytrader ..")
 	mvn_install()
-							
+	
 	RunLog.info( "\nConfiguring daytrader-mysql-xa-plan.xml")
 	RunLog.info( Run ("echo '"+vm_password+"' | sudo -S rm -rf /root/IBMWebSphere/daytrader-2.2.1-source-release/assemblies/javaee/daytrader-war/src/main/webapp/dbscripts/mysql/Table.ddl"))
 	RunLog.info( Run ("echo '"+vm_password+"' | sudo -S cp /root/IBMWebSphere/Table.ddl /root/IBMWebSphere/daytrader-2.2.1-source-release/assemblies/javaee/daytrader-war/src/main/webapp/dbscripts/mysql/"))
@@ -711,7 +794,6 @@ def put_file_sftp(user_name, password, ip, file_name):
 
 	for j in range(0,6):
 		#wait till expected pattern is found
-		#i = child.expect (['.assword', ".*>", "yes/no",pexpect.EOF])
 		i = child.expect (['.assword', ".*>", "yes/no",pexpect.EOF,pexpect.TIMEOUT], timeout=300)
 		if (i == 0):
 			child.sendline (password)
@@ -737,7 +819,6 @@ def get_file_sftp(user_name, password, ip, file_name):
 	file_sent = False
 
 	for j in range(0,6):
-		#i = child.expect (['.assword', ".*>", "yes/no",pexpect.EOF])
 		i = child.expect (['.assword', ".*>", "yes/no",pexpect.EOF,pexpect.TIMEOUT], timeout=300)
 		if (i == 0):
 			child.sendline (password)
@@ -756,7 +837,45 @@ def get_file_sftp(user_name, password, ip, file_name):
 			continue
 
 	return file_get_contents( "/tmp/mylog")
+	
+def verify_daytrader_instllation():
+	if (sys.argv[1] == 'loadbalancer_setup'):
+		ips = front_endVM_ips
+	elif (sys.argv[1] == "singleVM_setup"): 
+		ips = ["127.0.0.1"]
+	else:
+		return 1
+		
+	Run("mkdir /tmp/verify_dtr/")
+	for ip in ips:
+		dtr_url = "http://"+ip+":8080/daytrader"
+		Run("wget -t 2 -T 3 "+dtr_url+" -O /tmp/verify_dtr/"+ip+".html")
+	output = Run("grep -irun 'DayTrader' /tmp/verify_dtr/ | wc -l")
+	Run("rm -rf  /tmp/verify_dtr/")
+	output = output.rstrip('\n')
 
+	if( int(output) == len(ips)):
+		print "DTR_INSTALL_PASS" 
+		Run("echo 'DTR_INSTALL_PASS' > dtr_test.txt")
+		return 0
+	else:
+		print "DTR_INSTALL_FAIL" 
+		Run("echo 'DTR_INSTALL_FAIL' > dtr_test.txt")
+		return 1
+	
+def collect_logs():
+	Run("mkdir logs")
+	Run("cp -f /tmp/*.log logs/")
+	Run("cp -f *.XML logs/")
+	if (sys.argv[1] == 'loadbalancer_setup'):
+		for ip in front_endVM_ips:
+			exec_cmd_remote_ssh(vm_username, vm_password, ip, "mv Runtime.log "+ip+"-Runtime.log")
+			get_file_sftp(vm_username, vm_password, ip, ip+"-Runtime.log")
+	Run("cp -f *.log logs/")
+	Run("cp -f dtr_test.txt logs/")
+	Run("tar -czvf logs.tar.gz logs/")
+	
+	
 def setup_Daytrader_E2ELoadBalance_backend(front_end_users):
 	# Installing packages in Backend VM Role
 	if (not install_packages_backend()):
@@ -765,30 +884,26 @@ def setup_Daytrader_E2ELoadBalance_backend(front_end_users):
 	set_services_status(service_mysqld_name, "start")
 	rtrn = get_services_status(service_mysqld_name)
 	if (rtrn != "running"):
-		RunLog.error( "Failed to start mysqld")
-		exit()
+		RunLog.error( "Failed to start '"+service_mysqld_name+"'")
+		end_the_script()
 
 	# To make to connection from backend to other IP's ranging from 0.0.0.0
-	#bind = Run("echo '"+vm_password+"' | sudo -S sed -i 's/\(bind-address.*= \)\(.*\)/\\1 0.0.0.0/' /etc/mysql/my.cnf | grep bind")
-	bind = Run("echo 'Redhat.Redhat.777' | sudo -S sed -i 's/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/my.cnf | grep bind")
-	Run("echo '"+vm_password+"' | sudo -S service mysql restart")
+	bind = Run("echo '"+vm_password+"' | sudo -S sed -i 's/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/my.cnf | grep bind")
+	Run("echo '"+vm_password+"' | sudo -S service '"+service_mysqld_name+"' restart")
 	
 	# Installing the "mysql secure installation" in other Distro's (not in Ubuntu)
-	if (current_distro != 'Ubuntu'):
+	if (current_distro != 'ubuntu'):
 		mysql_secure_install(daytrader_db_root_password)
 			
 	# Creating database using mysql
 	create_db(daytrader_db_name, daytrader_db_root_password)
 	
 	# Creating users to access database from mysql
-	#for ip in front_end_users:
-		#create_user_db(daytrader_db_name, daytrader_db_root_password, ip, daytrader_db_username, daytrader_db_password)
 	create_user_db(daytrader_db_name, daytrader_db_root_password, "%", daytrader_db_username, daytrader_db_password)
-	RunLog.info( "Keeping 'mysqld' in startup..")
-	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig --add mysqld")
-	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig mysqld on")
-	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig mysql on")
-	RunLog.info( "Keeping 'mysqld' in startup..[done]")
+	RunLog.info( "Keeping '"+service_mysqld_name+"' service in startup..")
+	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig --add '"+service_mysqld_name+"'")
+	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig '"+service_mysqld_name+"' on")
+	RunLog.info( "Keeping '"+service_mysqld_name+"' service in startup..[done]")
 	
 def setup_Daytrader_E2ELoadBalance_frontend():
 	# Installing packages in Front-end VM Role's
@@ -798,7 +913,6 @@ def setup_Daytrader_E2ELoadBalance_frontend():
 
 	set_services_status(service_httpd_name, "start")
 	rtrn = get_services_status(service_httpd_name)
-
 	if (rtrn != "running"):
 		RunLog.error( "Failed to start :" + service_httpd_name)
 		exit
@@ -808,23 +922,20 @@ def setup_Daytrader_E2ELoadBalance_frontend():
 def setup_Daytrader_singleVM():
 	if(install_packages_singleVM() == False):
 		print "Abort"
-		exit()
+		end_the_script()
 	# Installing packages in Backend VM Role
-	if (not install_packages_backend()):
-		RunLog.error( "Failed to install packages for Backend VM Role")
 	set_services_status(service_mysqld_name, "start")
 	rtrn = get_services_status(service_mysqld_name)
 	if (rtrn != "running"):
 		RunLog.error( "Failed to start mysqld")
-		exit()
+		end_the_script()
 
 	# To make to connection from backend to other IP's ranging from 0.0.0.0
-	#bind = Run("echo 'rdPa$$w0rd' | sudo -S sed -i 's/\(bind-address.*= \)\(.*\)/\\1 0.0.0.0/' /etc/mysql/my.cnf | grep bind")
-	bind = Run("echo 'Redhat.Redhat.777' | sudo -S sed -i 's/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/my.cnf | grep bind")
-	Run("echo '"+vm_password+"' | sudo -S service mysql restart")
+	bind = Run("echo '"+vm_password+"' | sudo -S sed -i 's/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/my.cnf | grep bind")
+	Run("echo '"+vm_password+"' | sudo -S service '"+service_mysqld_name+"' restart")
 	
 	# Installing the "mysql secure installation" in other Distro's (not in Ubuntu)
-	if (current_distro != 'Ubuntu'):
+	if (current_distro != 'ubuntu'):
 		mysql_secure_install(daytrader_db_root_password)
 			
 	# Creating database using mysql
@@ -832,33 +943,24 @@ def setup_Daytrader_singleVM():
 	
 	# Creating users to access database from mysql
 	create_user_db(daytrader_db_name, daytrader_db_root_password, daytrader_db_hostname, daytrader_db_username, daytrader_db_password)
-	RunLog.info( "Keeping 'mysqld' in startup..")
-	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig --add mysqld")
-	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig mysqld on")
-	RunLog.info( "Keeping 'mysqld' in startup..[done]")
-	# Installing packages in Front-end VM Role's
-	if (not install_packages_frontend()):
-		RunLog.error( "Failed to install packages for Frontend VM Role")
-		exit
+	#create_user_db(daytrader_db_name, daytrader_db_root_password, "%", daytrader_db_username, daytrader_db_password)
+	RunLog.info( "Keeping '"+service_mysqld_name+"' service in startup..")
+	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig --add '"+service_mysqld_name+"'")
+	Run ("echo '"+vm_password+"' | sudo -S /sbin/chkconfig '"+service_mysqld_name+"' on")
+	RunLog.info( "Keeping '"+service_mysqld_name+"' service in startup..[done]")
 
-	set_services_status(service_httpd_name, "start")
-	rtrn = get_services_status(service_httpd_name)
-
-	if (rtrn != "running"):
-		RunLog.error( "Failed to start :" + service_httpd_name)
-		exit
 	setup_websphere()
 	setup_daytrader()	
-	#Keeping the server ins the startup and rebooting the VM.
+	#Keeping the server in the startup.
 	output = Run('cat '+startup_file+'   | grep "^exit"')
 	if "exit" in output:
 		RunLog.info( output)
 		output = exec_multi_cmds_local_sudo(("sed -i 's_^exit 0_sh /opt/IBM/WebSphere/AppServerCommunityEdition/bin/startup.sh\\nexit 0_' "+startup_file,"\n"))
+		Run("echo '"+vm_password+"' | sudo -S chmod 777 '"+startup_file+"'")
 	else:
 		RunLog.info( "exit not found")
 		exec_multi_cmds_local_sudo(('echo "sh /opt/IBM/WebSphere/AppServerCommunityEdition/bin/startup.sh" >>  '+startup_file,'\n'))
-	RunLog.info( "Rebooting the frontend....\n")
-	RunLog.info( exec_multi_cmds_local_sudo(["reboot"]))
+		Run("echo '"+vm_password+"' | sudo -S chmod 777 '"+startup_file+"'")
 
 def update_python_and_install_pexpect():
 	python_install_commands = (	"wget --no-check-certificate http://python.org/ftp/python/2.7.2/Python-2.7.2.tgz", \
@@ -894,7 +996,7 @@ def update_python_and_install_pexpect():
 	output = Run ("python -V 2>&1")
 	if "2.7.2" not in output:
 		RunLog.error( "Installing python 2.7.2 .. [failed!]\nAborting the script..\n")
-		exit()
+		end_the_script()
 	else:
 		RunLog.info( "Installing python 2.7.2 .. [done]")
 		
@@ -903,24 +1005,12 @@ def update_python_and_install_pexpect():
 	exec_multi_cmds_local_sudo(pexpect_install_commands)
 	RunLog.info( "Installing pexpect from source.. [done]")
 
-def collect_logs():
-	Run("mkdir logs")
-	Run("cp -f /tmp/*.log logs/")
-	Run("cp -f *.XML logs/")
-	if (sys.argv[1] == 'loadbalancer_setup'):
-		for ip in front_endVM_ips:
-			exec_cmd_remote_ssh(vm_username, vm_password, ip, "mv Runtime.log "+ip+"-Runtime.log")
-			get_file_sftp(vm_username, vm_password, ip, ip+"-Runtime.log")
-	Run("cp -f *.log logs/")
-	Run("cp -f dtr_test.txt logs/")
-	Run("tar -czvf logs.tar.gz logs/")
-	
 def get_username_password_from_xml():
 	global vm_username
 	global vm_password
 	if(not os.path.isfile("Daytrader_install.XML")):
 		RunLog.error("File not found Daytrader_install.XML")
-		exit()
+		end_the_script()
 	output = file_get_contents("Daytrader_install.XML")
 	outputlist = re.split("\n", output)
 
@@ -931,38 +1021,13 @@ def get_username_password_from_xml():
 		elif "</password>" in line:
 			matchObj = re.match( r'<password>(.*)</password>', line, re.M|re.I)
 			vm_password = matchObj.group(1)
-			
-def verify_daytrader_instllation():
-	if (sys.argv[1] == 'loadbalancer_setup'):
-		ips = front_endVM_ips
-	elif (sys.argv[1] == "singleVM_setup"): 
-		ips = ["127.0.0.1"]
-	else:
-		return 1
-		
-	Run("mkdir /tmp/verify_dtr/")
-	for ip in ips:
-		dtr_url = "http://"+ip+":8080/daytrader"
-		Run("wget -t 2 -T 3 "+dtr_url+" -O /tmp/verify_dtr/"+ip+".html")
-	output = Run("grep -irun 'DayTrader' /tmp/verify_dtr/ | wc -l")
-	Run("rm -rf  /tmp/verify_dtr/")
-	output = output.rstrip('\n')
-
-	if( int(output) == len(ips)):
-		print "DTR_INSTALL_PASS" 
-		Run("echo 'DTR_INSTALL_PASS' > dtr_test.txt")
-		return 0
-	else:
-		print "DTR_INSTALL_FAIL" 
-		Run("echo 'DTR_INSTALL_FAIL' > dtr_test.txt")
-		return 1
 
 def show_usage():
 	print "Error: Invalid usage"
 	print "Usage: \"python "+__file__+" singleVM_setup\" for single VM Daytrader Setup"
 	print "Usage: \"python "+__file__+" loadbalancer_setup\" for locagbalanced Daytrader Setup"
 	print "Usage: \"python "+__file__+" frontend_setup <back end vm ip>\" frontend setup for locadbalanced Daytrader Setup"
-	exit()
+	end_the_script()
 
 def RunTest():
 	ip = "127.0.0.1"
@@ -1001,7 +1066,6 @@ def RunTest():
 				for ip in front_endVM_ips:
 					RunLog.info("**********************************************************")
 					RunLog.info("\nConfiguring frontend"+str(frontend_count)+" at "+ip+":\n")
-					#TODO fix ssh tcp alive issue
 					RunLog.info( "Copying "+__file__+" to "+ip)
 					RunLog.info( put_file_sftp(front_endVM_username, front_endVM_password, ip, __file__))
 					RunLog.info( "Copying "+"azuremodules.py"+" to "+ip)
@@ -1022,14 +1086,14 @@ def RunTest():
 				daytrader_db_hostname = sys.argv[2]
 				setup_Daytrader_E2ELoadBalance_frontend()
 #				#Keeping the server ins the startup and rebooting the VM.
-				output = Run('cat '+startup_file+'   | grep "^exit"')
-				print output
-				if "exit" in output:
-					print output
+				output = Run('cat '+startup_file+'   | grep "^exit"')				
+				if "exit" in output:					
 					output = exec_multi_cmds_local_sudo(("sed -i 's_^exit 0_sh /opt/IBM/WebSphere/AppServerCommunityEdition/bin/startup.sh\\nexit 0_' "+startup_file,"\n"))					
+					Run("echo '"+vm_password+"' | sudo -S chmod 777 '"+startup_file+"'")
 				else:
 					RunLog.info( "exit not found")
 					exec_multi_cmds_local_sudo(('echo "sh /opt/IBM/WebSphere/AppServerCommunityEdition/bin/startup.sh" >>  '+startup_file,'\n'))
+					Run("echo '"+vm_password+"' | sudo -S chmod 777 '"+startup_file+"'")
 				RunLog.info( "Rebooting the frontend....\n")
 				RunLog.info( exec_multi_cmds_local_sudo(["reboot"]))
 			elif len(sys.argv) < 3:
@@ -1051,7 +1115,6 @@ def RunTest():
 # Code execution Start from here
 get_username_password_from_xml()
 set_variables_OS_dependent()
-current_distro = detect_distro()
 update_repos()
 disable_selinux()
 disable_iptables()
@@ -1066,20 +1129,39 @@ except ImportError:
 	RunLog.info( "pexpect_pkg_name: " + pexpect_pkg_name)
 	if(not install_package(pexpect_pkg_name)):
 		RunLog.info( "pexpect module could not be installed")
-		RunLog.info( "Installing pexpect from source..")
-		update_python_and_install_pexpect()
-		RunLog.info( "\n\nInvoking the script with new python:....")
-		RunLog.info( Run("python "+__file__+" "+' '.join(sys.argv[1:])))
-		exit()
+		pythonversion = Run ("echo '"+vm_password+"' | sudo -S python --version 2>&1")
+		if(pythonversion.find('2.7.*')):
+			if((current_distro == "sles") and (distro_version == "12")):
+				RunLog.info( "Trying to install pexpect module using rpm package")
+				Run("echo '"+vm_password+"' | sudo -S wget ftp://rpmfind.net/linux/opensuse/ports/aarch64/factory/repo/oss/suse/noarch/python-pexpect-3.1-1.1.noarch.rpm")
+				out = Run("echo '"+vm_password+"' | sudo -S zypper install -y python-pexpect-3.1-1.1.noarch.rpm")								
+				if(out.find('done')!= -1):
+					RunLog.info( " pexpect module rpm installation done..")
+				else:
+					RunLog.info( " pexpect module rpm installation failed..")
+					RunLog.info( "Installing pexpect from source..")
+					update_python_and_install_pexpect()
+					RunLog.info( "\n\nInvoking the script with new python:....")
+					RunLog.info( Run("python "+__file__+" "+' '.join(sys.argv[1:])))
+					end_the_script()
+			elif(current_distro == 'rhel'):
+				easy_install( module_name)
+			else:
+				RunLog.info( "Installing pexpect from source..")
+				update_python_and_install_pexpect()
+				RunLog.info( "\n\nInvoking the script with new python:....")
+				RunLog.info( Run("python "+__file__+" "+' '.join(sys.argv[1:])))
+				end_the_script()
+		else:
+			RunLog.info( "Installing pexpect from source..")
+			update_python_and_install_pexpect()
+			RunLog.info( "\n\nInvoking the script with new python:....")
+			RunLog.info( Run("python "+__file__+" "+' '.join(sys.argv[1:])))
+			end_the_script()
 
 import pexpect
-#Getting IBMWebSphere.tar.gz from IBM-dont-delete VM
-RunLog.info( get_file_sftp("azureuser", "rdPa$$w0rd", "138.91.168.232", "IBMWebSphere.tar.gz"))
-
 RunTest()
-#main()
-#exit(0)
- 
+
 result = verify_daytrader_instllation()
 if (sys.argv[1] != 'frontend_setup'):
 	collect_logs()

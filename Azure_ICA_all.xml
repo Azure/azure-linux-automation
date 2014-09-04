@@ -37,7 +37,7 @@
       <SubscriptionName>Your_Azure_Subscription_Name</SubscriptionName>
       <CertificateThumbprint>Certificate_Associated_with_your_Azure_Subscription</CertificateThumbprint>
       <ManagementEndpoint>https://management.core.windows.net</ManagementEndpoint>
-      <StorageAccount>Preferred_Stoarage_Account</StorageAccount>
+      <StorageAccount>Preferred_Storage_Account</StorageAccount>
       <!-- <Location>Preferred_Location</Location> -->
       <AffinityGroup>Your_Affinity_Group</AffinityGroup>
     </General>
@@ -116,27 +116,27 @@
           <udpPort>990</udpPort>
         </DTAP>
         <DTAPBkup>
-          <IP>168.61.65.46</IP>
+          <IP>ip_for_dtapbackup</IP>
         </DTAPBkup>
         <dnsServer>
-          <IP>192.168.3.120</IP>
-          <Hostname>ubuntudns</Hostname>
-          <Username>root</Username>
-          <Password>redhat</Password>
+          <IP>ip_of_dnsServer</IP>
+          <Hostname>hostname_of_dnsServer</Hostname>
+          <Username>user_of_dnsServer</Username>
+          <Password>password_of_dnsServer</Password>
         </dnsServer>
         <mysqlServer>
-          <IP>192.168.3.127</IP>
-          <Hostname>ubuntumysqlserver</Hostname>
-          <Username>root</Username>
-          <Password>redhat</Password>
-          <MysqlUsername>test</MysqlUsername>
-          <MysqlPassword>redhat</MysqlPassword>
+          <IP>ip_of_mysqlServer</IP>
+          <Hostname>hostname_of_mysqlServer</Hostname>
+          <Username>user_of_mysqlServer</Username>
+          <Password>password_of_mysqlServer</Password>
+          <MysqlUsername>user_of_mysqlDB</MysqlUsername>
+          <MysqlPassword>password_of_mysqlDB</MysqlPassword>
         </mysqlServer>
         <nfsServer>
-          <IP>192.168.3.125</IP>
-          <Hostname>ubuntunfsserver</Hostname>
-          <Username>root</Username>
-          <Password>redhat</Password>
+          <IP>ip_of_nfsServer</IP>
+          <Hostname>hostname_of_nfsServer</Hostname>
+          <Username>user_of_nfsServer</Username>
+          <Password>password_of_nfsServer</Password>
         </nfsServer>
         <ExternalPingServer>
           <IP>PublicPingServerIP(LinuxMachine)</IP>
@@ -612,7 +612,7 @@
       <VNETVM>
         <HostedService>
           <VnetName>VNet</VnetName>
-          <DnsServerIP>"192.168.3.120"</DnsServerIP>
+          <DnsServerIP>ip_of_dnsServer</DnsServerIP>
           <VirtualMachine>
             <state></state>
             <SubnetName>Subnet1</SubnetName>
@@ -668,7 +668,7 @@
         </HostedService>
         <HostedService>
           <VnetName>VNet</VnetName>
-          <DnsServerIP>"192.168.3.120"</DnsServerIP>
+          <DnsServerIP>ip_of_dnsServer</DnsServerIP>
           <VirtualMachine>
             <state></state>
             <SubnetName>Subnet2</SubnetName>
@@ -727,7 +727,7 @@
       <VNETVMPR>
         <HostedService>
           <VnetName>VNet</VnetName>
-          <DnsServerIP>"192.168.3.120"</DnsServerIP>
+          <DnsServerIP>ip_of_dnsServer</DnsServerIP>
           <VirtualMachine>
             <state></state>
             <SubnetName>Subnet1</SubnetName>
@@ -783,7 +783,7 @@
         </HostedService>
         <HostedService>
           <VnetName>VNet</VnetName>
-          <DnsServerIP>"192.168.3.120"</DnsServerIP>
+          <DnsServerIP>ip_of_dnsServer</DnsServerIP>
           <VirtualMachine>
             <state></state>
             <SubnetName>Subnet2</SubnetName>
@@ -1085,8 +1085,8 @@
     <vm>
       <hvServer>LISINTER620-4</hvServer>
       <vmName>VhdUpload</vmName>
-      <ipv4>10.200.51.232</ipv4>
-      <Password>redhat</Password>
+      <ipv4>ip_of_ipv4</ipv4>
+      <Password>User_Password</Password>
       <LIS_TARBALL>hv-rhel6.3-july9-2012.tar</LIS_TARBALL>
       <sshKey>rhel5_id_rsa.ppk</sshKey>
     </vm>
@@ -2162,12 +2162,11 @@
       <testName>E2E-DAYTRADER-SINGLE-VM-SETUP</testName>
       <testScript>E2E-DAYTRADER-SETUP.py</testScript>
       <testScriptPs1>E2E-DAYTRADER-SETUP.ps1</testScriptPs1>
-      <files>remote-scripts\azuremodules.py,remote-scripts\E2E-DAYTRADER-SETUP.py</files>
+      <files>remote-scripts\azuremodules.py,remote-scripts\E2E-DAYTRADER-SETUP.py,remote-scripts\Packages\IBMWebSphere\daytrader.tar.gz,remote-scripts\Packages\IBMWebSphere\wasce_setup-2.1.1.6-unix.bin</files>
       <setupType>E2ESingleVM</setupType>
       <TestType></TestType>
       <TestFeature></TestFeature>
       <TestID></TestID>
-	  <!-- Pass the command line argument for E2E Java Setup (either loadbalancer_setup or loadbalancer_setup) -->
 	  <E2ESetupCmdLineArgument>singleVM_setup</E2ESetupCmdLineArgument>
 	  <Priority>P0</Priority>
     </test>
@@ -2189,12 +2188,11 @@
       <testName>E2E-DAYTRADER-FOUR-VM-SETUP</testName>
       <testScript>E2E-DAYTRADER-SETUP.py</testScript>
       <testScriptPs1>E2E-DAYTRADER-SETUP.ps1</testScriptPs1>
-      <files>remote-scripts\azuremodules.py,remote-scripts\E2E-DAYTRADER-SETUP.py</files>
-      <setupType>E2EFourVM</setupType>
+	  <files>remote-scripts\azuremodules.py,remote-scripts\E2E-DAYTRADER-SETUP.py,remote-scripts\Packages\IBMWebSphere\daytrader.tar.gz,remote-scripts\Packages\IBMWebSphere\wasce_setup-2.1.1.6-unix.bin</files>
+	  <setupType>E2EFourVM</setupType>
       <TestType></TestType>
       <TestFeature></TestFeature>
       <TestID></TestID>
-	  <!-- Pass the command line argument for E2E Java Setup (either loadbalancer_setup or loadbalancer_setup) -->
 	  <E2ESetupCmdLineArgument>loadbalancer_setup</E2ESetupCmdLineArgument>
 	  <Priority>P0</Priority>
     </test>
@@ -2262,7 +2260,7 @@
 		<TestFeature></TestFeature>
 		<TestID></TestID>
 		<!--ExtraSmallVM,SmallVM,MediumVM,LargeVM,ExtraLargeVM -->
-		<SubtestValues>ExtraSmallVM,SmallVM</SubtestValues>
+		<SubtestValues>ExtraSmallVM,SmallVM,MediumVM,LargeVM,ExtraLargeVM</SubtestValues>
 		<ExistingDisks>
 			<MediaLink>http://sivahydsa.blob.core.windows.net/testdata/E2E_Existing_Disk_Test_Do_Not_Delete_0.vhd</MediaLink>
 			<MediaLink>http://sivahydsa.blob.core.windows.net/testdata/E2E_Existing_Disk_Test_Do_Not_Delete_1.vhd</MediaLink>
