@@ -17,11 +17,11 @@ expectedDiskSize = args.expected
 def RunTest(expectedSize):
     UpdateState("TestRunning")
     RunLog.info("Checking DiskSize...")
-    output = Run("df / | awk 'NR==2' | awk '{print $2}'")
+    output = Run("fdisk -l | awk '/sda/ {print $5;}' | awk 'NR==1'")
     ActualSize = float(output)
 
     if (ActualSize < expectedSize*1.1 and ActualSize > expectedSize*0.9) :
-        RunLog.info('Root file disk size is: %s', output)
+        RunLog.info('/dev/sda disk size is: %s', output)
         ResultLog.info('PASS')
         UpdateState("TestCompleted")
     else :

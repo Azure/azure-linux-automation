@@ -50,6 +50,13 @@ done
                 else
                     echo "Unknown"
                 fi
+        elif [ -e /etc/os-release ]; then
+                tmp=`cat /etc/os-release`
+                if [[ "$tmp" == *coreos* ]]; then
+                    echo "COREOS"
+                    exitVal=0
+                fi
+
         fi
 return $exitVal
 }
