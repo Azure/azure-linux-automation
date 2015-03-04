@@ -47,13 +47,18 @@ if ($isDeployed)
 
 	$wait=45
 	$Value = 6
-	$cmd1="./start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
-	$cmd2="./start-server.py -p $hs1vm2tcpport && mv Runtime.log start-server.py.log -f"
-	$cmd3="./start-client.py -c $hs1VIP -p $hs1vm1tcpport -t10 -P$Value"
+	$cmd1="python start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
+	$cmd2="python start-server.py -p $hs1vm2tcpport && mv Runtime.log start-server.py.log -f"
+	$cmd3="python start-client.py -c $hs1VIP -p $hs1vm1tcpport -t10 -P$Value"
+	$cmd11="python start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt"
+	$cmd22="python start-server-without-stopping.py -p $hs1vm2ProbePort -log iperf-probe.txt"
+	
 
 	$server1 = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeTcpPort $hs1vm1tcpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodeDip $hs1vm1.IpAddress
 	$server2 = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm2sshport -nodeTcpPort $hs1vm2tcpport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodeDip $hs1vm2.IpAddress
 	$client = CreateIperfNode -nodeIp $dtapServerIp -nodeSshPort $dtapServerSshport -nodeTcpPort $dtapServerTcpport -nodeIperfCmd $cmd3 -user $user -password $password -files $currentTestData.files -logDir $LogDir
+	#$server11 = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeTcpPort $hs1vm1tcpport -nodeIperfCmd $cmd11 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodeDip $hs1vm1.IpAddress
+	#$server22 = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm2sshport -nodeTcpPort $hs1vm2tcpport -nodeIperfCmd $cmd22 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodeDip $hs1vm2.IpAddress
 	$resultArr = @()
 	$result = "", ""
 #endregion
@@ -68,11 +73,11 @@ if ($isDeployed)
 			mkdir $LogDir\$mode\Server2 -ErrorAction SilentlyContinue | out-null
 			if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 			{#.........................................................................Client command will decided according to TestMode....
-				$cmd3="./start-client.py -c $hs1VIP -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P2" 
+				$cmd3="python start-client.py -c $hs1VIP -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P2" 
 			}
 			if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 			{
-				$cmd3="./start-client.py -c $hs1ServiceUrl -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P2"
+				$cmd3="python start-client.py -c $hs1ServiceUrl -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P2"
 			}
 			$server1.logDir = $LogDir + "\$mode" + "\Server1"
 			$server2.logDir = $LogDir + "\$mode" + "\Server2"
@@ -94,18 +99,23 @@ if ($isDeployed)
 #endregion
 			$stopWatch = SetStopWatch
 #Step 1.1: Start Iperf Server on both VMs
-
-			StartIperfServer $server1
-			StartIperfServer $server2
+			$server1.cmd = $cmd1
+			$server2.cmd = $cmd2
+			StartIperfServer -node $server1
+			StartIperfServer -node $server2
 #Start Iperf Server on Custom Probe 
 			$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "echo Test Started > iperf-probe.txt" -runAsSudo
 			$suppressedOut = RunLinuxCmd -username $server2.user -password $server2.password -ip $server2.ip -port $server2.sshPort -command "echo Test Started > iperf-probe.txt" -runAsSudo
 
 			$BothServersStarted_1 = GetStopWatchElapasedTime $stopWatch "ss"
-			$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "./start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt" -runAsSudo
-			$suppressedOut = RunLinuxCmd -username $server2.user -password $server2.password -ip $server2.ip -port $server2.sshPort -command "./start-server-without-stopping.py -p $hs1vm2ProbePort -log iperf-probe.txt" -runAsSudo
-			$isServer1Started = IsIperfServerStarted $server1
-			$isServer2Started = IsIperfServerStarted $server2 
+			#$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "python start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt" -runAsSudo
+			#$suppressedOut = RunLinuxCmd -username $server2.user -password $server2.password -ip $server2.ip -port $server2.sshPort -command "python start-server-without-stopping.py -p $hs1vm2ProbePort -log iperf-probe.txt" -runAsSudo
+			$server1.cmd = $cmd11
+			$server2.cmd = $cmd22
+			StartIperfServer -node $server1
+			StartIperfServer -node $server2
+			$isServer1Started = IsIperfServerStarted -node $server1
+			$isServer2Started = IsIperfServerStarted -node $server2 
 			Write-host $isServer1Started 
 			Write-host $isServer2Started 
 
@@ -116,23 +126,23 @@ if ($isDeployed)
 #Step1.2: Start Iperf Client on Listening VM
 				$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshport -command "echo Test Started > iperf-client.txt" -runAsSudo
 				StartIperfClient $client
-				$isClientStarted = IsIperfClientStarted $client
+				$isClientStarted = IsIperfClientStarted -node $client
 				$ClientStopped_1 = GetStopWatchElapasedTime $stopWatch "ss"
 				if($isClientStarted -eq $true) 
 				{
 #region Test Case Steps Execution
 #Step 2: Stop Iperf client
-					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "./stop-client.py" -runAsSudo
+					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "python stop-client.py" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "echo Client Stopped 1 >> iperf-client.txt" -runAsSudo
 
 #Step3 : Stop Iperf Server on VM1
-					$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "./stop-server.py" -runAsSudo
+					$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "python stop-server.py" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "echo Server1 Stopped 1 >> iperf-server.txt" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $server2.user -password $server2.password -ip $server2.ip -port $server2.sshport -command "echo Server1 Stopped 1 >> iperf-server.txt" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "echo Server1 Stopped 1 >> iperf-probe.txt" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $server2.user -password $server2.password -ip $server2.ip -port $server2.sshport -command "echo Server1 Stopped 1 >> iperf-probe.txt" -runAsSudo
 #Start iperf Server on Custom Probe Again, as stopping Iperfserver in above command have stopped all iperf server processes
-#$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "./start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt" -runAsSudo
+#$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "python start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt" -runAsSudo
 
 #Step4 : Wait for 30 sec and then Start Iperf Client Again
 					sleep($wait)
@@ -140,7 +150,7 @@ if ($isDeployed)
 					StartIperfClient $client
 					$clientStoppedMiddleStage = GetStopWatchElapasedTime $stopWatch "ss"
 #Step5 :  Stop Iperf Client Again 
-					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "./stop-client.py" -runAsSudo
+					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "python stop-client.py" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "echo Client Stopped 2 >> iperf-client.txt" -runAsSudo
 
 #Step6 : Start Iperf Server on VM1 
@@ -149,10 +159,12 @@ if ($isDeployed)
 					$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "echo Server1 Started 2 >> iperf-probe.txt" -runAsSudo
 					$suppressedOut = RunLinuxCmd -username $server2.user -password $server2.password -ip $server2.ip -port $server2.sshport -command "echo Server1 Started 2 >> iperf-probe.txt" -runAsSudo
 					$Server1StartedOnly_1 = GetStopWatchElapasedTime $stopWatch "ss"
-					StartIperfServer $server1
+					$server1.cmd = $cmd1
+					StartIperfServer  $server1
 #Start iperf Server on Custom Probe Again, as starting Iperfserver in above command have stopped running iperf server
-					$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "./start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt" -runAsSudo
-
+					#$suppressedOut = RunLinuxCmd -username $server1.user -password $server1.password -ip $server1.ip -port $server1.sshport -command "python start-server-without-stopping.py -p $hs1vm1ProbePort -log iperf-probe.txt" -runAsSudo
+					$server1.cmd = $cmd11
+					StartIperfServer -node $server1
 #Step7 : Wait for 30 sec and then Start Iperf Client Again
 					sleep($wait)
 					$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "echo Client Started 2 >> iperf-client.txt" -runAsSudo

@@ -34,10 +34,12 @@ if args.mss != None:
         command = command + ' -M' + str(args.mss)
 if args.mss_print == 'yes':
         command = command + ' -m'
-finalCommand = 'nohup ' + command + ' >>  iperf-server.txt &'
+#finalCommand = 'nohup ' + command + ' >>  iperf-server.txt &'
+finalCommand = command + ' >>  iperf-server.txt'
 
 
 server = finalCommand
+print(server)
 #Run('echo "TestStarted" > iperf-server.txt')
 StopServer()
 StartServer(server)

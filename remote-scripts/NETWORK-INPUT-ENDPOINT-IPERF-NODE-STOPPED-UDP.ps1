@@ -44,14 +44,14 @@ if ($isDeployed)
 		{
 			$testResult = $null
 			mkdir $LogDir\$mode -ErrorAction SilentlyContinue | out-null
-			$server.cmd ="./start-server.py -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
+			$server.cmd ="python start-server.py -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
 			if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 			{
-				$client.cmd ="./start-client.py -c $hs1VIP -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l1420"
+				$client.cmd ="python start-client.py -c $hs1VIP -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l1420"
 			}
 			if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 			{
-				$client.cmd ="./start-client.py -c $hs1ServiceUrl -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l1420"
+				$client.cmd ="python start-client.py -c $hs1ServiceUrl -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l1420"
 			}
 			$server.logDir = "$LogDir\$mode"
 			$client.logDir = "$LogDir\$mode"
@@ -85,10 +85,10 @@ if ($isDeployed)
 					if($serverState -eq $true)
 					{
 						LogMsg "Stopping Server.."
-						$suppressedOut = RunLinuxCmd -username $server.user -password $server.password -ip $server.ip -port $server.sshPort -command "./stop-server.py" -runAsSudo
+						$suppressedOut = RunLinuxCmd -username $server.user -password $server.password -ip $server.ip -port $server.sshPort -command "python stop-server.py" -runAsSudo
 						$suppressedOut = RunLinuxCmd -username $server.user -password $server.password -ip $server.ip -port $server.sshPort -command "echo ServerStopped1 >> iperf-server.txt" -runAsSudo
 						LogMsg "Stopping Client.."
-						$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "./stop-client.py" -runAsSudo
+						$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "python stop-client.py" -runAsSudo
 						
 
 						#Step 2. Do not start iperf server and start the client..
@@ -96,7 +96,7 @@ if ($isDeployed)
 						$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "echo ClientStarted2 >> iperf-client.txt" -runAsSudo
 
 						StartIperfClient $client
-						$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "./stop-client.py" -runAsSudo
+						$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "python stop-client.py" -runAsSudo
 						$suppressedOut = RunLinuxCmd -username $client.user -password $client.password -ip $client.ip -port $client.sshPort -command "echo ClientStopped2 >> iperf-client.txt" -runAsSudo
 						$isClientStarted = IsIperfClientStarted $client -beginningText ClientStarted2 -endText ClientStopped2
 						Write-Host "isClientConnecte : $isClientStarted"
@@ -119,7 +119,7 @@ if ($isDeployed)
 								if($isClientStarted -eq $true)
 								{
 									$serverState = IsIperfServerRunning $server
-									$suppressedOut = RunLinuxCmd -username $server.user -password $server.password -ip $server.ip -port $server.sshPort -command "./stop-server.py" -runAsSudo
+									$suppressedOut = RunLinuxCmd -username $server.user -password $server.password -ip $server.ip -port $server.sshPort -command "python stop-server.py" -runAsSudo
 									$suppressedOut = RunLinuxCmd -username $server.user -password $server.password -ip $server.ip -port $server.sshPort -command "echo ServerStopped3 >> iperf-server.txt" -runAsSudo
 
 									if($serverState -eq $true)

@@ -52,13 +52,13 @@ if ($isDeployed)
 				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "chmod +x *.py && rm -rf *.txt *.log" -runAsSudo
 				$suppressedOut = RunLinuxCmd -username $user -password $password -ip $dtapServerIp -port $dtapServerSshport -command "chmod +x *.py && rm -rf *.txt *.log" -runAsSudo
 				mkdir $LogDir\$Value\$mode -ErrorAction SilentlyContinue | out-null
-				$server.cmd = "./start-server.py -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
+				$server.cmd = "python start-server.py -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
 				if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 				{
-					$client.cmd = "./start-client.py -c $hs1VIP -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value"
+					$client.cmd = "python start-client.py -c $hs1VIP -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value"
 				}
 				if(($mode -eq "URL") -or ($mode -eq "Hostname")){
-					$client.cmd = "./start-client.py -c $hs1ServiceUrl -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value"
+					$client.cmd = "python start-client.py -c $hs1ServiceUrl -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value"
 				}
 				LogMsg "Test Started for UDP Datagram Size $Value in $mode mode.."
 

@@ -16,13 +16,14 @@ if ($isDeployed)
 	$hs1vm1Endpoints = $hs1vm1 | Get-AzureEndpoint
 
 	$hs1VIP = $hs1vm1Endpoints[0].Vip
+	$hs1vm1Hostname = $hs1vm1.InstanceName
 	$hs1ServiceUrl = $hs1vm1.DNSName
 	$hs1ServiceUrl = $hs1ServiceUrl.Replace("http://","")
 	$hs1ServiceUrl = $hs1ServiceUrl.Replace("/","")
 
 	$hs1vm2 = $testVMsinService[1]
 	$hs1vm2Endpoints = $hs1vm2 | Get-AzureEndpoint
-
+	
 	$hs1vm1tcpport = GetPort -Endpoints $hs1vm1Endpoints -usage tcp
 	$hs1vm2tcpport = GetPort -Endpoints $hs1vm2Endpoints -usage tcp
 	$hs1vm1udpport = GetPort -Endpoints $hs1vm1Endpoints -usage udp
@@ -38,14 +39,14 @@ if ($isDeployed)
 			try
 			{
                 $testResult = $null
-				$cmd1="./start-server.py -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
+				$cmd1="python start-server.py -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
 				if ($mode -eq "VIP")
 				{
-					$cmd2="./start-client.py -c $($hs1vm1.IpAddress)  -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value" 
+					$cmd2="python start-client.py -c $($hs1vm1.IpAddress)  -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value" 
 				}
 				elseif($mode -eq "URL")
 				{
-					$cmd2="./start-client.py -c $($hs1vm1.IpAddress)  -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value"
+					$cmd2="python start-client.py -c $hs1vm1Hostname  -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l $Value"
 				}
 				LogMsg "Starting in $mode mode.."
 				$a = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeUdpPort $hs1vm1udpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir

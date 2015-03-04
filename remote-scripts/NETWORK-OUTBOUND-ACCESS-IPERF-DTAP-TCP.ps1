@@ -42,8 +42,8 @@ if ($isDeployed)
 		$suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "chmod +x * && rm -rf *.log *.txt" -runAsSudo
 		$suppressedOut = RunLinuxCmd -username $user -password $password -ip $dtapServerIp -port $dtapServerSshport -command "chmod +x * && rm -rf *.log *.txt" -runAsSudo
 
-		$cmd1="./start-server.py -p $dtapServerTcpport && mv Runtime.log start-server.py.log -f"
-		$cmd2="./start-client.py -c $dtapServerIp -p $dtapServerTcpport -t$iperfTimeoutSeconds"
+		$cmd1="python start-server.py -p $dtapServerTcpport && mv Runtime.log start-server.py.log -f"
+		$cmd2="python start-client.py -c $dtapServerIp -p $dtapServerTcpport -t$iperfTimeoutSeconds"
 		$server = CreateIperfNode -nodeIp $dtapServerIp -nodeSshPort $dtapServerSshport -nodeTcpPort $dtapServerTcpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 		$client = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeTcpPort $hs1vm1tcpport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 		$testresult=IperfClientServerTest -server $server -client $client

@@ -33,8 +33,8 @@ if args.mss != None:
         command = command + ' -M' + str(args.mss)
 if args.mss_print == 'yes':
         command = command + ' -m'
-finalCommand = 'nohup ' + command + ' >>  ' + str(args.log) + ' &'
-
+#finalCommand = 'nohup ' + command + ' >>  ' + str(args.log) + ' &'
+finalCommand = command + ' >>  ' + str(args.log)
 
 server = finalCommand
 temp = Run(server)

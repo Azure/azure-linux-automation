@@ -115,6 +115,8 @@ Function DetectLinuxDistro($VIP, $SSHport, $testVMUser, $testVMPassword)
 		{
 			$CleanedDistroName = "UNKNOWN"
 		}
+        Set-Variable -Name detectedDistro -Value $CleanedDistroName -Scope Global
+        SetDistroSpecificVariables -detectedDistro $detectedDistro
 		LogMsg "Linux distro detected : $CleanedDistroName"
 		
 	}
@@ -964,8 +966,10 @@ Function SetDistroSpecificVariables($detectedDistro)
 {
 	if ( $detectedDistro -imatch "COREOS" )
 	{
-		$python_cmd = "/usr/share/oem/python/bin/python"
-		LogMsg "Set `$python_cmd > /usr/share/oem/python/bin/python"
+		#$python_cmd = "/usr/share/oem/python/bin/python"
+		#LogMsg "Set `$python_cmd > /usr/share/oem/python/bin/python"
+		$python_cmd = "python"
+		LogMsg "Set `$python_cmd > python"
 	}
 	else
 	{
@@ -1509,27 +1513,46 @@ Function RemoteCopy($uploadTo, $downloadFrom, $downloadTo, $port, $files, $usern
 	}
 }
 
-Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string] $command, [int] $port, [switch]$runAsSudo, [Boolean]$WriteHostOnly, [Boolean]$NoLogsPlease, [switch]$ignoreLinuxExitCode, [int]$runMaxAllowedTime = 600)
+Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string] $command, [int] $port, [switch]$runAsSudo, [Boolean]$WriteHostOnly, [Boolean]$NoLogsPlease, [switch]$ignoreLinuxExitCode, [int]$runMaxAllowedTime = 180, [switch]$RunInBackGround)
 {
 	$randomFileName = [System.IO.Path]::GetRandomFileName()
 	$maxRetryCount = 10
 	$currentDir = $PWD.Path
 	$RunStartTime = Get-Date
+	
 	if($runAsSudo)
 	{
 		$plainTextPassword = $password.Replace('"','');
-		$linuxCommand = "`"echo $plainTextPassword | sudo -S $command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
-		$logCommand = "`"echo $plainTextPassword | sudo -S $command`""
+		if ( $detectedDistro -eq "COREOS" )
+		{
+			$linuxCommand = "`"export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/share/oem/bin:/usr/share/oem/python/bin:/opt/bin && echo $plainTextPassword | sudo -S env `"PATH=`$PATH`" $command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
+			$logCommand = "`"export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/share/oem/bin:/usr/share/oem/python/bin:/opt/bin && echo $plainTextPassword | sudo -S env `"PATH=`$PATH`" $command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
+            #$logCommand = "`"echo $plainTextPassword | sudo -S env `"PATH=`$PATH`" $command`""		
+		}
+		else
+		{
+			$linuxCommand = "`"echo $plainTextPassword | sudo -S $command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
+			$logCommand = "`"echo $plainTextPassword | sudo -S $command`""
+		}
 	}
 	else
 	{
-		$linuxCommand = "`"$command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
-		$logCommand = "`"$command`""
+		if ( $detectedDistro -eq "COREOS" )
+		{
+			$linuxCommand = "`"export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/share/oem/bin:/usr/share/oem/python/bin:/opt/bin && $command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
+			$logCommand = "`"export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/share/oem/bin:/usr/share/oem/python/bin:/opt/bin && $command`""		
+		}
+		else
+		{
+			$linuxCommand = "`"$command && echo AZURE-LINUX-EXIT-CODE-`$? || echo AZURE-LINUX-EXIT-CODE-`$?`""
+			$logCommand = "`"$command`""
+		}
 	}
 	LogMsg ".\tools\plink.exe -t -pw $password -P $port $username@$ip $logCommand"
 	$returnCode = 1
 	$attempts = 0
 	$notExceededTimeLimit = $true
+    $isBackGroundProcessStarted = $false
 	while ( ($returnCode -ne 0) -and ($attempts -lt $maxRetryCount) -and $notExceededTimeLimit)
 	{
 		$attempts += 1
@@ -1543,103 +1566,107 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 		-ArgumentList $currentDir, $username, $password, $ip, $port, $linuxCommand
 		$RunLinuxCmdOutput = ""
 		$debugOutput = ""
-		While($notExceededTimeLimit -and ($runLinuxCmdJob.State -eq "Running"))
-		{
-			$jobOut = Receive-Job $runLinuxCmdJob 2> $LogDir\$randomFileName
-			if($jobOut)
-			{
-				foreach ($outLine in $jobOut)
-				{
-					if($outLine -imatch "AZURE-LINUX-EXIT-CODE-")
-					{
-						$LinuxExitCode = $outLine
-					}
-					else
-					{
-						$RunLinuxCmdOutput += "$outLine`n"
-					}
-				}
-			}
-			$debugLines = Get-Content $LogDir\$randomFileName
-			if($debugLines)
-			{
-				$debugString = ""
-				foreach ($line in $debugLines)
-				{
-					$debugString += $line
-				}
-				$debugOutput += "$debugString`n"
-			}
-			Write-Progress -Activity "Attempt : $attempts : Executing $logCommand on $ip : $port" -Status "Timeout in $($RunMaxAllowedTime - $RunElaplsedTime) seconds.." -Id 87678 -PercentComplete (($RunElaplsedTime/$RunMaxAllowedTime)*100) -CurrentOperation "SSH ACTIVITY : $debugString"
-			$RunCurrentTime = Get-Date
-			$RunDiffTime = $RunCurrentTime - $RunStartTime
-			$RunElaplsedTime =  $RunDiffTime.TotalSeconds
-			if($RunElaplsedTime -le $RunMaxAllowedTime)
-			{
-				$notExceededTimeLimit = $true
-			}
-			else
-			{
-				$notExceededTimeLimit = $false
-				Stop-Job $runLinuxCmdJob
-				$timeOut = $true
-			}
-		}
-		$jobOut = Receive-Job $runLinuxCmdJob 2> $LogDir\$randomFileName
-		if($jobOut)
-		{
-			foreach ($outLine in $jobOut)
-			{
-				if($outLine -imatch "AZURE-LINUX-EXIT-CODE-")
-				{
-					$LinuxExitCode = $outLine
-				}
-				else
-				{
-					$RunLinuxCmdOutput += "$outLine`n"
-				}
-			}
-		}
-		$debugLines = Get-Content $LogDir\$randomFileName
-		if($debugLines)
-		{
-			$debugString = ""
-			foreach ($line in $debugLines)
-			{
-				$debugString += $line
-			}
-			$debugOutput += "$debugString`n"
-		}
-		Write-Progress -Activity "Attempt : $attempts : Executing $logCommand on $ip : $port" -Status $runLinuxCmdJob.State -Id 87678 -SecondsRemaining ($RunMaxAllowedTime - $RunElaplsedTime) -Completed
-		Remove-Job $runLinuxCmdJob 
-		Remove-Item $LogDir\$randomFileName -Force | Out-Null
-		if ($LinuxExitCode -imatch "AZURE-LINUX-EXIT-CODE-0") 
-		{
-			$returnCode = 0
-			LogMsg "$command executed successfully in $RunElaplsedTime seconds." -WriteHostOnly $WriteHostOnly -NoLogsPlease $NoLogsPlease
-			$retValue = $RunLinuxCmdOutput.Trim()
-		}
-		else
-		{
-			if (!$ignoreLinuxExitCode)
-			{
-				$debugOutput = ($debugOutput.Split("`n")).Trim()
-				foreach ($line in $debugOutput)
-				{
-					if($line)
-					{
-						LogErr $line
-					}
-				}
-			}
-			if($debugOutput -imatch "Unable to authenticate")
+        
+        if ( $RunInBackGround )
+        {
+            While(($runLinuxCmdJob.State -eq "Running") -and ($isBackGroundProcessStarted -eq $false ) -and $notExceededTimeLimit)
+            {
+                $SSHOut = Receive-Job $runLinuxCmdJob 2> $LogDir\$randomFileName
+                $JobOut = Get-Content $LogDir\$randomFileName
+			    if($jobOut)
+			    {
+				    foreach($outLine in $jobOut)
+				    {
+					    if($outLine -imatch "Started a shell")
+					    {
+						    $LinuxExitCode = $outLine
+                            $isBackGroundProcessStarted = $true
+                            $returnCode = 0
+					    }
+					    else
+					    {
+						    $RunLinuxCmdOutput += "$outLine`n"
+					    }
+				    }
+			    }
+			    $debugLines = Get-Content $LogDir\$randomFileName
+			    if($debugLines)
+			    {
+				    $debugString = ""
+				    foreach ($line in $debugLines)
+				    {
+					    $debugString += $line
+				    }
+				    $debugOutput += "$debugString`n"
+			    }
+			    Write-Progress -Activity "Attempt : $attempts : Initiating command in Background Mode : $logCommand on $ip : $port" -Status "Timeout in $($RunMaxAllowedTime - $RunElaplsedTime) seconds.." -Id 87678 -PercentComplete (($RunElaplsedTime/$RunMaxAllowedTime)*100) -CurrentOperation "SSH ACTIVITY : $debugString"
+			    $RunCurrentTime = Get-Date
+			    $RunDiffTime = $RunCurrentTime - $RunStartTime
+			    $RunElaplsedTime =  $RunDiffTime.TotalSeconds
+			    if($RunElaplsedTime -le $RunMaxAllowedTime)
+			    {
+				    $notExceededTimeLimit = $true
+			    }
+			    else
+			    {
+				    $notExceededTimeLimit = $false
+				    Stop-Job $runLinuxCmdJob
+				    $timeOut = $true
+			    }
+            }
+            WaitFor -seconds 5
+            $SSHOut = Receive-Job $runLinuxCmdJob 2> $LogDir\$randomFileName
+		    if($SSHOut )
+		    {
+			    foreach ($outLine in $SSHOut)
+			    {
+				    if($outLine -imatch "AZURE-LINUX-EXIT-CODE-")
+				    {
+					    $LinuxExitCode = $outLine
+                        $isBackGroundProcessTerminated = $true
+				    }
+				    else
+				    {
+					    $RunLinuxCmdOutput += "$outLine`n"
+				    }
+			    }
+		    }
+            
+		    $debugLines = Get-Content $LogDir\$randomFileName
+		    if($debugLines)
+		    {
+			    $debugString = ""
+			    foreach ($line in $debugLines)
+			    {
+				    $debugString += $line
+			    }
+			    $debugOutput += "$debugString`n"
+		    }
+		    Write-Progress -Activity "Attempt : $attempts : Executing $logCommand on $ip : $port" -Status $runLinuxCmdJob.State -Id 87678 -SecondsRemaining ($RunMaxAllowedTime - $RunElaplsedTime) -Completed
+            if ( $isBackGroundProcessStarted -and !$isBackGroundProcessTerminated )
+            {
+                LogMsg "$command is running in background with ID $($runLinuxCmdJob.Id) ..."
+                Add-Content -Path $LogDir\CurrentTestBackgroundJobs.txt -Value $runLinuxCmdJob.Id
+            }
+            else
+            {
+                Remove-Job $runLinuxCmdJob 
+                if (!$isBackGroundProcessStarted)
+                {
+                    LogErr "Failed to start process in background.."
+                }
+                if ( $isBackGroundProcessTerminated )
+                {
+                    LogErr "Background Process terminated from Linux side with error code :  $($LinuxExitCode.Split("-")[4])"
+                    $returnCode = $($LinuxExitCode.Split("-")[4])
+                    LogErr $SSHOut
+                }
+			    if($debugOutput -imatch "Unable to authenticate")
 				{
 					LogMsg "Unable to authenticate. Not retrying!"
 					Throw "Unable to authenticate"
 
 				}
-			if(!$ignoreLinuxExitCode)
-			{
 				if($timeOut)
 				{
 					$retValue = $null
@@ -1648,7 +1675,7 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 				LogErr "Linux machine returned exit code : $($LinuxExitCode.Split("-")[4])"
 				if ($attempts -eq $maxRetryCount)
 				{
-					LogMsg "Failed to execute : $command."
+					Throw "Failed to execute : $command."
 				}
 				else
 				{
@@ -1657,14 +1684,134 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 						LogMsg "Failed to execute : $command. Retrying..."
 					}
 				}
-			}
-			else
-			{
-				LogMsg "Command execution returned return code $($LinuxExitCode.Split("-")[4]) Ignoring.."
-				$retValue = $RunLinuxCmdOutput.Trim()
-				break
-			}
-		}
+            }
+		    Remove-Item $LogDir\$randomFileName -Force | Out-Null   
+        }
+        else
+        {
+		    While($notExceededTimeLimit -and ($runLinuxCmdJob.State -eq "Running"))
+		    {
+			    $jobOut = Receive-Job $runLinuxCmdJob 2> $LogDir\$randomFileName
+			    if($jobOut)
+			    {
+				    foreach ($outLine in $jobOut)
+				    {
+					    if($outLine -imatch "AZURE-LINUX-EXIT-CODE-")
+					    {
+						    $LinuxExitCode = $outLine
+					    }
+					    else
+					    {
+						    $RunLinuxCmdOutput += "$outLine`n"
+					    }
+				    }
+			    }
+			    $debugLines = Get-Content $LogDir\$randomFileName
+			    if($debugLines)
+			    {
+				    $debugString = ""
+				    foreach ($line in $debugLines)
+				    {
+					    $debugString += $line
+				    }
+				    $debugOutput += "$debugString`n"
+			    }
+			    Write-Progress -Activity "Attempt : $attempts : Executing $logCommand on $ip : $port" -Status "Timeout in $($RunMaxAllowedTime - $RunElaplsedTime) seconds.." -Id 87678 -PercentComplete (($RunElaplsedTime/$RunMaxAllowedTime)*100) -CurrentOperation "SSH ACTIVITY : $debugString"
+			    $RunCurrentTime = Get-Date
+			    $RunDiffTime = $RunCurrentTime - $RunStartTime
+			    $RunElaplsedTime =  $RunDiffTime.TotalSeconds
+			    if($RunElaplsedTime -le $RunMaxAllowedTime)
+			    {
+				    $notExceededTimeLimit = $true
+			    }
+			    else
+			    {
+				    $notExceededTimeLimit = $false
+				    Stop-Job $runLinuxCmdJob
+				    $timeOut = $true
+			    }
+		    }
+		    $jobOut = Receive-Job $runLinuxCmdJob 2> $LogDir\$randomFileName
+		    if($jobOut)
+		    {
+			    foreach ($outLine in $jobOut)
+			    {
+				    if($outLine -imatch "AZURE-LINUX-EXIT-CODE-")
+				    {
+					    $LinuxExitCode = $outLine
+				    }
+				    else
+				    {
+					    $RunLinuxCmdOutput += "$outLine`n"
+				    }
+			    }
+		    }
+		    $debugLines = Get-Content $LogDir\$randomFileName
+		    if($debugLines)
+		    {
+			    $debugString = ""
+			    foreach ($line in $debugLines)
+			    {
+				    $debugString += $line
+			    }
+			    $debugOutput += "$debugString`n"
+		    }
+		    Write-Progress -Activity "Attempt : $attempts : Executing $logCommand on $ip : $port" -Status $runLinuxCmdJob.State -Id 87678 -SecondsRemaining ($RunMaxAllowedTime - $RunElaplsedTime) -Completed
+		    Remove-Job $runLinuxCmdJob 
+		    Remove-Item $LogDir\$randomFileName -Force | Out-Null
+		    if ($LinuxExitCode -imatch "AZURE-LINUX-EXIT-CODE-0") 
+		    {
+			    $returnCode = 0
+			    LogMsg "$command executed successfully in $RunElaplsedTime seconds." -WriteHostOnly $WriteHostOnly -NoLogsPlease $NoLogsPlease
+			    $retValue = $RunLinuxCmdOutput.Trim()
+		    }
+		    else
+		    {
+			    if (!$ignoreLinuxExitCode)
+			    {
+				    $debugOutput = ($debugOutput.Split("`n")).Trim()
+				    foreach ($line in $debugOutput)
+				    {
+					    if($line)
+					    {
+						    LogErr $line
+					    }
+				    }
+			    }
+			    if($debugOutput -imatch "Unable to authenticate")
+				    {
+					    LogMsg "Unable to authenticate. Not retrying!"
+					    Throw "Unable to authenticate"
+
+				    }
+			    if(!$ignoreLinuxExitCode)
+			    {
+				    if($timeOut)
+				    {
+					    $retValue = $null
+					    Throw "Tmeout while executing command : $command"
+				    }
+				    LogErr "Linux machine returned exit code : $($LinuxExitCode.Split("-")[4])"
+				    if ($attempts -eq $maxRetryCount)
+				    {
+					    Throw "Failed to execute : $command."
+				    }
+				    else
+				    {
+					    if ($notExceededTimeLimit)
+					    {
+						    LogMsg "Failed to execute : $command. Retrying..."
+					    }
+				    }
+			    }
+			    else
+			    {
+				    LogMsg "Command execution returned return code $($LinuxExitCode.Split("-")[4]) Ignoring.."
+				    $retValue = $RunLinuxCmdOutput.Trim()
+				    break
+			    }
+		    }
+        }
 	}
 	return $retValue
 }
@@ -1677,6 +1824,14 @@ Function DoTestCleanUp($result, $testName, $DeployedServices, [switch]$keepUserD
 	{
 		if($DeployedServices)
 		{
+            $currentTestBackgroundJobs = Get-Content $LogDir\CurrentTestBackgroundJobs.txt -ErrorAction SilentlyContinue
+            $currentTestBackgroundJobs = $currentTestBackgroundJobs.Split()
+            foreach ( $taskID in $currentTestBackgroundJobs )
+            {
+                #Removal of background 
+                LogMsg "Removing Background Job ID : $taskID..."
+                Remove-Job -Id $taskID -Force
+            }
 			$user=$xmlConfig.config.Azure.Deployment.Data.UserName
 			$KernelLogOutput=GetAndCheckKernelLogs -DeployedServices $deployedServices -status "Final" #Collecting kernel logs after execution of test case : v-sirebb
 			$isClened = @()
@@ -2817,9 +2972,10 @@ Function CreatePingNode
 }
 
 Function StartIperfServer($node)
-{
-	LogMsg "Starting iperf Server on $($node.ip)"
-	$out = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshport -command $node.cmd -runAsSudo
+{    
+    $currentDir = $PWD.Path
+    LogMsg "Starting iperf Server on $($node.ip)"
+	$out = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshport -command $node.cmd -runAsSudo -RunInBackGround
 	sleep 1
 }
 
@@ -2830,16 +2986,14 @@ Function StartIperfClient($node)
 	sleep 3
 }
 
-Function IsIperfServerStarted($node)
+Function IsIperfServerStarted($node, $expectedServerInstances = 1)
 {
-	RemoteCopy -download -downloadFrom $node.ip -files "/home/$user/start-server.py.log" -downloadTo $node.LogDir -port $node.sshPort -username $node.user -password $node.password
+	#RemoteCopy -download -downloadFrom $node.ip -files "/home/$user/start-server.py.log" -downloadTo $node.LogDir -port $node.sshPort -username $node.user -password $node.password
 	LogMsg "Verifying if server is started or not.."
-	RemoteCopy -download -downloadFrom $node.ip -files "/home/$user/isServerStarted.txt" -downloadTo $node.logdir -port $node.sshPort -username $node.user -password $node.password
-	$isServerStarted = Get-Content "$($node.logdir)\isServerStarted.txt"
-	Remove-Item "$($node.logdir)\isServerStarted.txt"
-	$out = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshPort -command "rm -rf isServerStarted.txt" -runAsSudo
-
-	if($isServerStarted -eq "yes"){
+    $iperfout = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshPort -command "ps -ef" -runAsSudo
+    LogMsg "Total iperf server running instances : $($iperfout.CompareTo("iperf -s"))"	
+	if($iperfout.CompareTo("iperf -s") -ge $expectedServerInstances)
+    {
 		return $true
 	}
 	else{
@@ -2849,7 +3003,7 @@ Function IsIperfServerStarted($node)
 
 Function IsIperfServerRunning($node)
 {
-	$out = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshport -command "./check-server.py && mv Runtime.log check-server.py.log -f" -runAsSudo
+	$out = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshport -command "python check-server.py && mv Runtime.log check-server.py.log -f" -runAsSudo
 	RemoteCopy -download -downloadFrom $node.ip -files "/home/$user/check-server.py.log, /home/$user/iperf-server.txt" -downloadTo $node.LogDir -port $node.sshPort -username $node.user -password $node.password
 	RemoteCopy -download -downloadFrom $node.ip -files "/home/$user/state.txt, /home/$user/Summary.log" -downloadTo $node.logdir -port $node.sshPort -username $node.user -password $node.password
 	$serverState = Get-Content "$($node.Logdir)\state.txt"
@@ -3516,7 +3670,7 @@ Function RunLinuxCmdOnRemoteVM($intermediateVM,$remoteVM, [switch] $runAsSudo, $
 	}
 	else
 	{
-		$RunSSHremoteCommand = "/home/test/RunSSHCmd.py -s `'$($remoteVM.Hostname)`' -u $($remoteVM.user) -p`'$newPass`' -P$($remoteVM.sshPort) -c `'$remoteCommand`'"
+		$RunSSHremoteCommand = "python /home/test/RunSSHCmd.py -s `'$($remoteVM.Hostname)`' -u $($remoteVM.user) -p`'$newPass`' -P$($remoteVM.sshPort) -c `'$remoteCommand`'"
 	}
 	if($runAsSudo)
 	{
@@ -3549,11 +3703,11 @@ Function RemoteCopyRemoteVM($intermediateVM,$remoteVM,$remoteFiles, [switch]$upl
 #$allFiles = "/home/test/azuremodules.py,/home/test/ConfigureDnsServer.py,/home/test/CleanupDnsServer.py,/home/test/ConfigureResolvConf.py,/home/test/RunSSHCmd.py,/home/test/RemoteCopy.py"
 		if($hostnameMode)
 		{
-			$uploadCommand = "./RemoteCopy.py  -m upload -c `'$($remoteVM.Hostname)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -r `'/home/$user`' -f `'$remoteFiles`'"
+			$uploadCommand = "python RemoteCopy.py  -m upload -c `'$($remoteVM.Hostname)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -r `'/home/$user`' -f `'$remoteFiles`'"
 		}
 		else
 		{
-			$uploadCommand = "./RemoteCopy.py  -m upload -c `'$($remoteVM.ip)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -r `'/home/$user`' -f `'$remoteFiles`'"
+			$uploadCommand = "python RemoteCopy.py  -m upload -c `'$($remoteVM.ip)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -r `'/home/$user`' -f `'$remoteFiles`'"
 		}
 		$remoteFiles = $remoteFiles.Replace(" ",'')
 		$uploadOutput = RunLinuxCmd -ip $intermediateVM.ip -port $intermediateVM.sshPort -username $intermediateVM.user -password $intermediateVM.password -command $uploadCommand -runAsSudo
@@ -3580,11 +3734,11 @@ Function RemoteCopyRemoteVM($intermediateVM,$remoteVM,$remoteFiles, [switch]$upl
 #$allFiles = "/home/test/azuremodules.py,/home/test/ConfigureDnsServer.py,/home/test/CleanupDnsServer.py,/home/test/ConfigureResolvConf.py,/home/test/RunSSHCmd.py,/home/test/RemoteCopy.py"
 		if($hostnameMode)
 		{
-			$downloadCommand = "./RemoteCopy.py  -m download -c `'$($remoteVM.Hostname)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -l `'/home/$user`' -f `'$remoteFiles`'"
+			$downloadCommand = "python RemoteCopy.py  -m download -c `'$($remoteVM.Hostname)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -l `'/home/$user`' -f `'$remoteFiles`'"
 		}
 		else
 		{
-			$downloadCommand = "./RemoteCopy.py  -m download -c `'$($remoteVM.ip)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -l `'/home/$user`' -f `'$remoteFiles`'"
+			$downloadCommand = "python RemoteCopy.py  -m download -c `'$($remoteVM.ip)`' -u $($remoteVM.user) -p `'$($remoteVM.password)`' -P$($remoteVM.sshPort) -l `'/home/$user`' -f `'$remoteFiles`'"
 		}
 		$remoteFiles = $remoteFiles.Replace(" ",'')
 		$downloadOutput = RunLinuxCmd -ip $intermediateVM.ip -port $intermediateVM.sshPort -username $intermediateVM.user -password $intermediateVM.password -command $downloadCommand -runAsSudo
@@ -3621,7 +3775,7 @@ Function ConfigureVNETVMs($SSHDetails)
 		$testPort = $IPPORT[1]
 		LogMsg "$testIP : $testPort configuration in progress.."
 
-		$out = RunLinuxCmd -ip $testIP -port $testPort -username $user -password $password -command "/home/$user/ConfigureResolvConf.py" -runAsSudo
+		$out = RunLinuxCmd -ip $testIP -port $testPort -username $user -password $password -command "python /home/$user/ConfigureResolvConf.py" -runAsSudo
 		if (-not ($out -imatch 'ExitCode : 0'))
 		{
 			Throw "$testIP : $testPort ConfigureResolvConf.py failed..."

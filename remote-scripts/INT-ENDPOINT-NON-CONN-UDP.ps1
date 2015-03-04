@@ -53,15 +53,15 @@ if($isDeployed)
             $testResult = $null
             if(($mode -eq "IP") -or ($mode -eq "VIP"))
             {
-	            $client.cmd ="./start-client.py -c $hs1vm1IP -p $testPort  -t$iperfTimeoutSeconds -u yes"
+	            $client.cmd ="python start-client.py -c $hs1vm1IP -p $testPort  -t$iperfTimeoutSeconds -u yes"
 	        }
             if(($mode -eq "URL") -or ($mode -eq "Hostname"))
             {
-	            $client.cmd ="./start-client.py -c $hs1vm1Hostname -p $testPort  -t$iperfTimeoutSeconds -u yes"
+	            $client.cmd ="python start-client.py -c $hs1vm1Hostname -p $testPort  -t$iperfTimeoutSeconds -u yes"
 	        }
             LogMsg "Starting the test in $mode mode.."
-            $server.cmd="./start-server.py -p $testPort -u yes  && mv Runtime.log start-server.py.log"
-	        #$cmd2="./start-client.py -c $($hs1vm1.IpAddress)  -p $hs1vm1tcpport -t10"
+            $server.cmd="python start-server.py -p $testPort -u yes  && mv Runtime.log start-server.py.log"
+	        #$cmd2="python start-client.py -c $($hs1vm1.IpAddress)  -p $hs1vm1tcpport -t10"
 	        mkdir $LogDir\$mode -ErrorAction SilentlyContinue | out-null
             $server.LogDir = "$LogDir\$mode"
             $client.LogDir = "$LogDir\$mode"

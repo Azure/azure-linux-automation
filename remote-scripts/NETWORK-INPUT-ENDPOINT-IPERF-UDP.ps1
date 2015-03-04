@@ -46,16 +46,16 @@ if ($isDeployed)
 			LogMsg "Test Started in $mode mode.."
 			mkdir $LogDir\$mode -ErrorAction SilentlyContinue | out-null
 
-			$server.cmd ="./start-server.py -i1 -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
+			$server.cmd ="python start-server.py -i1 -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
 
 			if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 			{
-				$client.cmd ="./start-client.py -c $hs1VIP -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l 1420"
+				$client.cmd ="python start-client.py -c $hs1VIP -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l 1420"
 			}
 
 			if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 			{
-				$client.cmd ="./start-client.py -c $hs1ServiceUrl -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l 1420"
+				$client.cmd ="python start-client.py -c $hs1ServiceUrl -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds -u yes -l 1420"
 			}
 			$server.logDir = "$LogDir\$mode"
 			$client.logDir = "$LogDir\$mode"

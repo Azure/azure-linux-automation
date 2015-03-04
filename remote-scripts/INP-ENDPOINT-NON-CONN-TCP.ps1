@@ -41,14 +41,14 @@ if($isDeployed)
 		try
 		{
 			$testResult = $null
-			$cmd1="./start-server.py -p $testPort && mv Runtime.log start-server.py.log"
+			$cmd1="python start-server.py -p $testPort && mv Runtime.log start-server.py.log"
 			if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 			{
-				$cmd2="./start-client.py -c $hs1VIP -p $testPort -t$iperfTimeoutSeconds"
+				$cmd2="python start-client.py -c $hs1VIP -p $testPort -t$iperfTimeoutSeconds"
 			}
 			if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 			{
-				$cmd2="./start-client.py -c $hs1ServiceUrl -p $testPort -t$iperfTimeoutSeconds"
+				$cmd2="python start-client.py -c $hs1ServiceUrl -p $testPort -t$iperfTimeoutSeconds"
 			}
 			$a = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodetcpPort $hs1vm1tcpport
 			$b = CreateIperfNode -nodeIp $dtapServerIp -nodeSshPort $dtapServerSshport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodetcpPort $dtapServerTcpport

@@ -35,8 +35,8 @@ if ($isDeployed)
 	$hs1vm1sshport = GetPort -Endpoints $hs1vm1Endpoints -usage ssh
 	$hs1vm2sshport = GetPort -Endpoints $hs1vm2Endpoints -usage ssh
 	$iperfTimeoutSeconds = $currentTestData.iperfTimeoutSeconds
-	$cmd1="./start-server.py -i1 -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
-	$cmd2="./start-client.py -c $($hs1vm1.IpAddress) -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds  -P 1 -u yes"
+	$cmd1="python start-server.py -i1 -p $hs1vm1udpport -u yes && mv Runtime.log start-server.py.log -f"
+	$cmd2="python start-client.py -c $($hs1vm1.IpAddress) -i1 -p $hs1vm1udpport -t$iperfTimeoutSeconds  -P 1 -u yes"
 
 	$server = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeUdpPort $hs1vm1udpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 	$client = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm2sshport -nodeudpPort $hs1vm2udpport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir
@@ -56,12 +56,12 @@ if ($isDeployed)
 
 				if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 				{
-					$client.cmd = "./start-client.py -c $hs1vm1IP  -p $hs1vm1udpport -t$iperfTimeoutSeconds  -P$Value -u yes"
+					$client.cmd = "python start-client.py -c $hs1vm1IP  -p $hs1vm1udpport -t$iperfTimeoutSeconds  -P$Value -u yes"
 				}
 
 				if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 				{
-					$client.cmd = "./start-client.py -c $hs1vm1Hostname  -p $hs1vm1udpport -t$iperfTimeoutSeconds -P$Value -u yes"
+					$client.cmd = "python start-client.py -c $hs1vm1Hostname  -p $hs1vm1udpport -t$iperfTimeoutSeconds -P$Value -u yes"
 				}
 
                 #Create Directory for each test mode to collect all results..

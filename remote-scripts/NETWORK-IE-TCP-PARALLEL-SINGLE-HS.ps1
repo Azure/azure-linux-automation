@@ -36,7 +36,7 @@ if($isDeployed)
 	$server = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeTcpPort $hs1vm1tcpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 	$client = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm2sshport -nodeTcpPort $hs1vm2tcpport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 	$iperfTimeoutSeconds = $currentTestData.iperfTimeoutSeconds
-	$server.cmd = "./start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
+	$server.cmd = "python start-server.py -p $hs1vm1tcpport && mv Runtime.log start-server.py.log -f"
 
 	foreach ($Value in $SubtestValues) 
 	{
@@ -52,12 +52,12 @@ if($isDeployed)
 			    $suppressedOut = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "chmod +x *" -runAsSudo
 				if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 				{
-					$client.cmd = "./start-client.py -c $hs1vm1IP -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P$Value"
+					$client.cmd = "python start-client.py -c $hs1vm1IP -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P$Value"
 				}
 
 				if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 				{
-					$client.cmd = "./start-client.py -c $hs1vm1Hostname -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P$Value"
+					$client.cmd = "python start-client.py -c $hs1vm1Hostname -p $hs1vm1tcpport -t$iperfTimeoutSeconds -P$Value"
 				}
 				LogMsg "Test Started for Parallel Connections $Value and $mode mode.."
 

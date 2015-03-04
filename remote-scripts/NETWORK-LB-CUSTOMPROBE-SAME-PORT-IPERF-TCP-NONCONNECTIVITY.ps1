@@ -47,8 +47,8 @@ if($isDeployed)
 
 	$testPort = $hs1vm1tcpport + 10
 	$pSize = 6
-	$cmd1="./start-server.py -p $testPort && mv Runtime.log start-server.py.log -f"
-	$cmd2="./start-server.py -p $testPort && mv Runtime.log start-server.py.log -f"
+	$cmd1="python start-server.py -p $testPort && mv Runtime.log start-server.py.log -f"
+	$cmd2="python start-server.py -p $testPort && mv Runtime.log start-server.py.log -f"
 
 	$server1 = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm1sshport -nodeTcpPort $hs1vm1tcpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodeDip $hs1vm1.IpAddress
 	$server2 = CreateIperfNode -nodeIp $hs1VIP -nodeSshPort $hs1vm2sshport -nodeTcpPort $hs1vm2tcpport -nodeIperfCmd $cmd2 -user $user -password $password -files $currentTestData.files -logDir $LogDir -nodeDip $hs1vm2.IpAddress
@@ -62,11 +62,11 @@ if($isDeployed)
 			$testResult = $null
 			if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 			{
-				$client.cmd = "./start-client.py -c $hs1VIP -p $testPort -t$iperfTimeoutSeconds -P$pSize"
+				$client.cmd = "python start-client.py -c $hs1VIP -p $testPort -t$iperfTimeoutSeconds -P$pSize"
 			}
 			if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 			{
-				$client.cmd = "./start-client.py -c $hs1ServiceUrl -p $testPort -t$iperfTimeoutSeconds -P$pSize"
+				$client.cmd = "python start-client.py -c $hs1ServiceUrl -p $testPort -t$iperfTimeoutSeconds -P$pSize"
 			}
 			mkdir $LogDir\$mode -ErrorAction SilentlyContinue | out-null
 			mkdir $LogDir\$mode\Server1 -ErrorAction SilentlyContinue | out-null

@@ -38,8 +38,8 @@ if ($isDeployed)
 	LogMsg "DTAP Machine : $dtapServerIp : $hs1vm1sshport"
 	$iperfTimeoutSeconds = $currentTestData.iperfTimeoutSeconds
 
-	$cmd1="./start-server.py -i1 -p $dtapServerTcpport && mv Runtime.log start-server.py.log -f"
-	$cmd2="./start-client.py -c $dtapServerIp -p $dtapServerTcpport -t$iperfTimeoutSeconds -P$Value"
+	$cmd1="$python_cmd start-server.py -i1 -p $dtapServerTcpport && mv Runtime.log start-server.py.log -f"
+	$cmd2="$python_cmd start-client.py -c $dtapServerIp -p $dtapServerTcpport -t$iperfTimeoutSeconds -P$Value"
 
 	$server = CreateIperfNode -nodeIp $dtapServerIp -nodeSshPort $dtapServerSshport -nodeTcpPort $dtapServerTcpport -nodeIperfCmd $cmd1 -user $user -password $password -files $currentTestData.files -logDir $LogDir
 	LogMsg "$dtapServerIp set as iperf server"
@@ -51,7 +51,7 @@ if ($isDeployed)
 		{
 			$testResult = $null
 			LogMsg "Test Started for Parallel Connections $Value"
-			$client.cmd = "./start-client.py -c $dtapServerIp -p $dtapServerTcpport -t20 -P$Value"
+			$client.cmd = "$python_cmd start-client.py -c $dtapServerIp -p $dtapServerTcpport -t20 -P$Value"
 			mkdir $LogDir\$Value -ErrorAction SilentlyContinue | out-null
 			$client.logDir = $LogDir + "\$Value"
 			$server.logDir = $LogDir + "\$Value"

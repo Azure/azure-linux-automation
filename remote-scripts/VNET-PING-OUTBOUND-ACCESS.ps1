@@ -160,12 +160,12 @@ if($isDeployed)
 
 					if(($mode -eq "IP") -or ($mode -eq "VIP") -or ($mode -eq "DIP"))
 					{
-						$pingFrom.cmd = "./ping.py -x $externalServerIP -c 10"
+						$pingFrom.cmd = "python ping.py -x $externalServerIP -c 10"
 					}
 
 					if(($mode -eq "URL") -or ($mode -eq "Hostname"))
 					{
-						$pingFrom.cmd = "./ping.py -x  $externalServerUrl  -c 10"
+						$pingFrom.cmd = "python ping.py -x  $externalServerUrl  -c 10"
 					}
 					LogMsg "Test Started for $Value in $mode mode.."
 
