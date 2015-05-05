@@ -3102,13 +3102,15 @@ Function IsIperfServerStarted($node, $expectedServerInstances = 1)
 {
 	#RemoteCopy -download -downloadFrom $node.ip -files "/home/$user/start-server.py.log" -downloadTo $node.LogDir -port $node.sshPort -username $node.user -password $node.password
 	LogMsg "Verifying if server is started or not.."
-    $iperfout = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshPort -command "ps -ef" -runAsSudo
-    LogMsg "Total iperf server running instances : $($iperfout.CompareTo("iperf -s"))"	
-	if($iperfout.CompareTo("iperf -s") -ge $expectedServerInstances)
-    {
+	$iperfout = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshPort -command "ps -ef | grep iperf -s | grep -v grep | wc -l" -runAsSudo
+	$iperfout = [int]$iperfout[-1].ToString()
+	LogMsg "Total iperf server running instances : $($iperfout)"	
+	if($iperfout -ge $expectedServerInstances)
+	{
 		return $true
 	}
-	else{
+	else
+	{
 		return $false
 	}
 }

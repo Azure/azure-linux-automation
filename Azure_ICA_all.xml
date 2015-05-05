@@ -2197,7 +2197,7 @@
 			<testName>NETWORK-LB-CUSTOMPROBE-OTHER-PORT-TWO-NODES-DOWN-TCP</testName>
 			<testScript></testScript>
 			<testScriptps1>NETWORK-LB-CUSTOMPROBE-OTHER-PORT-TWO-NODES-DOWN-TCP.ps1</testScriptps1>
-			<files>remote-scripts\start-server.py, remote-scripts\start-client.py, remote-scripts\check-server.py, remote-scripts\stop-server.py, remote-scripts\azuremodules.py, remote-scripts\start-server-without-stopping.py</files>
+			<files>remote-scripts\start-server.py, remote-scripts\start-client.py, remote-scripts\check-server.py, remote-scripts\stop-server.py, remote-scripts\azuremodules.py, remote-scripts\start-server-without-stopping.py, remote-scripts\stop-client.py</files>
 			<setupType>CustomProbeOtherPort</setupType>
 			<iperfTimeoutSeconds>20</iperfTimeoutSeconds>
 			<TestType></TestType>

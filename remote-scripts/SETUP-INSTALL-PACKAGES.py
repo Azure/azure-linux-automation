@@ -161,6 +161,9 @@ def ConfigFilesUpdate():
 	IsStartUp = False
 	RunLog.info("Updating configuration files..")
 
+	#Provisioning.MonitorHostName=n -> y, in Ubuntu it is n by default
+	Run("sed -i s/Provisioning.MonitorHostName=n/Provisioning.MonitorHostName=y/g  /etc/waagent.conf > /tmp/waagent.conf") 	
+	
 	# Disable 'requiretty' in sudoers
 	Run("sed -r 's/^.*Defaults\s*requiretty.*$/#Defaults requiretty/g' /etc/sudoers -i")
 
