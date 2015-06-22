@@ -1,0 +1,177 @@
+
+Preparing Files: --test=fileio --file-total-size=10G --file-extra-flags=dsync --file-fsync-freq=0
+--- Disk Usage Before Generating New Files ---
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/sda1       29822848 1622452  26662400   6% /
+devtmpfs         3560560       0   3560560   0% /dev
+tmpfs            3568752       0   3568752   0% /dev/shm
+tmpfs            3568752    8452   3560300   1% /run
+tmpfs            3568752       0   3568752   0% /sys/fs/cgroup
+/dev/sdb1       14317512   40988  13526192   1% /mnt/resource
+/dev/md1        20492880   45084  19383760   1% /mnt/RaidVolume
+--- Disk Usage After Generating New Files ---
+Filesystem     1K-blocks     Used Available Use% Mounted on
+/dev/sda1       29822848  1622552  26662300   6% /
+devtmpfs         3560560        0   3560560   0% /dev
+tmpfs            3568752        0   3568752   0% /dev/shm
+tmpfs            3568752     8452   3560300   1% /run
+tmpfs            3568752        0   3568752   0% /sys/fs/cgroup
+/dev/sdb1       14317512    40988  13526192   1% /mnt/resource
+/dev/md1        20492880 10530844   8898000  55% /mnt/RaidVolume
+=== End Preparation  06/22/2015 06:58:35 PM UTC ===
+===================================== Starting Run 06/22/2015 06:59:14 PM UTC script generated 2/9/2015 4:24:44 PM ================================
+------------------------------- rndrd, 8K, 16 threads 60 seconds------------------ 06/22/2015 06:59:14 PM UTC ---
+sysbench 0.4.12:  multi-threaded system evaluation benchmark
+
+Running the test with following options:
+Number of threads: 16
+
+Extra file open flags: 4096
+128 files, 80Mb each
+10Gb total file size
+Block size 8Kb
+Number of random requests for random IO: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() at the end of test, Enabled.
+Using synchronous I/O mode
+Doing random read test
+Threads started!
+Time limit exceeded, exiting...
+(last message repeated 15 times)
+Done.
+
+Operations performed:  254352 Read, 0 Write, 0 Other = 254352 Total
+Read 1.9406Gb  Written 0b  Total transferred 1.9406Gb  (33.112Mb/sec)
+ 4238.36 Requests/sec executed
+
+Test execution summary:
+    total time:                          60.0119s
+    total number of events:              254352
+    total time taken by event execution: 959.5018
+    per-request statistics:
+         min:                                  0.00ms
+         avg:                                  3.77ms
+         max:                                145.24ms
+         approx.  95 percentile:              45.50ms
+
+Threads fairness:
+    events (avg/stddev):           15897.0000/146.92
+    execution time (avg/stddev):   59.9689/0.00
+
+===================================== Starting Run 06/22/2015 07:01:01 PM UTC script generated 2/9/2015 4:24:44 PM ================================
+------------------------------- rndrd, 8K, 32 threads 60 seconds------------------ 06/22/2015 07:01:01 PM UTC ---
+sysbench 0.4.12:  multi-threaded system evaluation benchmark
+
+Running the test with following options:
+Number of threads: 32
+
+Extra file open flags: 4096
+128 files, 80Mb each
+10Gb total file size
+Block size 8Kb
+Number of random requests for random IO: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() at the end of test, Enabled.
+Using synchronous I/O mode
+Doing random read test
+Threads started!
+Time limit exceeded, exiting...
+(last message repeated 31 times)
+Done.
+
+Operations performed:  227156 Read, 0 Write, 0 Other = 227156 Total
+Read 1.7331Gb  Written 0b  Total transferred 1.7331Gb  (29.563Mb/sec)
+ 3784.06 Requests/sec executed
+
+Test execution summary:
+    total time:                          60.0297s
+    total number of events:              227156
+    total time taken by event execution: 1915.9666
+    per-request statistics:
+         min:                                  0.00ms
+         avg:                                  8.43ms
+         max:                                277.04ms
+         approx.  95 percentile:              49.77ms
+
+Threads fairness:
+    events (avg/stddev):           7098.6250/1463.10
+    execution time (avg/stddev):   59.8740/0.05
+
+===================================== Starting Run 06/22/2015 07:02:47 PM UTC script generated 2/9/2015 4:24:44 PM ================================
+------------------------------- rndwr, 8K, 16 threads 60 seconds------------------ 06/22/2015 07:02:47 PM UTC ---
+sysbench 0.4.12:  multi-threaded system evaluation benchmark
+
+Running the test with following options:
+Number of threads: 16
+
+Extra file open flags: 4096
+128 files, 80Mb each
+10Gb total file size
+Block size 8Kb
+Number of random requests for random IO: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() at the end of test, Enabled.
+Using synchronous I/O mode
+Doing random write test
+Threads started!
+Time limit exceeded, exiting...
+(last message repeated 15 times)
+Done.
+
+Operations performed:  0 Read, 59424 Write, 0 Other = 59424 Total
+Read 0b  Written 464.25Mb  Total transferred 464.25Mb  (7.7363Mb/sec)
+  990.25 Requests/sec executed
+
+Test execution summary:
+    total time:                          60.0094s
+    total number of events:              59424
+    total time taken by event execution: 959.9158
+    per-request statistics:
+         min:                                  2.25ms
+         avg:                                 16.15ms
+         max:                                956.62ms
+         approx.  95 percentile:              46.50ms
+
+Threads fairness:
+    events (avg/stddev):           3714.0000/42.02
+    execution time (avg/stddev):   59.9947/0.00
+
+===================================== Starting Run 06/22/2015 07:04:33 PM UTC script generated 2/9/2015 4:24:44 PM ================================
+------------------------------- rndwr, 8K, 32 threads 60 seconds------------------ 06/22/2015 07:04:33 PM UTC ---
+sysbench 0.4.12:  multi-threaded system evaluation benchmark
+
+Running the test with following options:
+Number of threads: 32
+
+Extra file open flags: 4096
+128 files, 80Mb each
+10Gb total file size
+Block size 8Kb
+Number of random requests for random IO: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() at the end of test, Enabled.
+Using synchronous I/O mode
+Doing random write test
+Threads started!
+Time limit exceeded, exiting...
+(last message repeated 31 times)
+Done.
+
+Operations performed:  0 Read, 59988 Write, 0 Other = 59988 Total
+Read 0b  Written 468.66Mb  Total transferred 468.66Mb  (7.8052Mb/sec)
+  999.06 Requests/sec executed
+
+Test execution summary:
+    total time:                          60.0444s
+    total number of events:              59988
+    total time taken by event execution: 1920.6750
+    per-request statistics:
+         min:                                  2.25ms
+         avg:                                 32.02ms
+         max:                                663.39ms
+         approx.  95 percentile:              54.32ms
+
+Threads fairness:
+    events (avg/stddev):           1874.6250/22.81
+    execution time (avg/stddev):   60.0211/0.00
+

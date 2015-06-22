@@ -1,0 +1,328 @@
+INFO : 06-22-2015 06:45:58 : ~~~~~~~~~~~~~~~TEST STARTED : ICA-LIS4-TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+INFO : 06-22-2015 06:45:58 : .\remote-scripts\ICA-LIS4-TEST.ps1
+INFO : 06-22-2015 06:45:58 : Starting multiple tests : ICA-LIS4-TEST
+INFO : 06-22-2015 06:46:01 : DS2DISK2
+INFO : 06-22-2015 06:46:01 : Creating Hosted Service : ICA-DS2DISK2-CentOS71-6-22-11-46-1.
+INFO : 06-22-2015 06:46:01 : Verifying that service name is not in use.
+INFO : 06-22-2015 06:46:04 : ICA-DS2DISK2-CentOS71-6-22-11-46-1 not found!
+INFO : 06-22-2015 06:46:04 : Using location : "Southeast Asia"
+INFO : 06-22-2015 06:46:04 : New-AzureService -ServiceName ICA-DS2DISK2-CentOS71-6-22-11-46-1 -Location "Southeast Asia"
+INFO : 06-22-2015 06:46:14 : Time Lapsed : 8.3425854 Seconds.
+INFO : 06-22-2015 06:46:14 : New-AzureService	
+INFO : 06-22-2015 06:46:14 : Hosted Service Created.
+INFO : 06-22-2015 06:46:14 : Adding Certificate to hosted service..
+INFO : 06-22-2015 06:46:14 : Add-AzureCertificate -CertToDeploy "D:\GitHub\iamshital\azure-linux-automation\ssh\myCert.cer" -ServiceName ICA-DS2DISK2-CentOS71-6-22-11-46-1
+INFO : 06-22-2015 06:46:49 : Time Lapsed : 34.7519718 Seconds.
+INFO : 06-22-2015 06:46:49 : Certificate added successfully.
+INFO : 06-22-2015 06:46:49 : New-AzureVM -ServiceName ICA-DS2DISK2-CentOS71-6-22-11-46-1 -VMs (( New-AzureVMConfig -Name ICA-DS2DISK2-CentOS71-6-22-11-46-1-role-0 -InstanceSize Standard_DS2 -ImageName 5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-71-20150605 | Add-AzureProvisioningConfig -Linux -LinuxUser test -Password "Linux,.0n,.Azure" -SSHPublicKeys (New-AzureSSHKey -PublicKey -Fingerprint 690076D4C41C1DE677CD464EA63B44AE94C2E621 -Path /home/test/.ssh/authorized_keys) |  Set-AzureEndpoint -Name "SSH" -LocalPort "22" -PublicPort "22" -Protocol "tcp"  | Add-AzureDataDisk -CreateNew -DiskSizeInGB 10 -LUN 0 -HostCaching ReadOnly -DiskLabel "ICA-DS2DISK2-CentOS71-6-22-11-46-1-role-0-Disk-0" | Add-AzureDataDisk -CreateNew -DiskSizeInGB 10 -LUN 1 -HostCaching ReadOnly -DiskLabel "ICA-DS2DISK2-CentOS71-6-22-11-46-1-role-0-Disk-1" ))
+INFO : 06-22-2015 06:48:35 : Time Lapsed : 104.7451391 Seconds.
+INFO : 06-22-2015 06:48:35 : VM's deployed. Verifying..
+INFO : 06-22-2015 06:48:36 : Expected VMs : 1. Deployed VMs : 1
+INFO : 06-22-2015 06:48:36 : Deployment Created!
+INFO : 06-22-2015 06:48:36 : Sleeping 10 seconds to VM to start..
+INFO : 06-22-2015 06:48:46 : Waiting for VM(s) to become Ready.
+INFO : 06-22-2015 06:48:46 : checking ICA-DS2DISK2-CentOS71-6-22-11-46-1.. 
+INFO : 06-22-2015 06:50:29 : 
+INFO : 06-22-2015 06:50:29 : ICA-DS2DISK2-CentOS71-6-22-11-46-1 is Ready..
+INFO : 06-22-2015 06:50:29 : Trying to Connect to deployed VM(s)
+INFO : 06-22-2015 06:50:32 : ALL VM's SSH port is/are open now..
+INFO : 06-22-2015 06:50:32 : Get-AzureService -ServiceName ICA-DS2DISK2-CentOS71-6-22-11-46-1
+INFO : 06-22-2015 06:50:37 : Time Lapsed : 4.2969395 Seconds.
+INFO : 06-22-2015 06:50:39 : Collecting ICA-DS2DISK2-CentOS71-6-22-11-46-1-role-0 VM Kernel Initial Logs..
+INFO : 06-22-2015 06:50:39 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\435hu1ck.0o4 to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:50:43 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:50:43 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S dmesg > /home/test/InitialBootLogs.txt"
+INFO : 06-22-2015 06:50:48 : dmesg > /home/test/InitialBootLogs.txt executed successfully in 4.8327912 seconds.
+INFO : 06-22-2015 06:50:48 : Downloading /home/test/InitialBootLogs.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\ICA-DS2DISK2-CentOS71-6-22-11-46-1-role-0 using Password authentication
+INFO : 06-22-2015 06:50:52 : Download Success after 1 Attempt
+INFO : 06-22-2015 06:50:52 : ICA-DS2DISK2-CentOS71-6-22-11-46-1-role-0: Initial Kernel logs collected ..SUCCESSFULLY
+INFO : 06-22-2015 06:50:52 : dos2unix: converting file .\SetupScripts\DetectLinuxDistro.sh to Unix format...
+INFO : 06-22-2015 06:50:52 : Uploading .\SetupScripts\DetectLinuxDistro.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:50:56 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:50:56 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 06:51:01 : chmod +x *.sh executed successfully in 4.6250037 seconds.
+INFO : 06-22-2015 06:51:01 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S /home/test/DetectLinuxDistro.sh"
+INFO : 06-22-2015 06:51:06 : /home/test/DetectLinuxDistro.sh executed successfully in 4.5625033 seconds.
+INFO : 06-22-2015 06:51:06 : Set $python_cmd > python
+INFO : 06-22-2015 06:51:06 : Linux distro detected : CENTOS
+INFO : 06-22-2015 06:51:06 : Set $python_cmd > python
+INFO : 06-22-2015 06:51:08 : dos2unix: converting file .\SetupScripts\DetectLinuxDistro.sh to Unix format...
+INFO : 06-22-2015 06:51:08 : Uploading .\SetupScripts\DetectLinuxDistro.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:51:12 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:51:12 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 06:51:17 : chmod +x *.sh executed successfully in 4.5160536 seconds.
+INFO : 06-22-2015 06:51:17 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S /home/test/DetectLinuxDistro.sh"
+INFO : 06-22-2015 06:51:21 : /home/test/DetectLinuxDistro.sh executed successfully in 4.5468424 seconds.
+INFO : 06-22-2015 06:51:21 : Set $python_cmd > python
+INFO : 06-22-2015 06:51:21 : Linux distro detected : CENTOS
+INFO : 06-22-2015 06:51:21 : dos2unix: converting file remote-scripts\ManagePartitionOnDisk.sh to Unix format...
+INFO : 06-22-2015 06:51:21 : Uploading remote-scripts\ManagePartitionOnDisk.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:51:26 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:51:26 : dos2unix: converting file remote-scripts\ManageRaid.sh to Unix format...
+INFO : 06-22-2015 06:51:26 : Uploading remote-scripts\ManageRaid.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:51:30 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:51:30 : dos2unix: converting file remote-scripts\sys-custom.sh to Unix format...
+INFO : 06-22-2015 06:51:30 : Uploading remote-scripts\sys-custom.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:51:34 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:51:34 : dos2unix: converting file remote-scripts\packageInstaller.sh to Unix format...
+INFO : 06-22-2015 06:51:34 : Uploading remote-scripts\packageInstaller.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:51:38 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:51:38 : Uploading LinuxPackages\epel-release-7-5.noarch.rpm to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:51:42 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:51:42 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 06:51:47 : chmod +x *.sh executed successfully in 5.0938214 seconds.
+INFO : 06-22-2015 06:51:47 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S yum install --nogpgcheck -y ./epel-release-7-5.noarch.rpm "
+INFO : 06-22-2015 06:51:56 : yum install --nogpgcheck -y ./epel-release-7-5.noarch.rpm  executed successfully in 8.6405252 seconds.
+INFO : 06-22-2015 06:51:56 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S yum install --nogpgcheck -y sysstat"
+INFO : 06-22-2015 06:52:27 : yum install --nogpgcheck -y sysstat executed successfully in 31.4829734 seconds.
+INFO : 06-22-2015 06:52:27 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S yum install --nogpgcheck -y mdadm"
+INFO : 06-22-2015 06:52:37 : yum install --nogpgcheck -y mdadm executed successfully in 9.828137 seconds.
+INFO : 06-22-2015 06:52:37 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S yum install --nogpgcheck -y sysbench"
+INFO : 06-22-2015 06:52:47 : yum install --nogpgcheck -y sysbench executed successfully in 9.4426693 seconds.
+INFO : 06-22-2015 06:52:47 : STARTING TEST : Deploy and Verify attached disks
+INFO : 06-22-2015 06:52:47 : Attempt : 1/10 : Getting Attached disks
+INFO : 06-22-2015 06:52:54 : Verifying 2 disks..
+INFO : 06-22-2015 06:52:54 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S fdisk -l"
+INFO : 06-22-2015 06:52:59 : fdisk -l executed successfully in 4.5937525 seconds.
+INFO : 06-22-2015 06:52:59 : fdisk -l console output is saved to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Deploy and Verify attached disks\DataDiskStatusAfterDeployingVM.txt
+INFO : 06-22-2015 06:52:59 : Expected Disks : 2
+INFO : 06-22-2015 06:52:59 : Attached Disks : 2
+INFO : 06-22-2015 06:52:59 : All disks detected successfully
+INFO : 06-22-2015 06:52:59 : STARTING TEST : Pass1 - Create Raid partition on prev.NOT formatted disks
+INFO : 06-22-2015 06:52:59 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S wipefs -a /dev/sdc /dev/sdd"
+INFO : 06-22-2015 06:53:03 : wipefs -a /dev/sdc /dev/sdd executed successfully in 4.6094254 seconds.
+LinuxConsole06-22-2015 06:53:03 : 
+INFO : 06-22-2015 06:53:03 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "lsblk"
+INFO : 06-22-2015 06:53:08 : lsblk executed successfully in 4.5468796 seconds.
+INFO : 06-22-2015 06:53:08 : Creating the partition on /dev/sdc
+INFO : 06-22-2015 06:53:08 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./ManagePartitionOnDisk.sh -diskName /dev/sdc -create yes -forRaid yes"
+INFO : 06-22-2015 06:53:13 : ./ManagePartitionOnDisk.sh -diskName /dev/sdc -create yes -forRaid yes executed successfully in 4.9399833 seconds.
+INFO : 06-22-2015 06:53:13 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "lsblk"
+INFO : 06-22-2015 06:53:18 : lsblk executed successfully in 4.5312594 seconds.
+INFO : 06-22-2015 06:53:18 : /dev/sdc1 created successfully.
+INFO : 06-22-2015 06:53:18 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "lsblk"
+INFO : 06-22-2015 06:53:22 : lsblk executed successfully in 4.5625063 seconds.
+INFO : 06-22-2015 06:53:22 : Creating the partition on /dev/sdd
+INFO : 06-22-2015 06:53:22 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./ManagePartitionOnDisk.sh -diskName /dev/sdd -create yes -forRaid yes"
+INFO : 06-22-2015 06:53:28 : ./ManagePartitionOnDisk.sh -diskName /dev/sdd -create yes -forRaid yes executed successfully in 5.3593819 seconds.
+INFO : 06-22-2015 06:53:28 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "lsblk"
+INFO : 06-22-2015 06:53:32 : lsblk executed successfully in 4.6094146 seconds.
+INFO : 06-22-2015 06:53:32 : /dev/sdd1 created successfully.
+INFO : 06-22-2015 06:53:32 : Attempt : 1/10 : Rebooting VM...
+INFO : 06-22-2015 06:54:39 : Sleeping 10 seconds to VM to start..
+INFO : 06-22-2015 06:54:49 : Waiting for VM(s) to become Ready.
+INFO : 06-22-2015 06:54:49 : checking ICA-DS2DISK2-CentOS71-6-22-11-46-1.. 
+INFO : 06-22-2015 06:54:53 : 
+INFO : 06-22-2015 06:54:53 : ICA-DS2DISK2-CentOS71-6-22-11-46-1 is Ready..
+INFO : 06-22-2015 06:54:53 : Trying to Connect to deployed VM(s)
+INFO : 06-22-2015 06:54:55 : ALL VM's SSH port is/are open now..
+INFO : 06-22-2015 06:54:55 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /proc/mdstat"
+INFO : 06-22-2015 06:55:00 : cat /proc/mdstat executed successfully in 4.6789577 seconds.
+INFO : 06-22-2015 06:55:00 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S dmesg"
+INFO : 06-22-2015 06:55:06 : dmesg executed successfully in 5.418988 seconds.
+INFO : 06-22-2015 06:55:06 : Creating raid of 2 disks.
+INFO : 06-22-2015 06:55:06 : Disks : /dev/sdc1 /dev/sdd1
+INFO : 06-22-2015 06:55:06 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./ManageRaid.sh -create yes -diskNames /dev/sdc1^/dev/sdd1 -totalDisks 2 -RaidName /dev/md1"
+INFO : 06-22-2015 06:55:10 : ./ManageRaid.sh -create yes -diskNames /dev/sdc1^/dev/sdd1 -totalDisks 2 -RaidName /dev/md1 executed successfully in 4.7187572 seconds.
+LinuxConsole06-22-2015 06:55:10 : [sudo] password for test: mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md1 started.
+INFO : 06-22-2015 06:55:10 : Formatting /dev/md1 with ext4 file system
+INFO : 06-22-2015 06:55:10 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S mkfs -t ext4 /dev/md1"
+INFO : 06-22-2015 06:55:17 : mkfs -t ext4 /dev/md1 executed successfully in 7.0656915 seconds.
+LinuxConsole06-22-2015 06:55:17 : [sudo] password for test: mke2fs 1.42.9 (28-Dec-2013) Filesystem label= OS type: Linux Block size=4096 (log=2) Fragment size=4096 (log=2) Stride=128 blocks, Stripe width=256 blocks 1310720 inodes, 5238272 blocks 261913 blocks (5.00%) reserved for the super user First data block=0 Maximum filesystem blocks=2153775104 160 block groups 32768 blocks per group, 32768 fragments per group 8192 inodes per group Superblock backups stored on blocks:  	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,  	4096000  Allocating group tables:   0/160       done                             Writing inode tables:   0/160       done                             Creating journal (32768 blocks): done Writing superblocks and filesystem accounting information:   0/160       done
+INFO : 06-22-2015 06:55:17 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S mkdir -p /mnt/RaidVolume"
+INFO : 06-22-2015 06:55:23 : mkdir -p /mnt/RaidVolume executed successfully in 5.4375056 seconds.
+INFO : 06-22-2015 06:55:23 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S mount -o nobarrier /dev/md1 /mnt/RaidVolume"
+INFO : 06-22-2015 06:55:27 : mount -o nobarrier /dev/md1 /mnt/RaidVolume executed successfully in 4.4531334 seconds.
+INFO : 06-22-2015 06:55:27 : STARTING TEST : Pass1 - Sysbench
+INFO : 06-22-2015 06:55:27 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S cp -af sys-custom.sh /mnt/RaidVolume"
+INFO : 06-22-2015 06:55:32 : cp -af sys-custom.sh /mnt/RaidVolume executed successfully in 4.4519438 seconds.
+INFO : 06-22-2015 06:55:32 : dos2unix: converting file TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to Unix format...
+INFO : 06-22-2015 06:55:32 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:55:36 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:55:36 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 06:55:41 : chmod +x *.sh executed successfully in 4.5936946 seconds.
+INFO : 06-22-2015 06:55:41 : SYSBECH COMMAND : ./sys-custom.sh -PrepareFiles yes -RunTest no -CleanUp no -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27 -fileSize 10G
+INFO : 06-22-2015 06:55:41 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./InvokeSys.sh"
+INFO : 06-22-2015 06:55:50 : ./InvokeSys.sh is running in background with ID 532 ...
+INFO : 06-22-2015 06:55:50 : Verifying if sysbench --test is running..
+INFO : 06-22-2015 06:55:50 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "ps -ef"
+INFO : 06-22-2015 06:55:55 : ps -ef executed successfully in 4.6406304 seconds.
+INFO : 06-22-2015 06:55:55 : FOUND PROCESS : UID=root, PID=2320, RUNNING TIME=00:00:00, COMMAND=  sysbench --test fileio --file-to
+INFO : 06-22-2015 06:55:55 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:55:59 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3485218 seconds.
+INFO : 06-22-2015 06:55:59 : SYSBENCH-FILE-PREPARE-PROGRESS
+INFO : 06-22-2015 06:56:29 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:56:34 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.4843308 seconds.
+INFO : 06-22-2015 06:56:34 : SYSBENCH-FILE-PREPARE-PROGRESS
+INFO : 06-22-2015 06:57:04 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:57:09 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.4843746 seconds.
+INFO : 06-22-2015 06:57:09 : SYSBENCH-FILE-PREPARE-PROGRESS
+INFO : 06-22-2015 06:57:39 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:57:45 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 6.5205906 seconds.
+INFO : 06-22-2015 06:57:46 : SYSBENCH-FILE-PREPARE-PROGRESS
+INFO : 06-22-2015 06:58:16 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:58:20 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3482841 seconds.
+INFO : 06-22-2015 06:58:20 : SYSBENCH-FILE-PREPARE-PROGRESS
+INFO : 06-22-2015 06:58:50 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:58:56 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 5.2812206 seconds.
+INFO : 06-22-2015 06:58:56 : Sysbebch files prepared successfully.
+INFO : 06-22-2015 06:58:56 : Downloading /home/test/SysbenchLogs-2015-6-22-11-55-27/iostat-sysbench-file-prepare.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench using Password authentication
+INFO : 06-22-2015 06:59:00 : Download Success after 1 Attempt
+INFO : 06-22-2015 06:59:00 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST START :[1/4] MODE:RNDRD, IO:8K, Threads:16, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 06:59:00 : dos2unix: converting file TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to Unix format...
+INFO : 06-22-2015 06:59:00 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 06:59:05 : Upload Success after 1 Attempt
+INFO : 06-22-2015 06:59:05 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 06:59:10 : chmod +x *.sh executed successfully in 4.4218822 seconds.
+INFO : 06-22-2015 06:59:10 : SYSBENCH COMMAND : ./sys-custom.sh -RunTest yes -fileSize 10G -testIO 8K -testMode rndrd -testThread 16 -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27 -ioRuntime 60
+INFO : 06-22-2015 06:59:10 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./InvokeSys.sh"
+INFO : 06-22-2015 06:59:19 : ./InvokeSys.sh is running in background with ID 550 ...
+INFO : 06-22-2015 06:59:19 : Verifying if sysbench --test is running..
+INFO : 06-22-2015 06:59:19 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "ps -ef"
+INFO : 06-22-2015 06:59:24 : ps -ef executed successfully in 4.6585113 seconds.
+INFO : 06-22-2015 06:59:24 : FOUND PROCESS : UID=root, PID=2564, RUNNING TIME=00:00:01, COMMAND= sysbench --test fileio --file-to
+INFO : 06-22-2015 06:59:24 : Test sterted for mode : rndrd, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 06:59:24 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:59:28 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3280838 seconds.
+INFO : 06-22-2015 06:59:28 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 06:59:33 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.333506 seconds.
+INFO : 06-22-2015 06:59:33 : Test Running for mode : rndrd, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:00:03 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:00:09 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 5.4687022 seconds.
+INFO : 06-22-2015 07:00:09 : Test Running for mode : rndrd, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:00:39 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:00:43 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3593876 seconds.
+INFO : 06-22-2015 07:00:43 : Test finished for mode : rndrd, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:00:43 : Downloading /home/test/SysbenchLogs-2015-6-22-11-55-27/iostat-sysbench-rndrd-8K-16.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench using Password authentication
+INFO : 06-22-2015 07:00:47 : Download Success after 1 Attempt
+INFO : 06-22-2015 07:00:47 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST END:[1/4] MODE:RNDRD, IO:8K, Threads:16, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:00:47 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST START :[2/4] MODE:RNDRD, IO:8K, Threads:32, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:00:48 : dos2unix: converting file TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to Unix format...
+INFO : 06-22-2015 07:00:48 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 07:00:52 : Upload Success after 1 Attempt
+INFO : 06-22-2015 07:00:52 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 07:00:56 : chmod +x *.sh executed successfully in 4.4999895 seconds.
+INFO : 06-22-2015 07:00:56 : SYSBENCH COMMAND : ./sys-custom.sh -RunTest yes -fileSize 10G -testIO 8K -testMode rndrd -testThread 32 -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27 -ioRuntime 60
+INFO : 06-22-2015 07:00:56 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./InvokeSys.sh"
+INFO : 06-22-2015 07:01:06 : ./InvokeSys.sh is running in background with ID 564 ...
+INFO : 06-22-2015 07:01:06 : Verifying if sysbench --test is running..
+INFO : 06-22-2015 07:01:06 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "ps -ef"
+INFO : 06-22-2015 07:01:11 : ps -ef executed successfully in 4.6562564 seconds.
+INFO : 06-22-2015 07:01:11 : FOUND PROCESS : UID=root, PID=2800, RUNNING TIME=00:00:01, COMMAND= sysbench --test fileio --file-to
+INFO : 06-22-2015 07:01:11 : Test sterted for mode : rndrd, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:01:11 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:01:15 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.5157076 seconds.
+INFO : 06-22-2015 07:01:15 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:01:20 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.5155551 seconds.
+INFO : 06-22-2015 07:01:20 : Test Running for mode : rndrd, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:01:50 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:01:54 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3437221 seconds.
+INFO : 06-22-2015 07:01:54 : Test Running for mode : rndrd, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:02:25 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:02:29 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.586562 seconds.
+INFO : 06-22-2015 07:02:29 : Test finished for mode : rndrd, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:02:29 : Downloading /home/test/SysbenchLogs-2015-6-22-11-55-27/iostat-sysbench-rndrd-8K-32.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench using Password authentication
+INFO : 06-22-2015 07:02:33 : Download Success after 1 Attempt
+INFO : 06-22-2015 07:02:34 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST END:[2/4] MODE:RNDRD, IO:8K, Threads:32, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:02:34 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST START :[3/4] MODE:RNDWR, IO:8K, Threads:16, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:02:34 : dos2unix: converting file TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to Unix format...
+INFO : 06-22-2015 07:02:34 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 07:02:38 : Upload Success after 1 Attempt
+INFO : 06-22-2015 07:02:38 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 07:02:42 : chmod +x *.sh executed successfully in 4.6250072 seconds.
+INFO : 06-22-2015 07:02:42 : SYSBENCH COMMAND : ./sys-custom.sh -RunTest yes -fileSize 10G -testIO 8K -testMode rndwr -testThread 16 -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27 -ioRuntime 60
+INFO : 06-22-2015 07:02:42 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./InvokeSys.sh"
+INFO : 06-22-2015 07:02:52 : ./InvokeSys.sh is running in background with ID 578 ...
+INFO : 06-22-2015 07:02:52 : Verifying if sysbench --test is running..
+INFO : 06-22-2015 07:02:52 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "ps -ef"
+INFO : 06-22-2015 07:02:57 : ps -ef executed successfully in 4.9375061 seconds.
+INFO : 06-22-2015 07:02:57 : FOUND PROCESS : UID=root, PID=3062, RUNNING TIME=00:00:00, COMMAND=  sysbench --test fileio --file-to
+INFO : 06-22-2015 07:02:57 : Test sterted for mode : rndwr, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:02:57 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:03:02 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.7656324 seconds.
+INFO : 06-22-2015 07:03:02 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:03:07 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.5458762 seconds.
+INFO : 06-22-2015 07:03:07 : Test Running for mode : rndwr, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:03:37 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:03:41 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.5810289 seconds.
+INFO : 06-22-2015 07:03:41 : Test Running for mode : rndwr, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:04:11 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:04:16 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3593477 seconds.
+INFO : 06-22-2015 07:04:16 : Test finished for mode : rndwr, IO size : 8K, Total Threads : 16, Run Time : 60 seconds.
+INFO : 06-22-2015 07:04:16 : Downloading /home/test/SysbenchLogs-2015-6-22-11-55-27/iostat-sysbench-rndwr-8K-16.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench using Password authentication
+INFO : 06-22-2015 07:04:20 : Download Success after 1 Attempt
+INFO : 06-22-2015 07:04:20 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST END:[3/4] MODE:RNDWR, IO:8K, Threads:16, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:04:20 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST START :[4/4] MODE:RNDWR, IO:8K, Threads:32, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:04:20 : dos2unix: converting file TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to Unix format...
+INFO : 06-22-2015 07:04:20 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 07:04:24 : Upload Success after 1 Attempt
+INFO : 06-22-2015 07:04:24 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 07:04:29 : chmod +x *.sh executed successfully in 4.5625286 seconds.
+INFO : 06-22-2015 07:04:29 : SYSBENCH COMMAND : ./sys-custom.sh -RunTest yes -fileSize 10G -testIO 8K -testMode rndwr -testThread 32 -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27 -ioRuntime 60
+INFO : 06-22-2015 07:04:29 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./InvokeSys.sh"
+INFO : 06-22-2015 07:04:38 : ./InvokeSys.sh is running in background with ID 592 ...
+INFO : 06-22-2015 07:04:38 : Verifying if sysbench --test is running..
+INFO : 06-22-2015 07:04:38 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "ps -ef"
+INFO : 06-22-2015 07:04:43 : ps -ef executed successfully in 4.9219409 seconds.
+INFO : 06-22-2015 07:04:43 : FOUND PROCESS : UID=root, PID=3288, RUNNING TIME=00:00:00, COMMAND= 19:0 sysbench --test fileio --file-to
+INFO : 06-22-2015 07:04:43 : Test sterted for mode : rndwr, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:04:43 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:04:48 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.3978412 seconds.
+INFO : 06-22-2015 07:04:48 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:04:52 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.7031312 seconds.
+INFO : 06-22-2015 07:04:52 : Test Running for mode : rndwr, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:05:22 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:05:27 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.4843112 seconds.
+INFO : 06-22-2015 07:05:27 : Test Running for mode : rndwr, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:05:57 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt"
+INFO : 06-22-2015 07:06:02 : cat /home/test/SysbenchLogs-2015-6-22-11-55-27/CurrentSysbenchStatus.txt executed successfully in 4.5781001 seconds.
+INFO : 06-22-2015 07:06:02 : Test finished for mode : rndwr, IO size : 8K, Total Threads : 32, Run Time : 60 seconds.
+INFO : 06-22-2015 07:06:02 : Downloading /home/test/SysbenchLogs-2015-6-22-11-55-27/iostat-sysbench-rndwr-8K-32.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench using Password authentication
+INFO : 06-22-2015 07:06:06 : Download Success after 1 Attempt
+INFO : 06-22-2015 07:06:06 : =-=-=-=-=-=-=-=-=-=SYSBENCH TEST END:[4/4] MODE:RNDWR, IO:8K, Threads:32, RunTime:60 SECONDS=-=-=-=-=-=-=-=-=-=
+INFO : 06-22-2015 07:06:06 : 4 out of 4 sysbench tests completed.
+INFO : 06-22-2015 07:06:06 : Downloading /home/test/SysbenchLogs-2015-6-22-11-55-27/sysbench.log.txt from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench using Password authentication
+INFO : 06-22-2015 07:06:10 : Download Success after 1 Attempt
+INFO : 06-22-2015 07:06:10 : Starting sysbench clenup..
+INFO : 06-22-2015 07:06:10 : dos2unix: converting file TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to Unix format...
+INFO : 06-22-2015 07:06:10 : Uploading TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST\Pass1 - Sysbench\InvokeSys.sh to test : 104.215.153.195, port 22 using Password authentication
+INFO : 06-22-2015 07:06:14 : Upload Success after 1 Attempt
+INFO : 06-22-2015 07:06:14 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S chmod +x *.sh"
+INFO : 06-22-2015 07:06:19 : chmod +x *.sh executed successfully in 4.4217801 seconds.
+INFO : 06-22-2015 07:06:19 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./InvokeSys.sh"
+INFO : 06-22-2015 07:06:24 : ./InvokeSys.sh executed successfully in 5.8233999 seconds.
+INFO : 06-22-2015 07:06:24 : sysbench clenup completed..
+INFO : 06-22-2015 07:06:24 : Compressing sysbench logs and downloading..
+INFO : 06-22-2015 07:06:24 : SYSBENCH COMMAND : ./sys-custom.sh -CleanUp yes -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27 -fileSize 10G -testIO 8 -testMode rndwr -testThread 32 -CustomLogDir /home/test/SysbenchLogs-2015-6-22-11-55-27
+INFO : 06-22-2015 07:06:24 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "tar -cvzf SysBenchLogs.tar.gz /home/test/SysbenchLogs-2015-6-22-11-55-27/*.txt"
+INFO : 06-22-2015 07:06:29 : tar -cvzf SysBenchLogs.tar.gz /home/test/SysbenchLogs-2015-6-22-11-55-27/*.txt executed successfully in 4.514622 seconds.
+INFO : 06-22-2015 07:06:29 : Downloading SysBenchLogs.tar.gz from test : 104.215.153.195,port 22 to TestResults\Azure_ICA_all-20150622-184558\ICA-LIS4-TEST using Password authentication
+INFO : 06-22-2015 07:06:33 : Download Success after 1 Attempt
+INFO : 06-22-2015 07:06:33 : 4 out of 4 sysbench tests completed successfully.
+INFO : 06-22-2015 07:06:33 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "df"
+INFO : 06-22-2015 07:06:38 : df executed successfully in 4.5409367 seconds.
+INFO : 06-22-2015 07:06:38 : unmounting /dev/md1, if any.
+INFO : 06-22-2015 07:06:38 : Found mounted array : /dev/md1 mounted to /mnt/RaidVolume
+INFO : 06-22-2015 07:06:38 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S umount /mnt/RaidVolume"
+INFO : 06-22-2015 07:06:43 : umount /mnt/RaidVolume executed successfully in 4.6895981 seconds.
+INFO : 06-22-2015 07:06:43 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "cat /proc/mdstat"
+INFO : 06-22-2015 07:06:47 : cat /proc/mdstat executed successfully in 4.3792899 seconds.
+INFO : 06-22-2015 07:06:47 : Found active arry : md1
+INFO : 06-22-2015 07:06:47 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S mdadm --stop md1"
+INFO : 06-22-2015 07:06:52 : mdadm --stop md1 executed successfully in 4.4912556 seconds.
+INFO : 06-22-2015 07:06:52 : Starting Test : Pass1 - Upgrade kernel
+INFO : 06-22-2015 07:06:52 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "dmesg"
+INFO : 06-22-2015 07:06:57 : dmesg executed successfully in 5.2573331 seconds.
+INFO : 06-22-2015 07:06:57 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "uname -r"
+INFO : 06-22-2015 07:07:01 : uname -r executed successfully in 4.5382983 seconds.
+INFO : 06-22-2015 07:07:01 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "dmesg"
+INFO : 06-22-2015 07:07:06 : dmesg executed successfully in 5.0122821 seconds.
+INFO : 06-22-2015 07:07:06 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "echo Linux,.0n,.Azure | sudo -S ./packageInstaller.sh -update yes"
+INFO : 06-22-2015 07:07:29 : ./packageInstaller.sh -update yes executed successfully in 22.125255 seconds.
+INFO : 06-22-2015 07:07:29 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "dmesg"
+INFO : 06-22-2015 07:07:34 : dmesg executed successfully in 5.4435706 seconds.
+INFO : 06-22-2015 07:07:34 : .\tools\plink.exe -t -pw "Linux,.0n,.Azure" -P 22 test@104.215.153.195 "uname -r"
+INFO : 06-22-2015 07:07:39 : uname -r executed successfully in 4.543255 seconds.
+INFO : 06-22-2015 07:07:39 : No update available for Kernel version : 3.10.0-229.4.2.el7.x86_64.
+INFO : 06-22-2015 07:07:39 : ~~~~~~~~~~~~~~~TEST END : ICA-LIS4-TEST~~~~~~~~~~

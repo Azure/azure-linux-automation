@@ -1,0 +1,34 @@
+INFO : 06-22-2015 06:45:58 : Info : AzureAutomationManager.ps1 - LIS on Azure Automation
+INFO : 06-22-2015 06:45:58 : Info : Created test results directory: TestResults\Azure_ICA_all-20150622-184558
+INFO : 06-22-2015 06:45:58 : Info : Logfile =  TestResults\Azure_ICA_all-20150622-184558\azure_ica.log
+INFO : 06-22-2015 06:45:58 : Info : Using config file .\Azure_ICA_all.xml
+INFO : 06-22-2015 06:45:58 : Setting Subscription
+INFO : 06-22-2015 06:45:58 : SubscriptionName           : "Windows Azure Internal Consumption"
+INFO : 06-22-2015 06:45:58 : SubscriptionId             : 51627e5a-c9df-453c-9038-991020af2830
+INFO : 06-22-2015 06:45:58 : ServiceEndpoint            : 
+INFO : 06-22-2015 06:45:58 : CurrentStorageAccount      : xiolinuxsoutheastasia5
+INFO : 06-22-2015 06:45:58 : *************AZURE POWERSHELL****************
+INFO : 06-22-2015 06:45:58 : Starting the Cycle - LIS4
+INFO : 06-22-2015 06:45:58 : Base image name - 5112500AE3B842C8B9C604889F8753C3__OPENLOGIC-CENTOS-71-20150605
+INFO : 06-22-2015 06:45:58 : Loading the cycle Data...
+INFO : 06-22-2015 06:45:58 : Loading the test data for ICA-LIS4-TEST
+INFO : 06-22-2015 07:07:39 : Cycle Finished.. LIS4
+INFO : 06-22-2015 07:07:39 : 
+Test Results Summary
+ICA test run on 06/22/2015 18:45:58
+Image under test CentOS71
+Total Executed TestCases 1 (1 Pass, 0 Fail, 0 Abort)
+Total Execution Time(dd:hh:mm) 0:0:21
+XML file: Azure_ICA_all
+
+ICA-LIS4-TEST Execution Time: 21.68 minutes
+	ICA-LIS4-TEST : PASS  
+		  ICA-LIS4-TEST : TestID1 : Deploy and Verify attached disks : PASS 
+		  ICA-LIS4-TEST : TestID8 : Pass1 - Create Raid partition on prev.NOT formatted disks : PASS 
+		  ICA-LIS4-TEST : TestID9 : Pass1 - Sysbench : PASS 
+		  ICA-LIS4-TEST : TestID10 : Pass1 - Upgrade kernel : PASS 
+
+
+Logs can be found at \\ShitalBldg40\TestResults\Azure_ICA_all-20150622-184558
+
+

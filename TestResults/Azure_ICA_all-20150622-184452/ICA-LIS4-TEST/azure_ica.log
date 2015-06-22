@@ -1,0 +1,13 @@
+INFO : 06-22-2015 06:44:52 : ~~~~~~~~~~~~~~~TEST STARTED : ICA-LIS4-TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+INFO : 06-22-2015 06:44:52 : .\remote-scripts\ICA-LIS4-TEST.ps1
+INFO : 06-22-2015 06:44:52 : Starting multiple tests : ICA-LIS4-TEST
+INFO : 06-22-2015 06:44:55 : DS2DISK2
+INFO : 06-22-2015 06:44:55 : Creating Hosted Service : ICA-DS2DISK2-CentOS71-6-22-11-44-55.
+INFO : 06-22-2015 06:44:55 : Verifying that service name is not in use.
+INFO : 06-22-2015 06:44:57 : ICA-DS2DISK2-CentOS71-6-22-11-44-55 not found!
+INFO : 06-22-2015 06:44:57 : Using location : "Southeast Asia"
+INFO : 06-22-2015 06:44:57 : New-AzureService -ServiceName ICA-DS2DISK2-CentOS71-6-22-11-44-55 -Location "Southeast Asia"
+INFO : 06-22-2015 06:45:14 : ICA-DS2DISK2-CentOS71-6-22-11-44-55 ..service exists!
+WARNING : 06-22-2015 18:45:14 : Warning : Deleting All Virtual Machines in ICA-DS2DISK2-CentOS71-6-22-11-44-55 in 5 seconds. Interrupt to break..
+INFO : 06-22-2015 06:45:19 : Deleting ICA-DS2DISK2-CentOS71-6-22-11-44-55...
+INFO : 06-22-2015 06:45:52 : Deleted ICA-DS2DISK2-CentOS71-6-22-11-44-55 after 1 Attempt

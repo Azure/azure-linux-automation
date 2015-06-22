@@ -35,7 +35,7 @@
 			<CertificateThumbprint>Certificate_Associated_with_your_Azure_Subscription</CertificateThumbprint>
 			<ManagementEndpoint>https://management.core.windows.net</ManagementEndpoint>
 			<StorageAccount>Preferred_Stoarage_Account</StorageAccount>
-			<!--<Location>"Preferred_Location"</Location>-->
+			<Location>"Preferred_Location"</Location>
 			<AffinityGroup>Your_Affinity_Group</AffinityGroup>
 		</General>
 		<CSUpload>
@@ -51,8 +51,8 @@
 			<Data>
 				<!-- You can add your own distro and Image names here -->
 				<Distro>
-					<Name>U1410xfs</Name>
-					<OsImage>UBUNTU1410-xfs-capture</OsImage>
+					<Name>U1410</Name>
+					<OsImage>b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu_DAILY_BUILD-utopic-14_10-amd64-server-20150620-en-us-30GB</OsImage>
 				</Distro> 
 				<Distro>
 					<Name>Ubuntu1404Daily</Name>
@@ -60,8 +60,8 @@
 				</Distro>
 
 				<Distro>
-					<Name>RHEL7206</Name>
-					<OsImage>RHEL7-WA206-30July.vhd</OsImage>
+					<Name>CentOS71</Name>
+					<OsImage>5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-71-20150605</OsImage>
 				</Distro>
 				<VMsizes>
 					<ExtraSmall>
@@ -106,7 +106,7 @@
 					</A9>
 				</VMsizes>
 				<UserName>test</UserName>
-				<Password>"Your_Preferred_Password"</Password>
+				<Password>"Your_preferred_password"</Password>
 				<sshKey>myPrivateKey.ppk</sshKey>
 				<sshPublicKey>myCert.cer</sshPublicKey>
 				<WaagentVersion>"2.0.8"</WaagentVersion>
@@ -1683,6 +1683,107 @@
 					</VirtualMachine>
 				</HostedService>
 			</A11>
+			<DS2DISK2>
+				<isDeployed>NO</isDeployed>
+				<HostedService>
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_DS2</InstanceSize>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>22</PublicPort>
+						</EndPoints>
+						<DataDisk>
+							<LUN>0</LUN>
+							<DiskSizeInGB>10</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>1</LUN>
+							<DiskSizeInGB>10</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+					</VirtualMachine>
+				</HostedService>
+			</DS2DISK2>
+			<DS14DISK12>
+				<isDeployed>NO</isDeployed>
+				<HostedService>
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_DS2</InstanceSize>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>22</PublicPort>
+						</EndPoints>
+						<DataDisk>
+							<LUN>0</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>1</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>2</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>3</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>4</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>5</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>6</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>7</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>8</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>9</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>10</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+						<DataDisk>
+							<LUN>11</LUN>
+							<DiskSizeInGB>512</DiskSizeInGB>
+							<HostCaching>ReadOnly</HostCaching>
+						</DataDisk>
+					</VirtualMachine>
+				</HostedService>
+			</DS14DISK12>
+			
 		</Deployment>
 		
 
@@ -3301,6 +3402,30 @@
 			<TestFeature></TestFeature>
 			<TestID></TestID>
 		</test>
+		<test>
+			<testName>ICA-LIS4-TEST</testName>
+			<testScript></testScript>
+			<testScriptps1>ICA-LIS4-TEST.ps1</testScriptps1>
+			<files></files>
+			<LISExtractCommand>tar -xzf lis4.0.10-beta1.tar.gz^cp -ar lis4.0.10/* .</LISExtractCommand>
+			<setupType>DS2DISK2</setupType>
+			<files>remote-scripts\ManagePartitionOnDisk.sh,remote-scripts\ManageRaid.sh,remote-scripts\sys-custom.sh,remote-scripts\packageInstaller.sh,LinuxPackages\epel-release-7-5.noarch.rpm</files>
+			<!-- <SubtestValues>TestID1,TestID2,TestID3,TestID4,TestID5,TestID6,TestID7,TestID8,TestID9,TestID10,TestID12</SubtestValues> -->
+			<SubtestValues>TestID1,TestID2,TestID3,TestID4,TestID5,TestID6,TestID7,TestID8,TestID9,TestID10,TestID12</SubtestValues>
+			<sysbenchConfig>
+				<IOs>8</IOs>
+				<Threads>16,32</Threads>
+				<ioRuntime>60</ioRuntime>
+				<!-- <testModes>rndrd,rndwr,rndrw,seqrd,seqrewr</testModes> -->
+				<testModes>rndrd,rndwr,rndrw,seqrd,seqrewr</testModes>
+				<fileSize>10G</fileSize>
+			</sysbenchConfig>		
+			<dataDiskConfig>
+				<DiskSizeInGB>10</DiskSizeInGB>
+				<HostCaching>ReadOnly</HostCaching>
+			</dataDiskConfig>			
+			<Priority>P0</Priority>
+		</test>		
 	</testsDefinition>
 
 
@@ -3871,6 +3996,12 @@
 			<test>
 				<Name>ICA-BUILD-LINUX-KERNEL</Name>
 			</test>			
+		</Cycle>		
+		<Cycle>
+			<cycleName>LIS4</cycleName>
+			<test>
+				<Name>ICA-LIS4-TEST</Name>
+			</test>
 		</Cycle>		
 		<Cycle>
 			<cycleName>DEBUG</cycleName>

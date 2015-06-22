@@ -44,6 +44,10 @@ Download Putty executables from http://www.putty.org and keep them in `.\automat
         •	putty.exe
         •	puttygen.exe
 
+Download dos2unix executables from http://sourceforge.net/projects/dos2unix/ and keep them in `.\automation_root_folder\tools`. You should have the following utilities:
+
+        •	dos2unix.exe
+		
 ### Update Azure_ICA_all.xml file
 1.	Setup Subscription details.
 
