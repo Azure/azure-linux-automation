@@ -69,7 +69,7 @@ Specifies the subsciption id
 Function DetectLinuxDistro($VIP, $SSHport, $testVMUser, $testVMPassword)
 {
 
-	$tempout = RemoteCopy  -upload -uploadTo $VIP -port $SSHport -files ".\SetupScripts\DetectLinuxDistro.sh,.\SetupScripts\packageInstall.sh" -username $testVMUser -password $testVMPassword 2>&1 | Out-Null
+	$tempout = RemoteCopy  -upload -uploadTo $VIP -port $SSHport -files ".\SetupScripts\DetectLinuxDistro.sh" -username $testVMUser -password $testVMPassword 2>&1 | Out-Null
 	$tempout = RunLinuxCmd -username $testVMUser -password $testVMPassword -ip $VIP -port $SSHport -command "chmod +x *.sh" -runAsSudo 2>&1 | Out-Null
 	$DistroName = RunLinuxCmd -username $testVMUser -password $testVMPassword -ip $VIP -port $SSHport -command "/home/$user/DetectLinuxDistro.sh" -runAsSudo
 	if(($DistroName -imatch "Unknown") -or (!$DistroName))
@@ -117,7 +117,7 @@ Function DetectLinuxDistro($VIP, $SSHport, $testVMUser, $testVMPassword)
 		}
 		Set-Variable -Name detectedDistro -Value $CleanedDistroName -Scope Global
 		SetDistroSpecificVariables -detectedDistro $detectedDistro
-		LogMsg "Linux distro detected : $CleanedDistroName"
+		LogMsg "Linux distro detected : $CleanedDistroName"	
 	}
 	return $CleanedDistroName
 }
@@ -242,35 +242,35 @@ Function InstallPackages ($VMIpAddress, $VMSshPort, $VMUserName, $VMPassword)
 
 Function IsEnvironmentSupported()
 {
-    $version = (Get-Module -Name "Azure").Version
-    If ($version.Major -GT 0 -OR
-        $version.Minor -GT 8 -OR
-        (($version.Minor -EQ 8) -And ($version.Build -GE 8)))
-    {
-        return $true
-    }
-    Else
-    {
-        return $false
-    }
+	$version = (Get-Module -Name "Azure").Version
+	If ($version.Major -GT 0 -OR
+		$version.Minor -GT 8 -OR
+		(($version.Minor -EQ 8) -And ($version.Build -GE 8)))
+	{
+		return $true
+	}
+	Else
+	{
+		return $false
+	}
 }
 
 Function SetSubscription ($subscriptionID, $subscriptionName, $certificateThumbprint, $managementEndpoint, $storageAccount, $environment = "AzureCloud")
 {
-    $myCert = Get-Item cert:\CurrentUser\My\$certificateThumbprint
+	$myCert = Get-Item cert:\CurrentUser\My\$certificateThumbprint
 
-    # For Azure Powershell Version >= 0.8.8, Environment is used in Set-AzureSubscription for replacing ManagementEndpoint
-    if (IsEnvironmentSupported)
-    {
-        Set-AzureSubscription -SubscriptionName $subscriptionName -Certificate $myCert -SubscriptionID $subscriptionID `
-                              -CurrentStorageAccountName $storageAccount -Environment $environment
-    }
-    Else
-    {
-        Set-AzureSubscription -SubscriptionName $subscriptionName -Certificate $myCert -SubscriptionID $subscriptionID `
-                              -CurrentStorageAccountName $storageAccount -ServiceEndpoint $managementEndpoint
-    }
-    Select-AzureSubscription -Current $subscriptionName
+	# For Azure Powershell Version >= 0.8.8, Environment is used in Set-AzureSubscription for replacing ManagementEndpoint
+	if (IsEnvironmentSupported)
+	{
+		Set-AzureSubscription -SubscriptionName $subscriptionName -Certificate $myCert -SubscriptionID $subscriptionID `
+							  -CurrentStorageAccountName $storageAccount -Environment $environment
+	}
+	Else
+	{
+		Set-AzureSubscription -SubscriptionName $subscriptionName -Certificate $myCert -SubscriptionID $subscriptionID `
+							  -CurrentStorageAccountName $storageAccount -ServiceEndpoint $managementEndpoint
+	}
+	Select-AzureSubscription -Current $subscriptionName
 }
 
 <#
@@ -484,21 +484,21 @@ Function GenerateCommand ($Setup, $serviceName, $osImage, $HSData)
 		{
 			$vmName = $serviceName +"-role-"+$role
 		}
-        $diskCommand = ""
-        foreach ( $dataDisk in $newVM.DataDisk)
-        {
-            if ( $dataDisk.LUN -and $dataDisk.DiskSizeInGB -and $dataDisk.HostCaching )
-            {
-                if ($diskCommand)
-                {
-                    $diskCommand = $diskCommand + " | " + "Add-AzureDataDisk -CreateNew -DiskSizeInGB $($dataDisk.DiskSizeInGB) -LUN $($dataDisk.LUN) -HostCaching $($dataDisk.HostCaching) -DiskLabel `"$vmName-Disk-$($dataDisk.LUN)`"" 
-                }
-                else
-                {
-                    $diskCommand = "Add-AzureDataDisk -CreateNew -DiskSizeInGB $($dataDisk.DiskSizeInGB) -LUN $($dataDisk.LUN) -HostCaching $($dataDisk.HostCaching) -DiskLabel `"$vmName-Disk-$($dataDisk.LUN)`""
-                }
-            }
-        }
+		$diskCommand = ""
+		foreach ( $dataDisk in $newVM.DataDisk)
+		{
+			if ( $dataDisk.LUN -and $dataDisk.DiskSizeInGB -and $dataDisk.HostCaching )
+			{
+				if ($diskCommand)
+				{
+					$diskCommand = $diskCommand + " | " + "Add-AzureDataDisk -CreateNew -DiskSizeInGB $($dataDisk.DiskSizeInGB) -LUN $($dataDisk.LUN) -HostCaching $($dataDisk.HostCaching) -DiskLabel `"$vmName-Disk-$($dataDisk.LUN)`"" 
+				}
+				else
+				{
+					$diskCommand = "Add-AzureDataDisk -CreateNew -DiskSizeInGB $($dataDisk.DiskSizeInGB) -LUN $($dataDisk.LUN) -HostCaching $($dataDisk.HostCaching) -DiskLabel `"$vmName-Disk-$($dataDisk.LUN)`""
+				}
+			}
+		}
 		$sshPath = '/home/' + $defaultuser + '/.ssh/authorized_keys'		 	
 		$vmRoleConfig = "New-AzureVMConfig -Name $vmName -InstanceSize $instanceSize -ImageName $osImage"
 		$vmProvConfig = "Add-AzureProvisioningConfig -Linux -LinuxUser $defaultuser -Password $defaultPassword -SSHPublicKeys (New-AzureSSHKey -PublicKey -Fingerprint 690076D4C41C1DE677CD464EA63B44AE94C2E621 -Path $sshPath)"
@@ -780,7 +780,7 @@ Function VerifyAllDeployments($servicesToVerify)
 		{
 			LogErr "$serviceName provision Failed.."
 			$retValue = "False"
-            break
+			break
 		}
 	}
 
@@ -994,14 +994,14 @@ Function GetAndCheckKernelLogs($DeployedServices, $status)
 Function SetDistroSpecificVariables($detectedDistro)
 {
 	$python_cmd = "python"
-	LogMsg "Set `$python_cmd > python"    
+	LogMsg "Set `$python_cmd > python"	
 	Set-Variable -Name python_cmd -Value $python_cmd -Scope Global
 	Set-Variable -Name ifconfig_cmd -Value "ifconfig" -Scope Global
 	if($detectedDistro -eq "SLES" -or $detectedDistro -eq "SUSE" )
 	{
 		Set-Variable -Name ifconfig_cmd -Value "/sbin/ifconfig" -Scope Global
 		LogMsg "Set `$ifconfig_cmd > $ifconfig_cmd for $detectedDistro"
-	}
+	}	
 }
 
 Function DeployVMs ($xmlConfig, $setupType, $Distro, $getLogsIfFailed = $false)
@@ -1099,79 +1099,78 @@ Function DeployVMs ($xmlConfig, $setupType, $Distro, $getLogsIfFailed = $false)
 
 function GetLogsFromProvisionFailedVM ($vmName, $serviceName, $xmlConfig)
 {
-    try
-    {
-        LogMsg "Stopping the provision-failed VM : $vmName"
-        $tmp = Stop-AzureVM -ServiceName $serviceName -Name $vmName -Force
-        LogMsg "Stopped the VM succussfully"
-        
-        LogMsg "Capturing the provision-failed VM Image"
-        $ErrorImageName = "$serviceName-fail"
-        $tmp = Save-AzureVMImage -ServiceName $serviceName -Name $vmName -NewImageName $ErrorImageName -NewImageLabel $ErrorImageName
-        LogMsg "Successfully captured VM image : $ErrorImageName"
-        $vhdLink = (Get-AzureVMImage -ImageName $ErrorImageName).MediaLink
+	try
+	{
+		LogMsg "Stopping the provision-failed VM : $vmName"
+		$tmp = Stop-AzureVM -ServiceName $serviceName -Name $vmName -Force
+		LogMsg "Stopped the VM succussfully"
+		
+		LogMsg "Capturing the provision-failed VM Image"
+		$ErrorImageName = "$serviceName-fail"
+		$tmp = Save-AzureVMImage -ServiceName $serviceName -Name $vmName -NewImageName $ErrorImageName -NewImageLabel $ErrorImageName
+		LogMsg "Successfully captured VM image : $ErrorImageName"
+		$vhdLink = (Get-AzureVMImage -ImageName $ErrorImageName).MediaLink
 
-        $debugVMName = "$serviceName-debug"
-        $debugVMUser = $xmlConfig.config.Azure.Deployment.Data.UserName
-        $debugVMPasswd = $xmlConfig.config.Azure.Deployment.Data.Password
+		$debugVMName = "$serviceName-debug"
+		$debugVMUser = $xmlConfig.config.Azure.Deployment.Data.UserName
+		$debugVMPasswd = $xmlConfig.config.Azure.Deployment.Data.Password
 
-        $debugSshPath = "/home/$debugVMUser/.ssh/authorized_keys"
+		$debugSshPath = "/home/$debugVMUser/.ssh/authorized_keys"
 
-        LogMsg "Creating debug VM $debugVMName in service $serviceName"
-        $newVmConfigCmd = "New-AzureVMConfig -Name $debugVMName -InstanceSize `"Basic_A1`" -ImageName $DebugOsImage | Add-AzureProvisioningConfig -Linux -LinuxUser $debugVMUser -Password $debugVMPasswd -SSHPublicKeys (New-AzureSSHKey -PublicKey -Fingerprint `"690076D4C41C1DE677CD464EA63B44AE94C2E621`" -Path $debugSshPath) | Set-AzureEndpoint -Name `"SSH`" -LocalPort 22 -PublicPort 22 -Protocol `"TCP`""
-        $newVmCmd = "New-AzureVM -ServiceName $serviceName -VMs ($newVmConfigCmd)"
-        
-        $out = RunAzureCmd -AzureCmdlet $newVmCmd
+		LogMsg "Creating debug VM $debugVMName in service $serviceName"
+		$newVmConfigCmd = "New-AzureVMConfig -Name $debugVMName -InstanceSize `"Basic_A1`" -ImageName $DebugOsImage | Add-AzureProvisioningConfig -Linux -LinuxUser $debugVMUser -Password $debugVMPasswd -SSHPublicKeys (New-AzureSSHKey -PublicKey -Fingerprint `"690076D4C41C1DE677CD464EA63B44AE94C2E621`" -Path $debugSshPath) | Set-AzureEndpoint -Name `"SSH`" -LocalPort 22 -PublicPort 22 -Protocol `"TCP`""
+		$newVmCmd = "New-AzureVM -ServiceName $serviceName -VMs ($newVmConfigCmd)"
+		
+		$out = RunAzureCmd -AzureCmdlet $newVmCmd
 
-        $isVerified = VerifyAllDeployments -servicesToVerify @($serviceName)
-        if ($isVerified -eq "True")
-        {
-            $isConnected = isAllSSHPortsEnabled -DeployedServices $serviceName
-            if ($isConnected -ne "True")
-            {
-                return
-            }
-        }
+		$isVerified = VerifyAllDeployments -servicesToVerify @($serviceName)
+		if ($isVerified -eq "True")
+		{
+			$isConnected = isAllSSHPortsEnabled -DeployedServices $serviceName
+			if ($isConnected -ne "True")
+			{
+				return
+			}
+		}
 
-        LogMsg "Removing image $ErrorImageName, keep the VHD $vhdLink"
-        Remove-AzureVMImage -ImageName $ErrorImageName
+		LogMsg "Removing image $ErrorImageName, keep the VHD $vhdLink"
+		Remove-AzureVMImage -ImageName $ErrorImageName
 
-        LogMsg "Attaching VHD $vhdLink to VM $debugVMName"    
-        $vm = Get-AzureVM -ServiceName $serviceName -Name $debugVMName
-        $vm | Add-AzureDataDisk -ImportFrom -MediaLocation $vhdLink -DiskLabel "main" -LUN 0 | Update-AzureVM
+		LogMsg "Attaching VHD $vhdLink to VM $debugVMName"	
+		$vm = Get-AzureVM -ServiceName $serviceName -Name $debugVMName
+		$vm | Add-AzureDataDisk -ImportFrom -MediaLocation $vhdLink -DiskLabel "main" -LUN 0 | Update-AzureVM
 
-        $ip = (Get-AzureEndpoint -VM $vm)[0].Vip
+		$ip = (Get-AzureEndpoint -VM $vm)[0].Vip
 
-        $runFile = "remote-scripts\GetLogFromDataDisk.py"
-	    $out = RemoteCopy -uploadTo $ip -port 22  -files "$runFile" -username $debugVMUser -password $debugVMPasswd -upload
+		$runFile = "remote-scripts\GetLogFromDataDisk.py"
+		$out = RemoteCopy -uploadTo $ip -port 22  -files "$runFile" -username $debugVMUser -password $debugVMPasswd -upload
 
-        $out = RunLinuxCmd -ip $ip -port 22 -username $debugVMUser -password $debugVMPasswd -command "chmod +x *" -runAsSudo
-        $out = RunLinuxCmd -ip $ip -port 22 -username $debugVMUser -password $debugVMPasswd -command "./GetLogFromDataDisk.py -u $debugVMUser" -runAsSudo
+		$out = RunLinuxCmd -ip $ip -port 22 -username $debugVMUser -password $debugVMPasswd -command "chmod +x *" -runAsSudo
+		$out = RunLinuxCmd -ip $ip -port 22 -username $debugVMUser -password $debugVMPasswd -command "./GetLogFromDataDisk.py -u $debugVMUser" -runAsSudo
 
-        $dir = "$LogDir\$vmName"
-        if (-not (Test-Path $dir))
-        {
-            mkdir $dir
-        }
-        LogMsg "Downloading logs from the VHD"
-        $out = RemoteCopy -download -downloadFrom $ip -port 22 -files "/home/$debugVMUser/waagent.log" -downloadTo $dir -username $debugVMUser -password $debugVMPasswd
-        $out = RemoteCopy -download -downloadFrom $ip -port 22 -files "/home/$debugVMUser/messages.log" -downloadTo $dir -username $debugVMUser -password $debugVMPasswd
-        $out = RemoteCopy -download -downloadFrom $ip -port 22 -files "/home/$debugVMUser/dmesg.log" -downloadTo $dir -username $debugVMUser -password $debugVMPasswd
+		$dir = "$LogDir\$vmName"
+		if (-not (Test-Path $dir))
+		{
+			mkdir $dir
+		}
+		LogMsg "Downloading logs from the VHD"
+		$out = RemoteCopy -download -downloadFrom $ip -port 22 -files "/home/$debugVMUser/waagent.log" -downloadTo $dir -username $debugVMUser -password $debugVMPasswd
+		$out = RemoteCopy -download -downloadFrom $ip -port 22 -files "/home/$debugVMUser/messages.log" -downloadTo $dir -username $debugVMUser -password $debugVMPasswd
+		$out = RemoteCopy -download -downloadFrom $ip -port 22 -files "/home/$debugVMUser/dmesg.log" -downloadTo $dir -username $debugVMUser -password $debugVMPasswd
 
-        LogMsg "Stopping VM $debugVMName"
-        $tmp = Stop-AzureVM -ServiceName $serviceName -Name $debugVMName -Force
+		LogMsg "Stopping VM $debugVMName"
+		$tmp = Stop-AzureVM -ServiceName $serviceName -Name $debugVMName -Force
 
-        # Remove the Cloud Service
-        LogMsg "Executing: Remove-AzureService -ServiceName $serviceName -Force -DeleteAll"
-        Remove-AzureService -ServiceName $serviceName -Force -DeleteAll
-    }
-    catch
-    {
-        $ErrorMessage =  $_.Exception.Message
+		# Remove the Cloud Service
+		LogMsg "Executing: Remove-AzureService -ServiceName $serviceName -Force -DeleteAll"
+		Remove-AzureService -ServiceName $serviceName -Force -DeleteAll
+	}
+	catch
+	{
+		$ErrorMessage =  $_.Exception.Message
 		LogMsg "EXCEPTION in GetLogsFromProvisionFailedVM() : $ErrorMessage"
-    }
+	}
 }
-
 Function Test-TCP($testIP, $testport)
 {
 	$socket = new-object Net.Sockets.TcpClient
@@ -1529,9 +1528,18 @@ Function RemoteCopy($uploadTo, $downloadFrom, $downloadTo, $port, $files, $usern
 			$files = $files.split(",")
 			foreach ($f in $files)
 			{
+				if ( !$f )
+				{
+					continue
+				}
 				$retry=1
 				$maxRetry=10
 				$testFile = $f.trim()
+				if ( ( $f -imatch ".sh" ) -or ( $f -imatch ".py" ))
+				{
+					$out = .\tools\dos2unix.exe $f 2>&1
+					LogMsg $out
+				}
 				$recurse = ""
 				while($retry -le $maxRetry)
 				{
@@ -1682,7 +1690,7 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 		-ArgumentList $currentDir, $username, $password, $ip, $port, $linuxCommand
 		$RunLinuxCmdOutput = ""
 		$debugOutput = ""
-        
+		
 		if ( $RunInBackGround )
 		{
 			While(($runLinuxCmdJob.State -eq "Running") -and ($isBackGroundProcessStarted -eq $false ) -and $notExceededTimeLimit)
@@ -1747,7 +1755,7 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 					}
 				}
 			}
-            
+			
 			$debugLines = Get-Content $LogDir\$randomFileName
 			if($debugLines)
 			{
@@ -1781,6 +1789,7 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 				{
 					LogMsg "Unable to authenticate. Not retrying!"
 					Throw "Unable to authenticate"
+
 				}
 				if($timeOut)
 				{
@@ -1894,11 +1903,11 @@ Function RunLinuxCmd([string] $username,[string] $password,[string] $ip,[string]
 					}
 				}
 				if($debugOutput -imatch "Unable to authenticate")
-				{
-					LogMsg "Unable to authenticate. Not retrying!"
-					Throw "Unable to authenticate"
+					{
+						LogMsg "Unable to authenticate. Not retrying!"
+						Throw "Unable to authenticate"
 
-				}
+					}
 				if(!$ignoreLinuxExitCode)
 				{
 					if($timeOut)
@@ -1939,18 +1948,19 @@ Function DoTestCleanUp($result, $testName, $DeployedServices, [switch]$keepUserD
 	{
 		if($DeployedServices)
 		{
-            $currentTestBackgroundJobs = Get-Content $LogDir\CurrentTestBackgroundJobs.txt -ErrorAction SilentlyContinue
-            if ( $currentTestBackgroundJobs )
-            {
-                $currentTestBackgroundJobs = $currentTestBackgroundJobs.Split()
-            }
-            foreach ( $taskID in $currentTestBackgroundJobs )
-            {
-                #Removal of background 
-                LogMsg "Removing Background Job ID : $taskID..."
-                Remove-Job -Id $taskID -Force
-            }
+			$currentTestBackgroundJobs = Get-Content $LogDir\CurrentTestBackgroundJobs.txt -ErrorAction SilentlyContinue
+			if ( $currentTestBackgroundJobs )
+			{
+				$currentTestBackgroundJobs = $currentTestBackgroundJobs.Split()
+			}
+			foreach ( $taskID in $currentTestBackgroundJobs )
+			{
+				#Removal of background 
+				LogMsg "Removing Background Job ID : $taskID..."
+				Remove-Job -Id $taskID -Force
+			}
 			$user=$xmlConfig.config.Azure.Deployment.Data.UserName
+			$KernelLogOutput=GetAndCheckKernelLogs -DeployedServices $deployedServices -status "Final" #Collecting kernel logs after execution of test case : v-sirebb
 			try
 			{
 				$KernelLogOutput=GetAndCheckKernelLogs -DeployedServices $deployedServices -status "Final" #Collecting kernel logs after execution of test case : v-sirebb
@@ -3099,9 +3109,9 @@ Function CreatePingNode
 }
 
 Function StartIperfServer($node)
-{    
-    $currentDir = $PWD.Path
-    LogMsg "Starting iperf Server on $($node.ip)"
+{	
+	$currentDir = $PWD.Path
+	LogMsg "Starting iperf Server on $($node.ip)"
 	$out = RunLinuxCmd -username $node.user -password $node.password -ip $node.ip -port $node.sshport -command $node.cmd -runAsSudo -RunInBackGround
 	sleep 1
 }
@@ -4604,6 +4614,7 @@ Function DoSSHTestFromLocalVM($intermediateVM, $LocalVM, $toVM,[switch]$hostname
 	{
 		LogMsg "Executing - date - command on $($toVM.Hostname) .."
 		$sshOutput = RunLinuxCmd -username $intermediateVM.user -password $intermediateVM.password -ip $intermediateVM.ip -port $intermediateVM.sshport -runAsSudo -command "python /home/$user/RunSSHCmd.py -s `'$($LocalVM.ip)`' -u $($LocalVM.user) -p`'$($LocalVM.password)`' -P $($LocalVM.sshPort) -c `'python /home/$user/RunSSHCmd.py -s `"$($toVM.hostname)`" -u test -p `"$($toVM.password)`"`"  -P 22 -c `"date`" -o yes`'"
+
 	}
 	else
 	{
@@ -5766,7 +5777,7 @@ Function RetryOperation($operation, $description, $expectResult=$null, $maxRetry
 		}
 		catch
 		{
-            $retryCount ++
+			$retryCount ++
 			WaitFor -seconds $retryInterval
 			if ( $retryCount -le $maxRetryCount )
 			{
@@ -5785,5 +5796,4 @@ Function RetryOperation($operation, $description, $expectResult=$null, $maxRetry
 	} while ($True)
 	
 	return $null
-}
-#endregion  
+}#endregion  

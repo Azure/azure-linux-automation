@@ -1,0 +1,229 @@
+[sudo] password for test: Loaded plugins: fastestmirror
+
+base                                                     | 3.6 kB     00:00     
+
+epel/x86_64/metalink                                     |  11 kB     00:00     
+
+extras                                                   | 3.4 kB     00:00     
+
+openlogic                                                | 1.3 kB     00:00     
+
+updates                                                  | 3.4 kB     00:00     
+Loading mirror speeds from cached hostfile
+ * epel: linux.mirrors.es.net
+Resolving Dependencies
+--> Running transaction check
+---> Package openssl.x86_64 1:1.0.1e-42.el7.6 will be updated
+---> Package openssl.x86_64 1:1.0.1e-42.el7.8 will be an update
+---> Package openssl-libs.x86_64 1:1.0.1e-42.el7.6 will be updated
+---> Package openssl-libs.x86_64 1:1.0.1e-42.el7.8 will be an update
+---> Package tzdata.noarch 0:2015d-1.el7 will be updated
+---> Package tzdata.noarch 0:2015e-1.el7 will be an update
+---> Package wpa_supplicant.x86_64 1:2.0-13.el7_0 will be updated
+---> Package wpa_supplicant.x86_64 1:2.0-17.el7_1 will be an update
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package              Arch         Version                  Repository     Size
+================================================================================
+Updating:
+ openssl              x86_64       1:1.0.1e-42.el7.8        updates       711 k
+ openssl-libs         x86_64       1:1.0.1e-42.el7.8        updates       949 k
+ tzdata               noarch       2015e-1.el7              updates       432 k
+ wpa_supplicant       x86_64       1:2.0-17.el7_1           updates       803 k
+
+Transaction Summary
+================================================================================
+Upgrade  4 Packages
+
+Total download size: 2.8 M
+Downloading packages:
+Delta RPMs disabled because /usr/bin/applydeltarpm not installed.
+(2/4): openssl-libs-1.0.1e 0% [                 ]  0.0 B/s |    0 B   --:-- ETA 
+
+(2/4): openssl-libs-1.0.1e 0% [                 ]  0.0 B/s |  23 kB   --:-- ETA 
+
+(2/4): openssl-libs-1.0.1e 2% [                 ]  57 kB/s |  78 kB   00:49 ETA 
+
+(1/4): openssl-1.0.1e-42.e 6% [=                ]  70 kB/s | 174 kB   00:38 ETA 
+
+(1/4): openssl-1.0.1e-42.e 10% [=-              ]  92 kB/s | 313 kB   00:28 ETA 
+
+(1/4): openssl-1.0.1e-42.e 17% [==-             ] 123 kB/s | 514 kB   00:19 ETA 
+
+(2/4): openssl-libs-1.0.1e 26% [====            ] 160 kB/s | 758 kB   00:13 ETA 
+
+(2/4): openssl-libs-1.0.1e 37% [=====-          ] 208 kB/s | 1.1 MB   00:08 ETA 
+
+(1/4): openssl-1.0.1e-42.el7.8.x86_64.rpm                  | 711 kB   00:04     
+(3/4): tzdata-2015e-1.el7. 52% [========        ] 278 kB/s | 1.5 MB   00:04 ETA 
+
+(2/4): openssl-libs-1.0.1e-42.el7.8.x86_64.rpm             | 949 kB   00:04     
+
+(3/4): tzdata-2015e-1.el7.noarch.rpm                       | 432 kB   00:00     
+(4/4): wpa_supplicant-2.0- 76% [============    ] 375 kB/s | 2.2 MB   00:01 ETA 
+
+(4/4): wpa_supplicant-2.0- 85% [=============-  ] 389 kB/s | 2.4 MB   00:01 ETA 
+
+(4/4): wpa_supplicant-2.0- 98% [===============-] 427 kB/s | 2.8 MB   00:00 ETA 
+
+(4/4): wpa_supplicant-2.0-17.el7_1.x86_64.rpm              | 803 kB   00:01     
+--------------------------------------------------------------------------------
+Total                                              462 kB/s | 2.8 MB  00:06     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [                             ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#                            ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [##                           ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [###                          ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [####                         ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#####                        ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [######                       ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#######                      ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [########                     ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#########                    ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [##########                   ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [###########                  ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [############                 ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#############                ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [##############               ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [###############              ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [################             ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#################            ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [##################           ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [###################          ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [####################         ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#####################        ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [######################       ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#######################      ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [########################     ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [#########################    ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [##########################   ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [###########################  ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7 [############################ ] 1/8
+  Updating   : 1:openssl-libs-1.0.1e-42.el7.8.x86_64                        1/8 
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [                             ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#                            ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [##                           ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [###                          ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [####                         ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#####                        ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [######                       ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#######                      ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [########                     ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#########                    ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [##########                   ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [###########                  ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [############                 ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#############                ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [##############               ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [###############              ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [################             ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#################            ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [##################           ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [###################          ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [####################         ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#####################        ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [######################       ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#######################      ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [########################     ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [#########################    ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [##########################   ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [###########################  ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_ [############################ ] 2/8
+  Updating   : 1:wpa_supplicant-2.0-17.el7_1.x86_64                         2/8 
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [                             ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#                            ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [##                           ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [###                          ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [####                         ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#####                        ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [######                       ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [########                     ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#########                    ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [##########                   ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [###########                  ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [############                 ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#############                ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [###############              ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [################             ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#################            ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [##################           ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [###################          ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [####################         ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [######################       ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#######################      ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [########################     ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [#########################    ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [##########################   ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [###########################  ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x8 [############################ ] 3/8
+  Updating   : 1:openssl-1.0.1e-42.el7.8.x86_64                             3/8 
+  Updating   : tzdata-2015e-1.el7.noarch [                                ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#                               ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [##                              ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [###                             ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [####                            ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#####                           ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [######                          ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#######                         ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [########                        ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#########                       ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [##########                      ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [###########                     ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [############                    ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#############                   ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [##############                  ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [###############                 ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [################                ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#################               ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [##################              ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [###################             ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [####################            ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#####################           ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [######################          ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#######################         ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [########################        ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#########################       ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [##########################      ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [###########################     ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [############################    ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [#############################   ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [##############################  ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch [############################### ] 4/8
+  Updating   : tzdata-2015e-1.el7.noarch                                    4/8 
+
+  Cleanup    : 1:openssl-1.0.1e-42.el7.6.x86_64                             5/8 
+
+  Cleanup    : 1:wpa_supplicant-2.0-13.el7_0.x86_64                         6/8 
+
+  Cleanup    : tzdata-2015d-1.el7.noarch                                    7/8 
+
+  Cleanup    : 1:openssl-libs-1.0.1e-42.el7.6.x86_64                        8/8 
+
+  Verifying  : 1:wpa_supplicant-2.0-17.el7_1.x86_64                         1/8 
+
+  Verifying  : 1:openssl-1.0.1e-42.el7.8.x86_64                             2/8 
+
+  Verifying  : 1:openssl-libs-1.0.1e-42.el7.8.x86_64                        3/8 
+
+  Verifying  : tzdata-2015e-1.el7.noarch                                    4/8 
+
+  Verifying  : 1:wpa_supplicant-2.0-13.el7_0.x86_64                         5/8 
+
+  Verifying  : 1:openssl-libs-1.0.1e-42.el7.6.x86_64                        6/8 
+
+  Verifying  : 1:openssl-1.0.1e-42.el7.6.x86_64                             7/8 
+
+  Verifying  : tzdata-2015d-1.el7.noarch                                    8/8 
+
+Updated:
+  openssl.x86_64 1:1.0.1e-42.el7.8     openssl-libs.x86_64 1:1.0.1e-42.el7.8    
+  tzdata.noarch 0:2015e-1.el7          wpa_supplicant.x86_64 1:2.0-17.el7_1     
+
+Complete!
+Install Update : SUCCESS

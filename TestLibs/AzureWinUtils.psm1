@@ -5,23 +5,34 @@ Import-Module .\TestLibs\RDFELibs.psm1 -Force
 # Operation : Prints the messages, warnings, errors
 # Parameter : message string
 
-function LogMsg([string]$msg, [Boolean]$WriteHostOnly, [Boolean]$NoLogsPlease)
+function LogMsg([string]$msg, [Boolean]$WriteHostOnly, [Boolean]$NoLogsPlease, [switch]$LinuxConsoleOuput)
 { 
-    $now = [Datetime]::Now.ToUniversalTime().ToString("MM/dd/yyyy HH:mm:ss : ")
-    $tag="INFO : "
-    $color = "green"
-    if(!$WriteHostOnly -and !$NoLogsPlease)
+    foreach ( $line in $msg )
     {
-        ($tag+ $now + $msg) | out-file -encoding ASCII -append -filePath $logFile       
-        write-host -f $color "$tag $now $msg"
-    }
-    elseif ($WriteHostOnly)
-    {
-        write-host "$tag $now $msg"
-    }
-    elseif ($NoLogsPlease)
-    {
-        $tempLog = "temp"
+        $now = [Datetime]::Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss : ")
+        $tag="INFO : "
+        $color = "green"
+        if(!$WriteHostOnly -and !$NoLogsPlease)
+        {
+            if ( $LinuxConsoleOuput )
+            {   
+                $tag = "LinuxConsole"               
+                Write-Host "$tag $now $line" -ForegroundColor Gray
+            }
+            else
+            {
+                write-host -f $color "$tag $now $line"
+            }
+            ($tag+ $now + $line) | out-file -encoding ASCII -append -filePath $logFile 
+        }
+        elseif ($WriteHostOnly)
+        {
+            write-host "$tag $now $line"
+        }
+        elseif ($NoLogsPlease)
+        {
+            #Nothing to do here.
+        }
     }
 }
 

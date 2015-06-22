@@ -1,0 +1,14 @@
+INFO : 06-22-2015 06:44:52 : Info : AzureAutomationManager.ps1 - LIS on Azure Automation
+INFO : 06-22-2015 06:44:52 : Info : Created test results directory: TestResults\Azure_ICA_all-20150622-184452
+INFO : 06-22-2015 06:44:52 : Info : Logfile =  TestResults\Azure_ICA_all-20150622-184452\azure_ica.log
+INFO : 06-22-2015 06:44:52 : Info : Using config file .\Azure_ICA_all.xml
+INFO : 06-22-2015 06:44:52 : Setting Subscription
+INFO : 06-22-2015 06:44:52 : SubscriptionName           : "Windows Azure Internal Consumption"
+INFO : 06-22-2015 06:44:52 : SubscriptionId             : 51627e5a-c9df-453c-9038-991020af2830
+INFO : 06-22-2015 06:44:52 : ServiceEndpoint            : 
+INFO : 06-22-2015 06:44:52 : CurrentStorageAccount      : xiolinuxsoutheastasia5
+INFO : 06-22-2015 06:44:52 : *************AZURE POWERSHELL****************
+INFO : 06-22-2015 06:44:52 : Starting the Cycle - LIS4
+INFO : 06-22-2015 06:44:52 : Base image name - 5112500AE3B842C8B9C604889F8753C3__OPENLOGIC-CENTOS-71-20150605
+INFO : 06-22-2015 06:44:52 : Loading the cycle Data...
+INFO : 06-22-2015 06:44:52 : Loading the test data for ICA-LIS4-TEST
