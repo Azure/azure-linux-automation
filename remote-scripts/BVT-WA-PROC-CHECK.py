@@ -17,4 +17,6 @@ def RunTest(command):
                     ResultLog.Error('FAIL')
                     UpdateState("TestCompleted")
         
-RunTest("ps -ef")
+
+RunTest("ps -ef | grep waagent | grep -v grep")
+

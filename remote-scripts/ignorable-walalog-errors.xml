@@ -1,0 +1,7 @@
+<!--#This list contains the ignorable boot errors of different images.-->
+<messages>		
+	<errors>
+		<keywords>.*Error Code is 127\n.*parted /dev/sdb print\n.*parted: command not found</keywords>		
+		<keywords>.*Failed to config rdma device.*</keywords>
+	</errors>
+</messages>

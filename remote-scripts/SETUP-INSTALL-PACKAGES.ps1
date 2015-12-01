@@ -71,6 +71,24 @@ if ($isDeployed)
 					{
 						$usePython3 = $true
 					}
+					#Add a User with sudo premissions for investigating issue
+					$newUser = 'shostctest'
+					$newPassword = 'P@ssw0rd01'
+					$userAddOutput = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "./AddNewUserWithSudoPremission.sh -newUser $newUser -newPassword $newPassword" -runAsSudo					
+
+					if ($userAddOutput -imatch "AUTOMATION_USER_ADDED")
+					{
+						$newUserAdded = $true
+						Set-Content -Value $userAddOutput -Path $LogDir\userAddOutput.txt -Force
+						LogMsg "Add new user : $newUser : SUCCESS"
+						LogMsg "Password for : $newUser : $newPassword"
+					}
+					else
+					{
+						$newUserAdded = $false
+						LogErr "Add new user : $newUser : FAILED"
+						LogErr "Output : $userAddOutput"
+					}
 					#VM De-provision
                     if ($DistroName -eq "COREOS")   
                     {  

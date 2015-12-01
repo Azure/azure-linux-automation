@@ -2292,7 +2292,7 @@
 			<testName>SETUP-INSTALL-PACKAGES</testName>
 			<testScript>SETUP-INSTALL-PACKAGES.py</testScript>
 			<testScriptPs1>SETUP-INSTALL-PACKAGES.ps1</testScriptPs1>
-			<files>.\remote-scripts\azuremodules.py,.\remote-scripts\SETUP-INSTALL-PACKAGES.py,.\remote-scripts\packages.xml</files>
+			<files>.\remote-scripts\azuremodules.py,.\remote-scripts\SETUP-INSTALL-PACKAGES.py,.\remote-scripts\AddNewUserWithSudoPremission.sh,.\remote-scripts\packages.xml</files>
 			<setupType>VMImage</setupType>
 			<TestType></TestType>
 			<TestFeature></TestFeature>
@@ -2548,7 +2548,7 @@
 			<testName>BVT-VERIFY-NO-ERROR-IN-LOGS</testName>
 			<testScript>BVT-VERIFY-NO-ERROR-IN-LOGS.py</testScript>
 			<testScriptPs1>BVT-VERIFY-NO-ERROR-IN-LOGS.ps1</testScriptPs1>
-			<files>.\remote-scripts\azuremodules.py,.\remote-scripts\BVT-VERIFY-NO-ERROR-IN-LOGS.py</files>
+			<files>.\remote-scripts\azuremodules.py,.\remote-scripts\BVT-VERIFY-NO-ERROR-IN-LOGS.py,.\remote-scripts\ignorable-walalog-errors.xml</files>
 			<setupType>BVTDeployment</setupType>
 			<TestType></TestType>
 			<TestFeature></TestFeature>
@@ -2566,6 +2566,18 @@
 			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
 			<TestID>AzureBVT_025</TestID>
 		</test>
+		<test>
+			<testName>BVT-VERIFY-RHUI-DOWNLOAD</testName>
+			<testScript>BVT-VERIFY-RHUI-DOWNLOAD.sh</testScript>
+			<testScriptPs1>BVT-VERIFY-RHUI-DOWNLOAD.ps1</testScriptPs1>
+			<files>.\remote-scripts\package-download-test.sh,.\remote-scripts\BVT-VERIFY-RHUI-DOWNLOAD.sh</files>
+			<setupType>BVTDeployment</setupType>
+			<TestType></TestType>
+			<TestFeature></TestFeature>
+			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
+			<TestID>AzureBVT_026</TestID>
+		</test>
+		
 		<test>
 			<testName>NETWORK-OUTBOUND-ACCESS-IPERF-DTAP-UDP</testName>
 			<TestMode>IP</TestMode>
@@ -4123,6 +4135,9 @@
 			<cycleName>BVT</cycleName>
 			<test>
 				<Name>BVT-VERIFY-NO-ERROR-IN-LOGS</Name>
+			</test>
+			<test>
+				<Name>BVT-VERIFY-RHUI-DOWNLOAD</Name>
 			</test>
 			<test>
 				<Name>BVT-VERIFY-VHD-PREREQUISITES</Name>
