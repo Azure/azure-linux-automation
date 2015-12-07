@@ -306,6 +306,24 @@ def ConfigFilesUpdate():
 
         return success
 
+def CheckCmdPyModExist(it):
+        ret = True
+        if(it.lower().startswith('python')):
+                try:
+                        pymod_name = it[it.index('-')+1:]
+                        if(pymod_name == 'crypto'):
+                                pymod_name = 'Crypto'
+                        imp.find_module(pymod_name)
+                except ImportError:
+                        ret = False
+                        RunLog.error("requisite python module: "+it+" is not exists on system.")
+        else:
+                output = Run('command -v '+it)
+                if(output.find(it) == -1):
+                        ret = False
+                        RunLog.error("requisite command: "+it+" is not exists on system.")
+        return ret
+
 def RunTest():
         UpdateState("TestRunning")
         success = True
@@ -323,7 +341,9 @@ def RunTest():
         for branch in xml_root:
                 for node in branch:
                         if (node.tag == "packages"):
-                                if(current_distro == node.attrib["distro"]):
+                                if(node.attrib['distro'] == 'universal'):
+                                        required_packages_list = node.text.split(',')
+                                elif(current_distro == node.attrib["distro"]):
                                         packages_list = node.text.split(",")
                         elif node.tag == "waLinuxAgent_link":
                                 tar_link[node.attrib["name"]] = node.text
@@ -337,8 +357,12 @@ def RunTest():
         if not (current_distro=="coreos"):
                 for package in packages_list:
                         if(not install_package(package)):
-                                success = False
-                                Run("echo '"+package+"' failed to install >> PackageStatus.txt")
+                                if(package in required_packages_list):
+                                        if(not CheckCmdPyModExist(package)):
+                                                success = False
+                                                Run("echo '"+package+"' failed to install >> PackageStatus.txt")
+                                else:
+                                        Run("echo '"+package+"' failed to install but can be ingored for tests >> PackageStatus.txt")
                                 #break
                         else:
                                 Run("echo '"+package+"' installed successfully >> PackageStatus.txt")
@@ -354,10 +378,12 @@ def RunTest():
                 iperf3_cmd = Run("command -v iperf3")
                 if not iperf_cmd and iperf3_cmd:
                         RunLog.info('iperf3 has been installed instead of iperf from default repository')                        
-                        if (ZypperPackageRemove('iperf') and download_and_install_rpm('iperf')):
+                        if (ZypperPackageRemove('iperf') and download_and_install_rpm('iperf') and CheckCmdPyModExist('iperf')):
                                 Run("echo 'iperf' installed successfully >> PackageStatus.txt")
                         else:
-                                Run("echo 'iperf' failed to install >> PackageStatus.txt")                                
+                                Run("echo 'iperf' failed to install >> PackageStatus.txt")
+                                success = False
+
                                 
         Run("echo '** Packages Installation Completed **' >> PackageStatus.txt")                
         if success == True:

@@ -1,10 +1,11 @@
 <!--#This list contains packages tobe installed separate each package name with space or tab or multiple number of spaces.-->
 <setup>
     <branch>
+    	<packages distro="universal">iperf,wget,python-crypto,python-paramiko,python-argparse,tar</packages>
 	    <packages distro="debian">iperf,mysql-server,gcc,bind9,python-crypto,python-paramiko,nfs-common,psmisc,tcpdump,ntp,libaio1,xfsprogs,dnsutils</packages>
 	    <packages distro="ubuntu">iperf,mysql-server,gcc,bind9,python-crypto,python-paramiko,nfs-common,psmisc,tcpdump,ntp,libaio1,xfsprogs</packages>
 	    <packages distro="SUSE">iperf,mysql,gcc,bind,python,python-argparse,python-paramiko,nfs-kernel-server,psmisc,tcpdump,ntp,libaio,xfsprogs</packages>
-		<packages distro="sles">iperf,mysql,gcc,bind,python,python-argparse,python-paramiko,nfs-kernel-server,psmisc,tcpdump,ntp,libaio,xfsprogs</packages>
+		<packages distro="sles">iperf,mysql,gcc,bind,python,python-argparse,python-crypto,python-paramiko,nfs-kernel-server,psmisc,tcpdump,ntp,libaio,xfsprogs</packages>
 	    <packages distro="opensuse">wget,iperf,mysql-community-server,gcc,bind,python,python-argparse,python-crypto,python-paramiko,nfs-kernel-server,psmisc,tcpdump,ntp,libaio1,xfsprogs</packages>
 	    <packages distro="centos">wget,mysql,iperf,gcc,bind,python,python-argparse,python-crypto,python-paramiko,nfs-utils,psmisc,tcpdump,ntp,libaio,xfsprogs,tar</packages>
 	    <packages distro="Oracle">wget,iperf,mysql,gcc,bind,python,python-argparse,python-devel,python-crypto,python-paramiko,nfs-utils,psmisc,tcpdump,ntp,libaio,xfsprogs,tar</packages>
@@ -15,7 +16,7 @@
 	    <rpm_link name="iperf">https://ciwestus.blob.core.windows.net/testtools/iperf-2.0.5-1.el5.x86_64.rpm</rpm_link>
 	    <rpm_link name="iozone"></rpm_link>
 	    <rpm_link name="python-argparse">ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/dassit:/opsi:/opsi4/RedHat_RHEL-6/x86_64/python-argparse-1.2.1-36.1.x86_64.rpm</rpm_link>
-	    <rpm_link name="python-crypto">http://www.convirture.com/repos/deps/SLES/11.x/x86_64/python-crypto-2.0.1-199.12.x86_64.rpm</rpm_link>
-	    <!--rpm_link name="python-paramiko">ftp://195.220.108.108/linux/opensuse/ports/armv7hl/distribution/12.3/repo/oss/suse/noarch/python-paramiko-1.9.0-2.1.1.noarch.rpm</rpm_link-->
+	    <rpm_link name="python-crypto">ftp://rpmfind.net/linux/opensuse/distribution/11.4/repo/oss/suse/x86_64/python-crypto-2.3-3.1.x86_64.rpm</rpm_link>
+	    <rpm_link name="python-paramiko">ftp://195.220.108.108/linux/opensuse/ports/armv7hl/distribution/12.3/repo/oss/suse/noarch/python-paramiko-1.9.0-2.1.1.noarch.rpm</rpm_link>
     </branch>
 </setup>
