@@ -289,7 +289,11 @@ Function RunTestsOnCycle ($cycleName , $xmlConfig, $Distro )
 				$currentJobs = Get-Job
 				foreach ( $job in $currentJobs )
 				{
-					$out = Remove-Job $job -Force -Verbose
+					$out = Remove-Job $job -Force -ErrorAction SilentlyContinue
+					if ( $? )
+					{
+						LogMsg "Removed background job ID $($job.Id)."
+					}
 				}
 				Write-Host $testSuiteResultDetails.totalPassTc,$testSuiteResultDetails.totalFailTc,$testSuiteResultDetails.totalAbortedTc
 				#Back to Test Suite Main Logging

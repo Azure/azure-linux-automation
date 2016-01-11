@@ -4080,6 +4080,17 @@
 			<DeploymentCount>250</DeploymentCount>
 			<TestID>Reboot_01</TestID>
 		</test>
+		<test>
+			<testName>ICA-VM-REBOOT-TEST</testName>
+			<testScript></testScript>
+			<testScriptPs1>ICA-VM-REBOOT-TEST.ps1</testScriptPs1>
+			<setupType>G5</setupType>
+			<TestType></TestType>
+			<TestFeature></TestFeature>
+			<SupportedExecutionModes>AzureServiceManagement</SupportedExecutionModes>
+			<rebootCount>100</rebootCount>
+			<TestID>Reboot_02</TestID>
+		</test>		
 		
 		<!-- PERFORMANCE TESTS DEFINITIONS -->
 		<test>

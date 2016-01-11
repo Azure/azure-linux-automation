@@ -1290,7 +1290,7 @@ Function isAllSSHPortsEnabledRG($AllVMDataObject)
         {
             $timeout = $timeout + 1
             Write-Host "$WaitingForConnect VM(s) still awaiting to open SSH port.." -NoNewline
-            Write-Host "Retry $timeout/100"
+            Write-Host "Retry $timeout/200"
             sleep 3
             $retValue = "False"
         }
@@ -1301,7 +1301,7 @@ Function isAllSSHPortsEnabledRG($AllVMDataObject)
         }
 
     }
-    While (($timeout -lt 100) -and ($WaitingForConnect -gt 0))
+    While (($timeout -lt 200) -and ($WaitingForConnect -gt 0))
 
     return $retValue
 }

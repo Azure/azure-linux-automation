@@ -69,7 +69,7 @@ $DeploymentCount = $currentTestData.DeploymentCount
                 }
                 else
                 {
-                    if ( $DeploymentStatistics.BootTime -lt 600 )
+                    if ( $DeploymentStatistics.BootTime -lt 1800 )
                     {
                         $successCount += 1
                         LogMsg "ATTEMPT : $count/$DeploymentCount : Deploying $($VMSizes[$VMSizeNumber]) VM.. SUCCESS"
