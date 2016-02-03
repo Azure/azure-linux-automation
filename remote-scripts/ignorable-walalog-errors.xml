@@ -3,5 +3,6 @@
 	<errors>
 		<keywords>.*Error Code is 127\n.*parted /dev/sdb print\n.*parted: command not found</keywords>		
 		<keywords>.*Failed to config rdma device.*</keywords>
+		<keywords>.*CalledProcessError.*</keywords>
 	</errors>
 </messages>

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from azuremodules import *
 
@@ -15,8 +15,12 @@ white_list_xml = args.whitelist
 def RunTest():
     UpdateState("TestRunning")
     RunLog.info("Checking for ERROR messages in waagent.log...")
-    errors = Run("grep -i error /var/log/waagent.log")
-    if (not errors) :
+    f = open('/var/log/waagent.log','r')
+    content_list = f.readlines()
+    f.close()
+    errors_list = [x for x in content_list if 'error' in x.lower()]
+
+    if (not errors_list) :
         RunLog.info('There is no errors in the logs waagent.log')
         ResultLog.info('PASS')
         UpdateState("TestCompleted")
@@ -31,35 +35,20 @@ def RunTest():
             xml_root = white_list_file.getroot()
             RunLog.info('Checking ignorable walalog ERROR messages...')
             for node in xml_root:
-                if (errors and node.tag == "errors"):
+                if (node.tag == "errors"):
                     for keywords in node:
-                        if(errors):
-                            errors = RemoveIgnorableMessages(''.join(errors), keywords.text)
-        if (errors):
-            RunLog.info('ERROR are  present in wala log.')
-            RunLog.info('Errors: ' + ''.join(errors))
+                        RunLog.info('Scan ignorable error with pattern: "%s"' % keywords.text)
+                        errors_list = [ x for x in errors_list if not re.match(keywords.text,x,re.IGNORECASE)]
+
+        if (errors_list):
+            RunLog.info('ERRORs are present in wala log.')
+            RunLog.info('Errors: ')
+            for x in errors_list:
+                RunLog.info(x)
             ResultLog.error('FAIL')
         else:
+            RunLog.info('ERRORs can be ignored in wala log')
             ResultLog.info('PASS')
         UpdateState("TestCompleted")
-		
-def RemoveIgnorableMessages(messages, keywords):
-    matchstring = re.findall(keywords,messages,re.M)
-    if(matchstring):			
-        for msg in matchstring:
-            RunLog.info('Ignorable ERROR message:\n' + msg)
-        str = re.split(matchstring[0],messages)
-        valid_list = []
-        for substr in str:
-            if re.search('error', substr, re.IGNORECASE):
-                valid_list.append(substr)
-            else:
-                continue
-        if len(valid_list) > 0:
-            return valid_list
-        else:
-            return None             
-    else:
-        return messages
-
+    
 RunTest()
