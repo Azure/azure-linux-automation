@@ -2704,14 +2704,45 @@
 					</VirtualMachine>
 				</HostedService>
 			</ExtensionTest>
-			<M1S3>
+			<M1S1>
+				<isDeployed>NO</isDeployed>
+				<HostedService>
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>server-vm</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12122</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>client-vm</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12222</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>					
+				</HostedService>
+			</M1S1>			
+			<M1S5>
 				<!-- This setup type defines One Master and Three slave machines. Hence name is M(aster)1S(lave)3. -->
 				<isDeployed>NO</isDeployed>
 				<HostedService>
 					<VirtualMachine>
 						<state></state>
-						<InstanceSize>Standard_D2</InstanceSize>
-						<ARMInstanceSize>Standard_D2</ARMInstanceSize>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
 						<RoleName>master</RoleName>
 						<EndPoints>
 							<Name>SSH</Name>
@@ -2723,8 +2754,8 @@
 					</VirtualMachine>
 					<VirtualMachine>
 						<state></state>
-						<InstanceSize>Standard_D2</InstanceSize>
-						<ARMInstanceSize>Standard_D2</ARMInstanceSize>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
 						<RoleName>slave1</RoleName>
 						<EndPoints>
 							<Name>SSH</Name>
@@ -2736,8 +2767,8 @@
 					</VirtualMachine>					
 					<VirtualMachine>
 						<state></state>
-						<InstanceSize>Standard_D2</InstanceSize>
-						<ARMInstanceSize>Standard_D2</ARMInstanceSize>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
 						<RoleName>slave2</RoleName>
 						<EndPoints>
 							<Name>SSH</Name>
@@ -2749,8 +2780,8 @@
 					</VirtualMachine>					
 					<VirtualMachine>
 						<state></state>
-						<InstanceSize>Standard_D2</InstanceSize>
-						<ARMInstanceSize>Standard_D2</ARMInstanceSize>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
 						<RoleName>slave3</RoleName>
 						<EndPoints>
 							<Name>SSH</Name>
@@ -2760,8 +2791,78 @@
 						</EndPoints>
 						<DataDisk></DataDisk>
 					</VirtualMachine>					
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>slave4</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12522</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>					
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>slave5</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12622</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>					
 				</HostedService>
-			</M1S3>			
+			</M1S5>	
+			<S2C1>
+				<isDeployed>NO</isDeployed>
+				<HostedService>
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>Server1</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12122</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>Server2</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12222</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>					
+					<VirtualMachine>
+						<state></state>
+						<InstanceSize>Standard_G5</InstanceSize>
+						<ARMInstanceSize>Standard_G5</ARMInstanceSize>
+						<RoleName>Client</RoleName>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>12322</PublicPort>
+						</EndPoints>
+						<DataDisk></DataDisk>
+					</VirtualMachine>					
+				</HostedService>
+			</S2C1>			
 		</Deployment>
 		
 
@@ -4718,21 +4819,43 @@
 			<testName>ICA-TERASORT-BENCHMARK-TEST</testName>
 			<testScript></testScript>
 			<testScriptps1>ICA-TERASORT-BENCHMARK-TEST.ps1</testScriptps1>
-			<setupType>M1S3</setupType>
-			<TERAGEN_RECORDS>50000</TERAGEN_RECORDS>
+			<setupType>M1S5</setupType>
+			<TERAGEN_RECORDS>60000000</TERAGEN_RECORDS>
 			<sshKey>.\ssh\myPrivateKey.key</sshKey>
 			<!-- Hadoop version is optional here. If left blank then hadoop version will be taken from remoteXML file of this definition.-->
 			<HADOOP_VERSION></HADOOP_VERSION>
 			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
-			<!--Remote Files will be directly downloaded to test VM.-->
 			<remoteFiles>https://raw.githubusercontent.com/LIS/lis-test/master/WS2012R2/lisa/remote-scripts/ica/perf_hadoopterasort.sh</remoteFiles>
 			<!--Remote XML will be downloaded to automation server for analysis-->
 			<remoteXML>https://raw.githubusercontent.com/LIS/lis-test/master/WS2012R2/lisa/xml/perf_hadoopterasort.xml</remoteXML>
 			<SubtestValues>SOME,TEXTS,NEEDS,TO,BE,PRESENT,HERE,FOR,PRINTING,TEST,SUMMARY</SubtestValues>
 			<Priority>P0</Priority>
 		</test>		
-		
-
+		<test>
+			<testName>ICA-PERF-REDIS-TEST</testName>
+			<testScript></testScript>
+			<testScriptps1>ICA-PERF-REDIS-TEST.ps1</testScriptps1>
+			<setupType>M1S1</setupType>
+			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
+			<remoteFiles>https://raw.githubusercontent.com/LIS/lis-test/master/WS2012R2/lisa/remote-scripts/ica/performance_redis.sh</remoteFiles>
+			<!--Remote XML will be downloaded to automation server for analysis-->
+			<remoteXML>https://raw.githubusercontent.com/LIS/lis-test/master/WS2012R2/lisa/xml/Perf_Redis.xml</remoteXML>
+			<SubtestValues>SOME,TEXTS,NEEDS,TO,BE,PRESENT,HERE,FOR,PRINTING,TEST,SUMMARY</SubtestValues>
+			<Priority>P0</Priority>
+		</test>		
+		<test>
+			<testName>ICA-PERF-APACHE-BENCHMARK-TEST</testName>
+			<testScript></testScript>
+			<testScriptps1>ICA-PERF-APACHE-BENCHMARK-TEST.ps1</testScriptps1>
+			<setupType>M1S1</setupType>
+			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
+			<!--Remote Files will be directly downloaded to test VM.-->
+			<remoteFiles>https://raw.githubusercontent.com/LIS/lis-test/master/WS2012R2/lisa/remote-scripts/ica/performance_ab.sh</remoteFiles>
+			<!--Remote XML will be downloaded to automation server for analysis-->
+			<remoteXML>https://raw.githubusercontent.com/LIS/lis-test/master/WS2012R2/lisa/xml/Perf_AB.xml</remoteXML>
+			<SubtestValues>SOME,TEXTS,NEEDS,TO,BE,PRESENT,HERE,FOR,PRINTING,TEST,SUMMARY</SubtestValues>
+			<Priority>P0</Priority>
+		</test>			
 		<test>
 		  <testName>RHUI-STRESS-DOWNLOAD</testName>
 		  <entrytestScript>start-rhui-stress-test-in-background.py</entrytestScript>
@@ -4751,8 +4874,29 @@
 		  <TestID>AzureRHUIStress_001</TestID>
 		</test>
 
+			<test>
+				<testName>ICA-PERF-ZOOKEEPER-TEST</testName>
+				<testScript></testScript>
+				<testScriptps1>ICA-PERF-ZOOKEEPER-TEST.ps1</testScriptps1>
+				<setupType>S2C1</setupType>
+				<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
+				<TestParameters>
+					<param>ZK_VERSION=3.4.6</param>
+					<param>ZK_TIMEOUT=1000000</param>
+					<param>ZK_ZNODE_SIZE=100</param>
+					<param>ZK_ZNODE_COUNT=100</param>
+					<param>ZK_FORCE=true</param>
+					<param>ZK_SYNCHRONOUS=true</param>
+					<param>ZK_VERBOSE=false</param>				
+				</TestParameters>
+				<!--Remote Files will be directly downloaded to test VM.-->
+				<remoteFiles>https://raw.githubusercontent.com/phunt/zk-smoketest/master/zkclient.py,https://raw.githubusercontent.com/phunt/zk-smoketest/master/zk-latencies.py,https://github.com/phunt/zk-smoketest/raw/master/lib.linux-x86_64-2.6/libzookeeper_mt.so.2,https://github.com/phunt/zk-smoketest/raw/master/lib.linux-x86_64-2.6/zookeeper.so</remoteFiles>
+				<!--Remote XML will be downloaded to automation server for analysis-->
+				<remoteXML></remoteXML>
+				<Priority>P0</Priority>
+			</test>			
+			
 		</testsDefinition>
-
 	<testCycles>
 		<!-- Setup related tests -->
 		<Cycle>
@@ -5457,9 +5601,26 @@
 
 		<Cycle>
 			<cycleName>LISA-TERASORT-PERF</cycleName>
-			<!--You can add individual tests here and run them for debugging purpose. You can also add new cycles. -->
 			<test>
 				<Name>ICA-TERASORT-BENCHMARK-TEST</Name>
+			</test>
+		</Cycle>		
+		<Cycle>
+			<cycleName>LISA-REDIS-PERF</cycleName>
+			<test>
+				<Name>ICA-PERF-REDIS-TEST</Name>
+			</test>
+		</Cycle>		
+		<Cycle>
+			<cycleName>LISA-APACHE-PERF</cycleName>
+			<test>
+				<Name>ICA-PERF-APACHE-BENCHMARK-TEST</Name>
+			</test>
+		</Cycle>		
+		<Cycle>
+			<cycleName>LISA-ZK-PERF</cycleName>
+			<test>
+				<Name>ICA-PERF-ZOOKEEPER-TEST</Name>
 			</test>
 		</Cycle>		
 		

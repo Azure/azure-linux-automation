@@ -16,80 +16,94 @@ if ($isDeployed)
 		$ExtensionVerfiedWithPowershell = $false
 		$LogFilesPaths = ""
 		$LogFiles = ""
-		$folderToSearch = "/var/log/azure"
 		$ExtensionName = "CustomScriptForLinux"
-		$FoundFiles = GetFilePathsFromLinuxFolder -folderToSearch $folderToSearch -IpAddress $hs1VIP -SSHPort $hs1vm1sshport -username $user -password $password
+		$statusFile = "0.status"
+		
+		#region check Extension Status from 0.status file
+		LogMsg "--------------------- STAGE 1/3 : verification of $statusFile : START ---------------------"
+		$statusFilePath = GetFilePathsFromLinuxFolder -folderToSearch "/var/lib/waagent" -IpAddress $allVMData.PublicIP -SSHPort $allVMData.SSHPort -username $user -password $password -expectedFiles "$statusFile"
+
+		if ( $statusFilePath[0] )
+		{
+			$ExtensionStatusInStatusFile = GetExtensionStatusFromStatusFile -statusFilePaths $statusFilePath[0] -ExtensionName $ExtensionName -vmData $allVMData
+		}
+		else
+		{
+			LogErr "status file not found under /var/lib/waagent"
+			$ExtensionStatusInStatusFile = $false
+		}
+		LogMsg "--------------------- STAGE 1/3 : verification of $statusFile : END ---------------------"
+		#endregion
+
+		#region check Extension from Azure Side
+		LogMsg "--------------------- STAGE 2/3 : verification from Azure : START ---------------------"
+		$ExtensionStatusFromAzure = VerifyExtensionFromAzure -ExtensionName $ExtensionName -ServiceName $isDeployed -ResourceGroupName $isDeployed
+		LogMsg "--------------------- STAGE 2/3 : verification from Azure : END ---------------------"
+		#endregion
+
+		#region check if extension has done its job properply...
+		LogMsg "--------------------- STAGE 3/3 : verification of Extension Execution : START ---------------------"
+		$folderToSearch = "/var/log/azure"
+		$FoundFiles = GetFilePathsFromLinuxFolder -folderToSearch $folderToSearch -IpAddress $hs1VIP -SSHPort $hs1vm1sshport -username $user -password $password -expectedFiles "extension.log,CommandExecution.log"
 		$LogFilesPaths = $FoundFiles[0]
 		$LogFiles = $FoundFiles[1]
-		foreach ($file in $LogFilesPaths.Split(","))
-		{
-			$fileName = $file.Split("/")[$file.Split("/").Count -1]
-			if ( $file -imatch $ExtensionName )
+		$retryCount = 1
+		$maxRetryCount = 10
+		if ($LogFilesPaths)
+		{   
+			do
 			{
-				$out = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "cat $file > $fileName" -runAsSudo
-				RemoteCopy -download -downloadFrom $hs1VIP -files $fileName -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
-			}
-			else
-			{
-				LogErr "Unexpected Extension Found : $($file.Split("/")[4]) with version $($file.Split("/")[5])"
-				LogMsg "Skipping download for : $($file.Split("/")[4]) : $fileName"
-			}
-		}		
-		RemoteCopy -download -downloadFrom $hs1VIP -files "/var/log/waagent.log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
-		$lsOutput = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "ls /var/log/" -runAsSudo
-		LogMsg -msg $lsOutput -LinuxConsoleOuput
-		if ($lsOutput -imatch "CustomExtensionSuccessful")
-		{
-			$extensionVerified = $true
-		}
-		else
-		{
-			$extensionVerified = $false
-		}
-		if ( $UseAzureResourceManager )
-		{
-			$ConfirmExtensionScriptBlock = {
-				$ExtensionStatus = Get-AzureResource -OutputObjectFormat New -ResourceGroupName $isDeployed  -ResourceType "Microsoft.Compute/virtualMachines/extensions" -ExpandProperties
-				if ( ($ExtensionStatus.Properties.ProvisioningState -eq "Succeeded") -and ( $ExtensionStatus.Properties.Type -eq $ExtensionName ) )
+				DownloadExtensionLogFilesFromVarLog -LogFilesPaths $LogFilesPaths -ExtensionName $ExtensionName -vmData $AllVMData
+				LogMsg "Attempt : $retryCount/$maxRetryCount : Checking if Custom Script is executed...."
+				RemoteCopy -download -downloadFrom $hs1VIP -files "/var/log/waagent.log" -downloadTo $LogDir -port $hs1vm1sshport -username $user -password $password
+				$lsOutput = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "ls /var/log/" -runAsSudo
+				LogMsg -msg $lsOutput -LinuxConsoleOuput
+				if ($lsOutput -imatch "CustomExtensionSuccessful")
 				{
-					LogMsg "$ExtensionName extension status is Succeeded in Properties.ProvisioningState"
-					$ExtensionVerfiedWithPowershell = $true
+					$extensionExecutionVerified = $true
+					$waitForExtension = $false
+					LogMsg "Custom Script execution verified successfully."
 				}
 				else
 				{
-					LogErr "$ExtensionName extension status is Failed in Properties.ProvisioningState"
-					$ExtensionVerfiedWithPowershell = $false
+					$extensionExecutionVerified  = $false
+					LogErr "Custom Script execution not yet detected."
+					$waitForExtension = $true
+					WaitFor -Seconds 30
 				}
-				return $ExtensionVerfiedWithPowershell
+				$retryCount += 1
 			}
+			while (($retryCount -le $maxRetryCount) -and $waitForExtension )
 		}
 		else
 		{
-			$ConfirmExtensionScriptBlock = {
-		
-			$vmDetails = Get-AzureVM -ServiceName $isDeployed
- 				if ( ( $vmDetails.ResourceExtensionStatusList.ExtensionSettingStatus.Status -eq "Success" ) -and ($vmDetails.ResourceExtensionStatusList.ExtensionSettingStatus.Name -imatch $ExtensionName ))
-				{
-					$ExtensionVerfiedWithPowershell = $true
-					LogMsg "$ExtensionName extension status is SUCCESS in (Get-AzureVM).ResourceExtensionStatusList.ExtensionSettingStatus"
-				}
-				else
-				{
-					$ExtensionVerfiedWithPowershell = $false
-					LogErr "$ExtensionName extension status is FAILED in (Get-AzureVM).ResourceExtensionStatusList.ExtensionSettingStatus"
-				}
-				return $ExtensionVerfiedWithPowershell
-			}
+			LogErr "No Extension logs are available."
+			$extensionExecutionVerified  = $false
 		}
+		LogMsg "--------------------- STAGE 3/3 : verification of Extension Execution : END ---------------------"
+		#endregion
 
-		$ExtensionVerfiedWithPowershell = RetryOperation -operation $ConfirmExtensionScriptBlock -description "Confirming $ExtensionName extension from Azure side." -expectResult $true -maxRetryCount 10 -retryInterval 10
-		
-		if ( $ExtensionVerfiedWithPowershell -and $extensionVerified )
+		if ( $ExtensionStatusFromAzure -and $extensionExecutionVerified  -and $ExtensionStatusInStatusFile )
 		{
+			LogMsg "STATUS FILE VERIFICATION : PASS"
+			LogMsg "AZURE STATUS VERIFICATION : PASS"
+			LogMsg "EXTENSION EXECUTION VERIFICATION : PASS"
 			$testResult = "PASS"
 		}
 		else
 		{
+			if ( !$ExtensionStatusInStatusFile )
+			{
+				LogErr "STATUS FILE VERIFICATION : FAIL"
+			}
+			if ( !$ExtensionStatusFromAzure )
+			{
+				LogErr "AZURE STATUS VERIFICATION : FAIL"
+			}
+			if ( !$extensionExecutionVerified )
+			{
+				LogErr "EXTENSION EXECUTION VERIFICATION : FAIL"
+			}
 			$testResult = "FAIL"
 		}
 		LogMsg "Test result : $testResult"

@@ -90,9 +90,10 @@ if ($isDeployed)
 		Set-Content -Value "/root/perf_hadoopterasort.sh &> terasortConsoleLogs.txt" -Path "$LogDir\StartTerasortTest.sh"
 		Set-Content -Value "echo `"Host *`" > /home/$user/.ssh/config" -Path "$LogDir\disableHostKeyVerification.sh"
 		Add-Content -Value "echo StrictHostKeyChecking=no >> /home/$user/.ssh/config" -Path "$LogDir\disableHostKeyVerification.sh"
-		Logmsg (Get-Content $constantsFile)
+		LogMsg (Get-Content $constantsFile)
 		foreach ( $vmData in $allVMData )
 		{
+			LogMsg "Preaparing $($vmData.RoleName) for test..."
 			RemoteCopy -uploadTo $vmData.PublicIP -port $vmData.SSHPort -files ".\$constantsFile,.\$LogDir\perf_hadoopterasort.sh,.\remote-scripts\enableRoot.sh,$sshKeyPath,.\$LogDir\StartTerasortTest.sh,.\$LogDir\disableHostKeyVerification.sh" -username $user -password $password -upload
 			$out = RunLinuxCmd -ip $vmData.PublicIP -port $vmData.SSHPort -username $user -password $password -command "chmod +x /home/$user/*.sh" -runAsSudo			
 			$rootPasswordSet = RunLinuxCmd -ip $vmData.PublicIP -port $vmData.SSHPort -username $user -password $password -command "/home/$user/enableRoot.sh -password $($password.Replace('"',''))" -runAsSudo
@@ -110,6 +111,9 @@ if ($isDeployed)
 			$out = RunLinuxCmd -ip $vmData.PublicIP -port $vmData.SSHPort -username "root" -password $password -command "/home/$user/disableHostKeyVerification.sh" 
 			$out = RunLinuxCmd -ip $vmData.PublicIP -port $vmData.SSHPort -username "root" -password $password -command "cp /home/$user/.ssh/config /root/.ssh/" 
 			$out = RunLinuxCmd -ip $vmData.PublicIP -port $vmData.SSHPort -username "root" -password $password -command "service sshd restart" 
+			LogMsg "Adding $($vmData.InternalIP) $($vmData.RoleName) to /etc/hosts of $($masterVMData.RoleName) "
+			$out = RunLinuxCmd -ip $masterVMData.PublicIP -port $masterVMData.SSHPort -username "root" -password $password -command "echo $($vmData.InternalIP) $($vmData.RoleName) >> /etc/hosts"
+			LogMsg "$($vmData.RoleName) preparation finished."
 		}
 		#endregion
 
