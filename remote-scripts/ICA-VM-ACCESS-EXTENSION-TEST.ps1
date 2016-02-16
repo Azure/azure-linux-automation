@@ -148,8 +148,16 @@ Function VMAccessExtTest($TaskType)
 		if(($ExtensionStatus -eq $True) -and ($ExtExecutionLogStatus -eq $True))  		
 		{
 			LogMsg "$TaskType Extension executed successfully.."
-			$VMStatus = RunLinuxCmd -username $NewUser -password $passwd -ip $hs1VIP -port $hs1vm1sshport -command "/usr/sbin/waagent --version"
-			$VMStatus1 = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "cat /etc/shadow" -runAsSudo
+			$output = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "ps aux | grep waagent | grep -v grep" -runAsSudo  
+			if($output -match 'python3')  
+			{  
+				$VMStatus = RunLinuxCmd -username $NewUser -password $passwd -ip $hs1VIP -port $hs1vm1sshport -command "python3 /usr/sbin/waagent --version"  
+			}  
+			else  
+			{  
+ 				$VMStatus = RunLinuxCmd -username $NewUser -password $passwd -ip $hs1VIP -port $hs1vm1sshport -command "/usr/sbin/waagent --version" 
+ 			}
+ 			$VMStatus1 = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "cat /etc/shadow" -runAsSudo
 			if(($VMStatus -imatch "WALinuxAgent") -and ($VMStatus1 -imatch $NewUser))
 			{
 				$ExtStatus = $True
@@ -202,8 +210,16 @@ Function VMAccessExtTest($TaskType)
 			if(($ExtensionStatus -imatch $True) -and ($ExtExecutionLogStatus -eq $True))
 			{
 				LogMsg "$TaskType Extension executed successfully.."
-				$VMStatus = RunLinuxCmd -username $NewUser -password $newpassword -ip $hs1VIP -port $hs1vm1sshport -command "/usr/sbin/waagent --version"
-				$VMStatus2 = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "cat /etc/shadow" -runAsSudo
+				$output = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "ps aux | grep waagent | grep -v grep" -runAsSudo  
+				if($output -match 'python3')  
+				{
+					$VMStatus = RunLinuxCmd -username $NewUser -password $newpassword -ip $hs1VIP -port $hs1vm1sshport -command "python3 /usr/sbin/waagent --version"  
+				}
+				else  
+				{
+					$VMStatus = RunLinuxCmd -username $NewUser -password $newpassword -ip $hs1VIP -port $hs1vm1sshport -command "/usr/sbin/waagent --version"  
+				}
+  				$VMStatus2 = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "cat /etc/shadow" -runAsSudo
 				if(($VMStatus -imatch "WALinuxAgent") -and ($VMStatus2 -imatch $NewUser))
 				{
 					$ExtStatus = $True

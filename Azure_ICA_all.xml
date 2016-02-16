@@ -836,8 +836,56 @@
 						<DataDisk></DataDisk>
 					</VirtualMachine>
 				</HostedService>
-			</VNETVM>
-
+			</VNETVM>			
+			<VMWithMaxNICs>
+				<isDeployed>NO</isDeployed>
+				<MaxNic>8</MaxNic>
+				<HostedService>
+					<VnetName>AzureDTAP02Net</VnetName>
+					<VnetDomainDBFilePath>/etc/bind/zones/lisvnetlab.com.db</VnetDomainDBFilePath>
+					<VnetDomainRevFilePath>/etc/bind/zones/rev.4.168.192.in-addr.arpa</VnetDomainRevFilePath>
+					<Subnet1Range>192.168.2.0/27</Subnet1Range>
+					<Subnet2Range>192.168.2.32/27</Subnet2Range>
+					<DnsServerIP>192.168.3.120</DnsServerIP>
+					<VirtualMachine>
+						<state>
+						</state>
+						<SubnetName>Subnet1</SubnetName>
+						<InstanceSize>Standard_D14</InstanceSize>
+						<ARMSubnetName>Subnet1</ARMSubnetName>
+						<ARMInstanceSize>Standard_D14</ARMInstanceSize>
+						<EndPoints>
+							<Name>SSH</Name>
+							<Protocol>tcp</Protocol>
+							<LocalPort>22</LocalPort>
+							<PublicPort>22</PublicPort>
+						</EndPoints>
+						<DataDisk>
+						</DataDisk>
+						<NetworkInterfaces>
+							<Name>Ethernet1</Name>
+						</NetworkInterfaces>
+						<NetworkInterfaces>
+							<Name>Ethernet2</Name>
+						</NetworkInterfaces>
+						<NetworkInterfaces>
+							<Name>Ethernet3</Name>
+						</NetworkInterfaces>
+						<NetworkInterfaces>
+							<Name>Ethernet4</Name>
+						</NetworkInterfaces>
+						<NetworkInterfaces>
+							<Name>Ethernet5</Name>
+						</NetworkInterfaces>
+						<NetworkInterfaces>
+							<Name>Ethernet6</Name>
+						</NetworkInterfaces>
+						<NetworkInterfaces>
+							<Name>Ethernet7</Name>
+						</NetworkInterfaces>
+					</VirtualMachine>
+				</HostedService>
+			</VMWithMaxNICs>
 			<VNETVMPR>
 				<isDeployed>NO</isDeployed>
 				<HostedService>
@@ -3077,7 +3125,6 @@
 			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
 			<TestID>AzureBVT_027</TestID>
 		</test>
-		
 		<test>
 			<testName>NETWORK-OUTBOUND-ACCESS-IPERF-DTAP-UDP</testName>
 			<TestMode>IP</TestMode>
@@ -4473,6 +4520,22 @@
 			<SubtestValues></SubtestValues>
 			<Priority>P0</Priority>
 		</test>
+		<test>
+			<testName>E2E-VERIFY-MAX-NIC</testName>
+			<testScript>
+			</testScript>
+			<testScriptPs1>E2E-VERIFY-MAX-NIC.ps1</testScriptPs1>
+			<files>
+			</files>
+			<setupType>VMWithMaxNICs</setupType>
+			<TestType>
+			</TestType>
+			<TestFeature>
+			</TestFeature>
+			<SupportedExecutionModes>AzureServiceManagement,AzureResourceManager</SupportedExecutionModes>
+			<TestID>
+			</TestID>
+		</test>		
 
 		<test>
 			<testName>INJECTION-VERIFY-ENABLE</testName>
@@ -4700,10 +4763,6 @@
 			<subnetName>clouderasubvnet</subnetName>
 			<numberOfDataNodes>1</numberOfDataNodes>
 			<VmSize>Standard_D4</VmSize>
-			<company>yourcompany</company>
-			<emailAddress>email@yourcompany.com</emailAddress>
-			<firstName>myfirstname</firstName>
-			<lastName>mylastname</lastName>			
           </parameters>
 		  <TestType>
 		  </TestType>
@@ -5359,6 +5418,9 @@
 			</test>
 			<test>
 				<Name>E2E-WA-UNINST</Name>
+			</test>
+			<test>
+				<Name>E2E-VERIFY-MAX-NIC</Name>
 			</test>
 		</Cycle>
 		

@@ -623,11 +623,28 @@ Function GenerateCommand ($Setup, $serviceName, $osImage, $HSData)
 			$vmProvConfig = $vmProvConfig + "| Set-AzureSubnet -SubnetNames $SubnetName"
 		}
 		$vmPortConfig =  $portCommand.Substring(0,$portCommand.Length-1)
+		#Add multiply NICs configuration
+		$vmNetworkInterfaceConfig = ""
+		foreach ( $NetworkInterface in $newVM.NetworkInterfaces)
+		{
+			if($vmNetworkInterfaceConfig)
+			{
+				$vmNetworkInterfaceConfig = $vmNetworkInterfaceConfig + " | " + "Add-AzureNetworkInterfaceConfig -Name $($NetworkInterface.Name) -SubnetName $SubnetName"			
+			}
+			else
+			{
+				$vmNetworkInterfaceConfig = "Add-AzureNetworkInterfaceConfig -Name $($NetworkInterface.Name) -SubnetName $SubnetName"
+			}
+		}
 		
 		#Start building SingleVM Config command..
 
 		$singleVMCommand = "( " + $vmRoleConfig + " | " + $vmProvConfig + " | " + $vmPortConfig
-		
+
+		if ( $vmNetworkInterfaceConfig )
+		{
+			$singleVMCommand = $singleVMCommand + " | " + $vmNetworkInterfaceConfig
+		}		
 		if ( $diskCommand )
 		{
 			$singleVMCommand = $singleVMCommand + " | " + $diskCommand

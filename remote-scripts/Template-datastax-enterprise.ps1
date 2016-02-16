@@ -30,13 +30,21 @@ try
 	$jsonfile.parameters.opsCenterAdminPassword.value = $password.Replace('"','')
 	$jsonfile.parameters.clusterNodeCount.value = [int]($parameters.clusterNodeCount)
 	$jsonfile.parameters.clusterName.value = $parameters.clusterName
-	$jsonfile.parameters.clusterVmSize.value = $parameters.clusterVmSize	
-	$jsonfile.parameters.region.value = $location.Replace('"','')
-	if($env:RoleInstanceSize)
+	if($env:GetRandomValue -eq $True)
 	{
-		$jsonfile.parameters.clusterVmSize.value = $env:RoleInstanceSize
+		$AllowedValue =  Get-Content ..\azure-quickstart-templates\datastax-enterprise\azuredeploy.json -Raw | ConvertFrom-Json
+		$jsonfile.parameters.region.value = $AllowedValue.parameters.region.allowedValues | Get-Random
+		$jsonfile.parameters.clusterVmSize.value = $AllowedValue.parameters.clusterVmSize.allowedValues | Get-Random
 	}
-
+	else
+	{
+		$jsonfile.parameters.clusterVmSize.value = $parameters.clusterVmSize
+		$jsonfile.parameters.region.value = $location.Replace('"','')
+		if($env:RoleInstanceSize)
+		{
+			$jsonfile.parameters.clusterVmSize.value = $env:RoleInstanceSize
+		}
+	}
 	# save template parameter file
 	$jsonfile | ConvertTo-Json | Out-File .\azuredeploy.parameters.json
 	if(Test-Path .\azuredeploy.parameters.json)
