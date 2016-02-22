@@ -4,5 +4,6 @@
 		<keywords>.*Error Code is 127\n[^\n]*parted /dev/sdb print\n[^\n]*parted: command not found</keywords>		
 		<keywords>.*Failed to config rdma device.*</keywords>
 		<keywords>.*ERROR:CalledProcessError.  Error Code is 1\n[^\n]*ERROR:CalledProcessError.  Command string was chcon unconfined_u:object_r:ssh_home_t:s0[^\n]*\n[^\n]*ERROR:CalledProcessError.  Command result was chcon: invalid context: unconfined_u:object_r:ssh_home_t:s0: Operation not supported</keywords>
+		<keywords>.*NdDriverVersion not found.\n[^\n]*check or update Rdma driver failed with error[^\n]*\n[^\n]*\n[^\n]*\n[^\n]*\n[^\n]*\n[^\n]*RdmaError\n[^\n]*ERROR:</keywords>		
 	</errors>
 </messages>
