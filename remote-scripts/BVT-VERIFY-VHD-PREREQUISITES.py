@@ -59,7 +59,7 @@ def verify_grub(distro):
 		grub_out = Run("dmesg")
 	if "console=ttyS0" in grub_out and "rootdelay=300" in grub_out and "libata.atapi_enabled=0" not in grub_out and "reserve=0x1f0,0x8" not in grub_out:
 		if distro == "ORACLELINUX" or distro == "REDHAT":
-			# check numa=off in grub for CentOS 6.x and Oracle Linux 6.x
+			# check numa=off in grub for RedHat 6.x and Oracle Linux 6.x
 			version_release = Run("cat /etc/system-release | grep -Eo '[0-9].?[0-9]?' | head -1 | tr -d '\n'")
 			if float(version_release) < 7.0:
 				if "numa=off" in grub_out:
@@ -73,7 +73,7 @@ def verify_grub(distro):
 			print(distro+"_TEST_GRUB_VERIFICATION_SUCCESS")
 			return True
 		if distro == "CENTOS":
-			# check numa=off in grub for CentOS 6.x and Oracle Linux 6.x
+			# check numa=off in grub for CentOS 6.x
 			version_release = Run("cat /etc/system-release | grep -Eo '[0-9].?[0-9]?' | head -1 | tr -d '\n'")
 			if float(version_release) < 6.6:
 				if "numa=off" in grub_out:
