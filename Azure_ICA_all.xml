@@ -5340,6 +5340,93 @@
 		  <TestID>AzureTemplate_002</TestID>
 		</test>
 
+    <test>
+      <testName>Template-bosh-cf-deployment</testName>
+      <testScript></testScript>
+      <testScriptPs1>Template-bosh-cf-deployment.ps1</testScriptPs1>
+      <files></files>
+      <setupType></setupType>
+      <parameters>
+        <vmName></vmName>
+        <adminUsername></adminUsername>
+        <sshKeyData></sshKeyData>
+        <environment></environment>
+        <tenantID></tenantID>
+        <clientID></clientID>
+        <clientSecret></clientSecret>
+        <autoDeployBosh>enabled</autoDeployBosh>
+        <cpiUrl></cpiUrl>
+        <cpiSha1></cpiSha1>
+        <stemcellUrl></stemcellUrl>
+        <stemcellSha1></stemcellSha1>
+      </parameters>
+      <TestType>
+      </TestType>
+      <TestFeature>
+      </TestFeature>
+      <SupportedExecutionModes>AzureResourceManager</SupportedExecutionModes>
+      <TestID>AzureTemplate_003</TestID>
+    </test>
+
+    <test>
+      <testName>Template-bosh-cf-lifecycle-test</testName>
+      <testScript></testScript>
+      <testScriptPs1>Template-bosh-cf-lifecycle-test.ps1</testScriptPs1>
+      <files></files>
+      <setupType></setupType>
+      <parameters>
+        <vmName></vmName>
+        <adminUsername></adminUsername>
+        <sshKeyData></sshKeyData>
+        <environment></environment>
+        <tenantID></tenantID>
+        <clientID></clientID>
+        <clientSecret></clientSecret>
+        <autoDeployBosh>disabled</autoDeployBosh>
+      </parameters>
+      <TestType>
+      </TestType>
+      <TestFeature>
+      </TestFeature>
+      <SupportedExecutionModes>AzureResourceManager</SupportedExecutionModes>
+      <TestID>AzureTemplate_004</TestID>
+    </test>
+
+    <test>
+      <testName>Template-bosh-cf-perf</testName>
+      <testScript></testScript>
+      <testScriptPs1>Template-bosh-cf-perf.ps1</testScriptPs1>
+      <files></files>
+      <setupType></setupType>
+      <parameters>
+        <vmName></vmName>
+        <adminUsername></adminUsername>
+        <sshKeyData></sshKeyData>
+        <environment></environment>
+        <tenantID></tenantID>
+        <clientID></clientID>
+        <clientSecret></clientSecret>
+        <autoDeployBosh>disabled</autoDeployBosh>
+        <cpiUrl></cpiUrl>
+        <cpiSha1></cpiSha1>
+        <stemcellUrl></stemcellUrl>
+        <stemcellSha1></stemcellSha1>
+        <boshInstanceType></boshInstanceType>
+        <boshDiskSize></boshDiskSize>
+        <compilationInstanceType></compilationInstanceType>
+        <compilationDiskSize></compilationDiskSize>
+        <cfSmallInstanceType></cfSmallInstanceType>
+        <cfMediumInstanceType></cfMediumInstanceType>
+        <cfLargeInstanceType></cfLargeInstanceType>
+      </parameters>
+      <TestType>
+      </TestType>
+      <TestFeature>
+      </TestFeature>
+      <SupportedExecutionModes>AzureResourceManager</SupportedExecutionModes>
+      <TestID>AzureTemplate_005</TestID>
+    </test>
+
 		<!-- IMPORTED FROM LISA TEST DEFINITIONS -->
 		<test>
 			<testName>ICA-TERASORT-BENCHMARK-TEST</testName>
@@ -6497,6 +6584,19 @@
 			<cycleName>LVM-SHRINK</cycleName>
 			<test>
 				<Name>ICA-LVM-SHRINK-FUNCTIONAL-TEST</Name>
+			</test>
+		</Cycle>
+
+		<Cycle>
+			<cycleName>BOSH-CF</cycleName>
+			<test>
+				<Name>Template-bosh-cf-deployment</Name>
+			</test>
+			<test>
+				<Name>Template-bosh-cf-lifecycle-test</Name>
+			</test>
+			<test>
+				<Name>Template-bosh-cf-perf</Name>
 			</test>
 		</Cycle>
 

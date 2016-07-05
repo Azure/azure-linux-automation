@@ -113,14 +113,14 @@ Function DeleteResourceGroup([string]$RGName, [switch]$KeepDisks)
 {
     try
     {
-        $ResourceGroup = Get-AzureResourceGroup -Name $RGName -ErrorAction Ignore
+        $ResourceGroup = Get-AzureRmResourceGroup -Name $RGName -ErrorAction Ignore
     }
     catch
     {
     }
     if ($ResourceGroup)
     {
-        Remove-AzureResourceGroup -Name $RGName -Force -Verbose
+        Remove-AzureRmResourceGroup -Name $RGName -Force -Verbose
         $retValue = $?
     }
     else
@@ -145,7 +145,7 @@ Function CreateResourceGroup([string]$RGName, $location)
             if($location)
             {
                 LogMsg "Using location : $location"
-                $createRG = New-AzureResourceGroup -Name $RGName -Location $location.Replace('"','') -Force -Verbose
+                $createRG = New-AzureRmResourceGroup -Name $RGName -Location $location.Replace('"','') -Force -Verbose
             }
             $operationStatus = $createRG.ProvisioningState
             if ($operationStatus  -eq "Succeeded")
@@ -180,7 +180,7 @@ Function CreateResourceGroupDeployment([string]$RGName, $location, $setupType, $
             if($location)
             {
                 LogMsg "Creating Deployment using $TemplateFile ..."
-                $createRGDeployment = New-AzureResourceGroupDeployment -Name $ResourceGroupDeploymentName -ResourceGroupName $RGName -TemplateFile $TemplateFile -Verbose
+                $createRGDeployment = New-AzureRmResourceGroupDeployment -Name $ResourceGroupDeploymentName -ResourceGroupName $RGName -TemplateFile $TemplateFile -Verbose
             }
             $operationStatus = $createRGDeployment.ProvisioningState
             if ($operationStatus  -eq "Succeeded")
@@ -213,7 +213,7 @@ if($storageAccount)
  $StorageAccountName = $storageAccount
 }
 LogMsg "Getting Storage Account : $StorageAccountName details ..."
-$StorageAccountType = (Get-AzureStorageAccount | where {$_.StorageAccountName -eq "$StorageAccountName"}).AccountType
+$StorageAccountType = (Get-AzureRmStorageAccount | where {$_.StorageAccountName -eq "$StorageAccountName"}).AccountType
 if($StorageAccountType -match 'Premium')
 {
     $StorageAccountType = "Premium_LRS"
@@ -280,7 +280,7 @@ if ($RGXMLData.ARMVnetName)
 {
     $ExistingVnet = $RGXMLData.ARMVnetName
     LogMsg "Getting $ExistingVnet Virtual Netowrk info ..."
-    $ExistingVnetResourceGroupName = ( Get-AzureResource | Where {$_.Name -eq $ExistingVnet}).ResourceGroupName
+    $ExistingVnetResourceGroupName = ( Get-AzureRmResource | Where {$_.Name -eq $ExistingVnet}).ResourceGroupName
     LogMsg "ARM VNET : $ExistingVnet (ResourceGroup : $ExistingVnetResourceGroupName)"
     $virtualNetworkName = $ExistingVnet
 }
@@ -1450,7 +1450,7 @@ Function CreateRGDeploymentWithTempParameters([string]$RGName, $TemplateFile, $T
         {
             $FailCounter++
             LogMsg "Creating Deployment using $TemplateFile $TemplateParameterFile..."
-            $createRGDeployment = New-AzureResourceGroupDeployment -Name $ResourceGroupDeploymentName -ResourceGroupName $RGName -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -Verbose
+            $createRGDeployment = New-AzureRmResourceGroupDeployment -Name $ResourceGroupDeploymentName -ResourceGroupName $RGName -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -Verbose
             $operationStatus = $createRGDeployment.ProvisioningState
             if ($operationStatus  -eq "Succeeded")
             {

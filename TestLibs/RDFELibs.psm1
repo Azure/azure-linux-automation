@@ -2554,7 +2554,7 @@ Function DoTestCleanUp($result, $testName, $DeployedServices, $ResourceGroups, [
 						}
 						else
 						{
-							$RGdetails = Get-AzureResourceGroup -Name $group
+							$RGdetails = Get-AzureRmResourceGroup -Name $group
 							if ( (  $RGdetails.Tags[0].Name -eq $preserveKeyword ) -and (  $RGdetails.Tags[0].Value -eq "yes" ))
 							{
 								LogMsg "Skipping Cleanup of preserved resource group."
@@ -2584,7 +2584,7 @@ Function DoTestCleanUp($result, $testName, $DeployedServices, $ResourceGroups, [
 					{
 						LogMsg "Preserving the Resource Group(s) $group"
 						LogMsg "Setting tags : preserve = yes; testName = $testName"
-						$out = Set-AzureResourceGroup -Name $group -Tag @{Name =$preserveKeyword; Value = "yes"},@{Name ="testName"; Value = "$testName"}
+						$out = Set-AzureRmResourceGroup -Name $group -Tag @{Name =$preserveKeyword; Value = "yes"},@{Name ="testName"; Value = "$testName"}
 						LogMsg "Collecting VM logs.."
 						if ( !$isVMLogsCollected)
 						{
