@@ -43,7 +43,7 @@ def verify_grub(distro):
 			RunLog.error("Unable to locate grub file")
 			print(distro+"_TEST_GRUB_VERIFICATION_FAIL")
 			return False
-	if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "SLES" or distro == "FEDORA":
+	if distro == "CENTOS" or distro == "EULEROS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "SLES" or distro == "FEDORA":
 		if os.path.isfile("/boot/grub2/grub.cfg"):
 			RunLog.info("Getting Contents of /boot/grub2/grub.cfg")
 			grub_out = Run("cat /boot/grub2/grub.cfg")
@@ -58,10 +58,10 @@ def verify_grub(distro):
 		#in core os we don't have access to boot partition
 		grub_out = Run("dmesg")
 	if "console=ttyS0" in grub_out and "rootdelay=300" in grub_out and "libata.atapi_enabled=0" not in grub_out and "reserve=0x1f0,0x8" not in grub_out:
-		if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT":
+		if distro == "CENTOS" or distro == "EULEROS" or distro == "ORACLELINUX" or distro == "REDHAT":
 			# check numa=off in grub for CentOS 6.x and Oracle Linux 6.x
 			version_release = Run("cat /etc/system-release | grep -Eo '[0-9].?[0-9]?' | head -1 | tr -d '\n'")
-			if float(version_release) < 6.6:
+			if distro != "EULEROS" and float(version_release) < 6.6:
 				if "numa=off" in grub_out:
 					print(distro+"_TEST_GRUB_VERIFICATION_SUCCESS")
 				else : 
@@ -93,9 +93,9 @@ def verify_network_manager(distro):
 		return True
 	else:
 		# NetworkManager package no longer conflicts with the wwagent on CentOS 7.0+ and Oracle Linux 7.0+
-		if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT":
+		if distro == "CENTOS" or distro=="EULEROS" or distro == "ORACLELINUX" or distro == "REDHAT":
 			version_release = Run("cat /etc/system-release | grep -Eo '[0-9].?[0-9]?' | head -1 | tr -d '\n'")
-			if float(version_release) < 7.0:
+			if distro != "EULEROS" and float(version_release) < 7.0:
 				RunLog.error("Network Manager is installed")
 				print(distro+"_TEST_NETWORK_MANAGER_INSTALLED")
 				return False
@@ -111,7 +111,7 @@ def verify_network_manager(distro):
 def verify_network_file_in_sysconfig(distro):
 	import os.path
 	RunLog.info("Checking if network file exists in /etc/sysconfig")
-	if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "FEDORA":
+	if distro == "CENTOS" or distro == "EULEROS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "FEDORA":
 		if os.path.isfile("/etc/sysconfig/network"):
 			RunLog.info("File Exists.")
 			n_out = Run("cat /etc/sysconfig/network")
@@ -130,7 +130,7 @@ def verify_network_file_in_sysconfig(distro):
 
 def verify_ifcfg_eth0(distro):
 	RunLog.info("Verifying contents of ifcfg-eth0 file")
-	if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "FEDORA":
+	if distro == "CENTOS" or distro == "EULEROS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "FEDORA":
 		i_out = Run("cat /etc/sysconfig/network-scripts/ifcfg-eth0")
 		i_out = i_out.replace('"','')
 		#if "DEVICE=eth0" in i_out and "ONBOOT=yes" in i_out and "BOOTPROTO=dhcp" in i_out and "DHCP=yes" in i_out:
@@ -153,7 +153,7 @@ def verify_ifcfg_eth0(distro):
 def verify_udev_rules(distro):
 	import os.path
 	RunLog.info("Verifying if udev rules are moved to /var/lib/waagent/")
-	if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "FEDORA":
+	if distro == "CENTOS" or distro == "EULEROS" or distro == "ORACLELINUX" or distro == "REDHAT" or distro == "FEDORA":
 		if not os.path.isfile("/lib/udev/rules.d/75-persistent-net-generator.rules") and not os.path.isfile("/etc/udev/rules.d/70-persistent-net.rules"):
 			RunLog.info("rules are moved.")
 			print(distro+"_TEST_UDEV_RULES_SUCCESS")
@@ -285,6 +285,23 @@ if distro == "CENTOS":
 			print(distro+"_TEST_YUM_CONF_ERROR")
 	else:
 		print(distro+"_TEST_YUM_CONF_SUCCESS")
+	result = verify_grub(distro)
+
+if distro == "EULEROS":
+	#Test 1 : Make sure Network Manager is not installed
+	result = verify_network_manager(distro)
+	result = verify_network_file_in_sysconfig(distro)
+	result = verify_ifcfg_eth0(distro)
+	result = verify_udev_rules(distro)
+	#Verify repositories
+	r_out = Run("yum repolist")
+	if "base" in r_out :
+		RunLog.info("Expected repositories are present")
+		print(distro+"_TEST_REPOSITORIES_AVAILABLE")
+	else:
+		if "base" not in r_out:
+			RunLog.error("Base repository not present")
+		print(distro+"_TEST_REPOSITORIES_ERROR")
 	result = verify_grub(distro)
 
 if distro == "REDHAT" or distro == "FEDORA":

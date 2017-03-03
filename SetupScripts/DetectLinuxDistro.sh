@@ -38,6 +38,9 @@ done
                 elif [[ "$tmp" == *CentOS* ]]; then
                     echo "CENTOS"
                     exitVal=0
+                elif [[ "$tmp" == *EulerOS* ]]; then
+                    echo "EULEROS"
+                    exitVal=0
                 elif [[ "$tmp" == *Fedora* ]]; then
                     echo "FEDORA"
                     exitVal=0

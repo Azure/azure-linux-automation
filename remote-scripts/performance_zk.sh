@@ -87,6 +87,8 @@ LinuxRelease()
             echo "FEDORA";;
         CentOS*)
             echo "CENTOS";;
+        EulerOS*)
+            echo "EULEROS";;
         *SUSE*)
             echo "SLES";;
         Red*Hat*)
@@ -448,7 +450,7 @@ ZK_URL=http://apache.spinellicreations.com/zookeeper/zookeeper-${ZK_VERSION}/${Z
 #
 distro=`LinuxRelease`
 case $distro in
-    "CENTOS" | "RHEL")
+    "CENTOS" | "EULEROS" | "RHEL")
         ConfigRHELZK
     ;;
     "UBUNTU")

@@ -77,7 +77,7 @@ foreach ($newSetupType in $currentTestData.SubtestValues)
 				RemoteCopy -uploadTo $testVMObject.ip -port $testVMObject.sshPort -files .\remote-scripts\Packages\iozone-3.424-2.el6.rf.x86_64.rpm,.\remote-scripts\Packages\mdadm-3.3-4.8.1.x86_64.rpm -username $testVMObject.user -password $testVMObject.password -upload 2>&1 | Out-Null
 							
 			}
-			elseif($LinuxDistro -imatch "CENTOS" -or "REDHAT" -or "ORACLE" -or "RHEL")
+			elseif($LinuxDistro -imatch "CENTOS" -or "EULEROS" -or "REDHAT" -or "ORACLE" -or "RHEL")
 			{
 				RemoteCopy -uploadTo $testVMObject.ip -port $testVMObject.sshPort -files .\remote-scripts\Packages\iozone-3.424-2.el6.rf.x86_64.rpm,.\remote-scripts\Packages\mdadm-3.2.6-31.el7.x86_64.rpm -username $testVMObject.user -password $testVMObject.password -upload 2>&1 | Out-Null
 			}
