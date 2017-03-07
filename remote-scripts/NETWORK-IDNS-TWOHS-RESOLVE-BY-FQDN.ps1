@@ -31,8 +31,8 @@ if($isDeployed)
 		$suppressedOut = RunLinuxCmd -username $vm1.user -password $vm1.password -ip $vm1.Ip -port $vm1.SshPort -command "chmod +x *" -runAsSudo
 		if(!$vm1.fqdn -and !$vm2.fqdn)
 		{
-			$vm1.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"
-			$vm2.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs2VIP -port $hs2vm1sshport -command "hostname --fqdn"
+			$vm1.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn" -runAsSudo
+			$vm2.fqdn =  RunLinuxCmd -username $user -password $password -ip $hs2VIP -port $hs2vm1sshport -command "hostname --fqdn" -runAsSudo
 		}
 
 		$vm1.hostname = $vm1.fqdn

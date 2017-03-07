@@ -9,7 +9,7 @@ foreach ($service in $ExistingServices)
         {
         Write-Host "Removing $($service.ServiceName).."
         sleep 10
-        Remove-AzureService -ServiceName $service.ServiceName -Force -ErrorAction Continue
+        Remove-AzureService -ServiceName $service.ServiceName -DeleteAll -Force -ErrorAction Continue
         }
 
     }
