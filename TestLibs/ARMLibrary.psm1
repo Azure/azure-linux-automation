@@ -330,14 +330,14 @@ $StorageProfileScriptBlock = {
                         LogMsg "├Using VHD : $osVHD"
                         Add-Content -Value "$($indents[6])^image^: " -Path $jsonFile
                         Add-Content -Value "$($indents[6]){" -Path $jsonFile
-                            Add-Content -Value "$($indents[7])^uri^: ^[concat('http://',variables('StorageAccountName'),'.blob.core.windows.net/vhds/','$osVHD')]^" -Path $jsonFile
+                            Add-Content -Value "$($indents[7])^uri^: ^[concat('http://',variables('StorageAccountName'),'.blob.core.chinacloudapi.cn/vhds/','$osVHD')]^" -Path $jsonFile
                         Add-Content -Value "$($indents[6])}," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^osType^: ^Linux^," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^name^: ^$vmName-OSDisk^," -Path $jsonFile
                         #Add-Content -Value "$($indents[6])^osType^: ^Linux^," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^vhd^: " -Path $jsonFile
                         Add-Content -Value "$($indents[6]){" -Path $jsonFile
-                            Add-Content -Value "$($indents[7])^uri^: ^[concat('http://',variables('StorageAccountName'),'.blob.core.windows.net/vhds/','$vmName-$RGrandomWord-osdisk.vhd')]^" -Path $jsonFile
+                            Add-Content -Value "$($indents[7])^uri^: ^[concat('http://',variables('StorageAccountName'),'.blob.core.chinacloudapi.cn/vhds/','$vmName-$RGrandomWord-osdisk.vhd')]^" -Path $jsonFile
                         Add-Content -Value "$($indents[6])}," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^caching^: ^ReadWrite^," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^createOption^: ^FromImage^" -Path $jsonFile
@@ -349,7 +349,7 @@ $StorageProfileScriptBlock = {
                         Add-Content -Value "$($indents[6])^createOption^: ^FromImage^," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^vhd^: " -Path $jsonFile
                         Add-Content -Value "$($indents[6]){" -Path $jsonFile
-                            Add-Content -Value "$($indents[7])^uri^: ^[concat('http://',variables('StorageAccountName'),'.blob.core.windows.net/vhds/','$vmName-$RGrandomWord-osdisk.vhd')]^" -Path $jsonFile
+                            Add-Content -Value "$($indents[7])^uri^: ^[concat('http://',variables('StorageAccountName'),'.blob.core.chinacloudapi.cn/vhds/','$vmName-$RGrandomWord-osdisk.vhd')]^" -Path $jsonFile
                         Add-Content -Value "$($indents[6])}," -Path $jsonFile
                         Add-Content -Value "$($indents[6])^caching^: ^ReadWrite^" -Path $jsonFile
 

@@ -55,16 +55,16 @@ if($isDeployed)
 			$testResult = ""
 			if(!$vm1DefaultFqdn -and !$vm2DefaultFqdn)
 			{
-				$vm1DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"
-				$vm2DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "hostname --fqdn"
+				$vm1DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn" -runAsSudo
+				$vm2DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "hostname --fqdn" -runAsSudo
 				$vm1.hostname = $hs1vm1Hostname
 				$vm2.hostname = $hs1vm2Hostname
 				$vm1.fqdn = $vm1DefaultFqdn
 				$vm2.fqdn = $vm2DefaultFqdn
 				$vm1Default = $vm1
 				$vm2Default = $vm2
-				$vm1DefaultHostname =  $hs1vm1Hostname
-				$vm2DefaultHostname = $hs1vm2Hostname
+				$vm1DefaultHostname =  $hs1vm1Hostname.ToLower()
+				$vm2DefaultHostname = $hs1vm2Hostname.ToLower()
 				$vm1NewFqdn = $vm1DefaultFqdn.Replace($vm1DefaultHostname, $hs1vm1NewHostname) 
 				$vm2NewFqdn = $vm2DefaultFqdn.Replace($vm2DefaultHostname, $hs1vm2NewHostname) 
 			}
