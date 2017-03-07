@@ -2050,7 +2050,7 @@ Function RemoteCopy($uploadTo, $downloadFrom, $downloadTo, $port, $files, $usern
 					if ( $username -ne "root" )
 					{
 						$chown_cmd = "chown -Rf ${username}:${username} $testFile"
-						LogMsg("$chown_cmd")
+						LogMsg "$chown_cmd"
 						$out = RunLinuxCmd -username $username -password $password -ip $downloadFrom -port $port -command "$chown_cmd" -runAsSudo
 					}
 
