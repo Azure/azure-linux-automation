@@ -55,8 +55,8 @@ if($isDeployed)
 			$testResult = ""
 			if(!$vm1DefaultFqdn -and !$vm2DefaultFqdn)
 			{
-				$vm1DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn"
-				$vm2DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "hostname --fqdn"
+				$vm1DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "hostname --fqdn" -runAsSudo
+				$vm2DefaultFqdn = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "hostname --fqdn" -runAsSudo
 				$vm1.hostname = $hs1vm1Hostname
 				$vm2.hostname = $hs1vm2Hostname
 				$vm1.fqdn = $vm1DefaultFqdn
