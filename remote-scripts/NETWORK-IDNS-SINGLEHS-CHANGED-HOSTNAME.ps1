@@ -65,8 +65,8 @@ if($isDeployed)
 				$vm2Default = $vm2
 				$vm1DefaultHostname =  $hs1vm1Hostname
 				$vm2DefaultHostname = $hs1vm2Hostname
-				$vm1NewFqdn = $vm1DefaultFqdn.Replace($vm1DefaultHostname, $hs1vm1NewHostname) 
-				$vm2NewFqdn = $vm2DefaultFqdn.Replace($vm2DefaultHostname, $hs1vm2NewHostname) 
+				$vm1NewFqdn = $vm1DefaultFqdn.ToLower().Replace($vm1DefaultHostname.ToLower(), $hs1vm1NewHostname) 
+				$vm2NewFqdn = $vm2DefaultFqdn.ToLower().Replace($vm2DefaultHostname.ToLower(), $hs1vm2NewHostname) 
 			}
 			$out = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm1sshport -command "rm -rf *.txt *.log" -runAsSudo 
 			$out = RunLinuxCmd -username $user -password $password -ip $hs1VIP -port $hs1vm2sshport -command "rm -rf *.txt *.log" -runAsSudo 
