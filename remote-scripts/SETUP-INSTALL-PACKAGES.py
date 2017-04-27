@@ -445,6 +445,10 @@ def RunTest():
         else:
                 RunLog.info('PACKAGE-INSTALL-CONFIG-FAIL')
                 Run("echo 'PACKAGE-INSTALL-CONFIG-FAIL' >> SetupStatus.txt")
+
+        if current_distro == "centos":
+                RunLog.info('Start waagent service')
+                Run("nohup service waagent start")
         
 
 #Code execution starts from here
