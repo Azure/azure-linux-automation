@@ -58,8 +58,22 @@ def verify_grub(distro):
 		#in core os we don't have access to boot partition
 		grub_out = Run("dmesg")
 	if "console=ttyS0" in grub_out and "rootdelay=300" in grub_out and "libata.atapi_enabled=0" not in grub_out and "reserve=0x1f0,0x8" not in grub_out:
-		if distro == "CENTOS" or distro == "ORACLELINUX" or distro == "REDHAT":
-			# check numa=off in grub for CentOS 6.x and Oracle Linux 6.x
+		if distro == "ORACLELINUX" or distro == "REDHAT":
+			# check numa=off in grub for RedHat 6.x and Oracle Linux 6.x
+			version_release = Run("cat /etc/system-release | grep -Eo '[0-9].?[0-9]?' | head -1 | tr -d '\n'")
+			if float(version_release) < 6.6:
+				if "numa=off" in grub_out:
+					print(distro+"_TEST_GRUB_VERIFICATION_SUCCESS")
+				else : 
+					RunLog.error("numa=off not present in etc/default/grub")
+					print(distro+"_TEST_GRUB_VERIFICATION_FAIL")
+			else:
+				print(distro+"_TEST_GRUB_VERIFICATION_SUCCESS")
+		else:
+			print(distro+"_TEST_GRUB_VERIFICATION_SUCCESS")
+			return True
+		if distro == "CENTOS":
+			# check numa=off in grub for CentOS 6.x
 			version_release = Run("cat /etc/system-release | grep -Eo '[0-9].?[0-9]?' | head -1 | tr -d '\n'")
 			if float(version_release) < 6.6:
 				if "numa=off" in grub_out:
