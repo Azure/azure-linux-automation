@@ -79,6 +79,8 @@ LinuxRelease()
             echo "FEDORA";;
         CentOS*)
             echo "CENTOS";;
+        EulerOS*)
+            echo "EULEROS";;
         *SUSE*)
             echo "SLES";;
         Red*Hat*)
@@ -141,7 +143,7 @@ ConfigUbuntuMemC()
 
 ConfigRHELMemC()
 {
-    LogMsg "Info: Running CENTOS/RHEL Config on client VM."
+    LogMsg "Info: Running CENTOS/EULEROS/RHEL Config on client VM."
     LogMsg "Checking if memcached is installed or not.."
     memslap --help > /dev/null
     if [ $? -ne 0 ]; then
@@ -314,7 +316,7 @@ echo "MC_INITIAL_LOAD   = ${MC_INITIAL_LOAD}"
 #
 distro=`LinuxRelease`
 case $distro in
-    "CENTOS" | "RHEL")
+    "CENTOS" | "EULEROS" | "RHEL")
         ConfigRHELMemC
 		testString="memslap --servers=${MC_SERVERS} --concurrency=${MC_CONCURRENCY} --execute-number=${MC_EXECUTE_NUMBER} --initial-load=${MC_INITIAL_LOAD} --flush"
     ;;

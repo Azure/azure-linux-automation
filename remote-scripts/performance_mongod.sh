@@ -121,6 +121,8 @@ LinuxRelease()
             echo "FEDORA";;
         CentOS*)
             echo "CENTOS";;
+        EulerOS*)
+            echo "EULEROS";;
         *SUSE*)
             echo "SLES";;
         Red*Hat*)
@@ -332,7 +334,7 @@ fi
 #
 distro=`LinuxRelease`
 case $distro in
-    "CENTOS" | "RHEL")
+    "CENTOS" | "EULEROS" | "RHEL")
         ConfigRhel
     ;;
     "UBUNTU")

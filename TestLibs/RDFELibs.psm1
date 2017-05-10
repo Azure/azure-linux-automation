@@ -93,6 +93,10 @@ Function DetectLinuxDistro($VIP, $SSHport, $testVMUser, $testVMPassword)
 			{
 				$CleanedDistroName = "CENTOS"
 			}
+			elseif ($DistroName -imatch "EULEROS")
+			{
+				$CleanedDistroName = "EULEROS"
+			}
 			elseif ($DistroName -imatch "SLES")
 			{
 				$CleanedDistroName = "SLES"

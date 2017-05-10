@@ -75,7 +75,7 @@ LinuxDistro=`./DetectLinuxDistro.sh`
 if [ $LinuxDistro == "SLES" -o $LinuxDistro == "SUSE" ]; then
     #zypper update
 	zypper --non-interactive install git-core make tar gcc bc patch dos2unix wget xz
-elif [ $LinuxDistro == "CENTOS" -o $LinuxDistro == "REDHAT" -o $LinuxDistro == "FEDORA" -o $LinuxDistro == "ORACLELINUX" ]; then
+elif [ $LinuxDistro == "CENTOS" -o $LinuxDistro == "EULEROS" -o $LinuxDistro == "REDHAT" -o $LinuxDistro == "FEDORA" -o $LinuxDistro == "ORACLELINUX" ]; then
 	#yum update
 	yum install -y git make tar gcc bc patch dos2unix wget xz
 elif [ $LinuxDistro == "UBUNTU" ]; then
