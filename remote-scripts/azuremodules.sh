@@ -393,3 +393,43 @@ function remove_cmd_from_startup ()
 	fi
 }
 
+install_azcopy ()
+{
+
+  if [[ `which yum` != "" ]]; then
+    echo "RedHat based OS"
+    sudo yum install rh-dotnet20 -y
+    #bash /opt/rh/rh-dotnet20/enable
+    sudo scl enable rh-dotnet20 bash
+    #sudo cp /opt/rh/rh-dotnet20/root/usr/bin/dotnet /usr/bin
+  else
+    if [[ `which apt-get` != "" ]]; then
+      echo "Ubuntu based OS"
+      curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+      sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+      sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
+      sudo apt-get update
+      sudo apt-get install dotnet-sdk-2.0.2 -y
+    fi
+  fi
+
+  wget -O azcopy.tar.gz https://aka.ms/downloadazcopyprlinux
+  tar -xf azcopy.tar.gz
+  sudo ./install.sh
+  check_exit_status "Installation of azcopy"
+}
+
+upload_files_to_blob_storage ()
+{
+	filename=$1
+  blob_storage_url=$2
+  key=$3
+  echo "Uploading logs to Storage account '"$blob_storage_url"'"
+
+  azcopy \
+		--source $filename \
+		--destination $blob_storage_url/$filename \
+		--dest-key $key
+
+}
+
