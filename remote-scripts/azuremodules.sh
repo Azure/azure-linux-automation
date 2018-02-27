@@ -27,13 +27,13 @@ function check_exit_status ()
     message=$1
 
     if [ $exit_status -ne 0 ]; then
-        echo "$message: Failed (exit code: $exit_status)" 
+        echo "$message: Failed (exit code: $exit_status)"
         if [ "$2" == "exit" ]
         then
             exit $exit_status
-        fi 
+        fi
     else
-        echo "$message: Success" 
+        echo "$message: Success"
     fi
 }
 
@@ -86,14 +86,14 @@ function updaterepos()
         Oracle|RHEL|CentOS)
             yum makecache
             ;;
-    
+
         Ubuntu)
             apt-get update
             ;;
         SUSE|openSUSE|sles)
             zypper refresh
             ;;
-         
+
         *)
             echo "Unknown ditribution"
             return 1
@@ -172,7 +172,7 @@ function creat_partitions ()
     do
        echo ${disk_list[$count]}
        (echo n; echo p; echo 2; echo; echo; echo t; echo fd; echo w;) | fdisk ${disk_list[$count]}
-       count=$(( $count + 1 ))   
+       count=$(( $count + 1 ))
     done
 }
 
@@ -186,7 +186,7 @@ function remove_partitions ()
     do
        echo ${disk_list[$count]}
        (echo p; echo d; echo w;) | fdisk ${disk_list[$count]}
-       count=$(( $count + 1 ))   
+       count=$(( $count + 1 ))
     done
 }
 
@@ -217,7 +217,7 @@ function create_raid_and_mount()
     check_exit_status "$deviceName Raid creation"
 
     time mkfs -t $format $deviceName
-    check_exit_status "$deviceName Raid format" 
+    check_exit_status "$deviceName Raid format"
 
     mkdir $mountdir
     uuid=`blkid $deviceName| sed "s/.*UUID=\"//"| sed "s/\".*\"//"`
@@ -238,8 +238,8 @@ function remote_copy ()
 
     if [[ `which sshpass` == "" ]]
     then
-        echo "sshpass not installed\n Installing now..." 
-        install_package "sshpass" 
+        echo "sshpass not installed\n Installing now..."
+        install_package "sshpass"
     fi
 
     if [ "x$host" == "x" ] || [ "x$user" == "x" ] || [ "x$passwd" == "x" ] || [ "x$filename" == "x" ] ; then
@@ -269,8 +269,8 @@ function remote_exec ()
     cmd=$@
     if [[ `which sshpass` == "" ]]
     then
-        echo "sshpass not installed\n Installing now..." 
-        install_package "sshpass" 
+        echo "sshpass not installed\n Installing now..."
+        install_package "sshpass"
     fi
 
     if [ "x$host" == "x" ] || [ "x$user" == "x" ] || [ "x$passwd" == "x" ] || [ "x$cmd" == "x" ] ; then
@@ -283,7 +283,7 @@ function remote_exec ()
 }
 
 function set_user_password {
-    # This routine can set root or any user's password. 
+    # This routine can set root or any user's password.
     if [[ $# == 3 ]]
     then
         user=$1
@@ -341,6 +341,8 @@ function collect_VM_properties ()
     echo ",Data disks attached,"`lsblk | grep "^sd" | awk '{print $1}' | sort | grep -v "sd[ab]$" | wc -l`  >> $output_file
     echo ",eth0 MTU,"`ifconfig eth0|grep MTU|sed "s/.*MTU:\(.*\) .*/\1/"` >> $output_file
     echo ",eth1 MTU,"`ifconfig eth1|grep MTU|sed "s/.*MTU:\(.*\) .*/\1/"` >> $output_file
+    cat /proc/cpuinfo > cpuinfo
+    dmesg > dmesg
 }
 
 function keep_cmd_in_startup ()
@@ -348,7 +350,7 @@ function keep_cmd_in_startup ()
 	testcommand=$*
 	startup_files="/etc/rc.d/rc.local /etc/rc.local /etc/SuSE-release"
 	count=0
-	for file in $startup_files 
+	for file in $startup_files
 	do
 		if [[ -f $file ]]
 		then
@@ -362,7 +364,7 @@ function keep_cmd_in_startup ()
 				echo "Added $testcommand >> $file"
 				((count++))
 			fi
-		fi	
+		fi
 	done
 	if [ $count == 0 ]
 	then
@@ -375,7 +377,7 @@ function remove_cmd_from_startup ()
 	testcommand=$*
 	startup_files="/etc/rc.d/rc.local /etc/rc.local /etc/SuSE-release"
 	count=0
-	for file in $startup_files 
+	for file in $startup_files
 	do
 		if [[ -f $file ]]
 		then
@@ -385,7 +387,7 @@ function remove_cmd_from_startup ()
 				((count++))
 				echo "Removed $testcommand from $file"
 			fi
-		fi	
+		fi
 	done
 	if [ $count == 0 ]
 	then
@@ -432,4 +434,3 @@ upload_files_to_blob_storage ()
 		--dest-key $key
 
 }
-
