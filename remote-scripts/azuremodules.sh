@@ -424,11 +424,18 @@ install_azcopy ()
 upload_files_to_blob_storage ()
 {
 	filename=$1
-  blob_storage_url=$2
-  key=$3
-  echo "Uploading logs to Storage account '"$blob_storage_url"'"
+	blob_storage_url=$2
+	key=$3
 
-  azcopy \
+	echo "Uploading logs to Storage account '"$blob_storage_url"'"
+	
+	if [[ `which azcopy` == "" ]]
+	then 
+		echo "azcopy wasn't installed\n Installing now..." 
+		install_azcopy 
+	fi
+	
+	azcopy \
 		--source $filename \
 		--destination $blob_storage_url/$filename \
 		--dest-key $key
