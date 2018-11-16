@@ -93,6 +93,10 @@ Function DetectLinuxDistro($VIP, $SSHport, $testVMUser, $testVMPassword)
 			{
 				$CleanedDistroName = "CENTOS"
 			}
+			elseif ($DistroName -imatch "EULEROS")
+			{
+				$CleanedDistroName = "EULEROS"
+			}
 			elseif ($DistroName -imatch "SLES")
 			{
 				$CleanedDistroName = "SLES"
@@ -2223,6 +2227,13 @@ Function RemoteCopy($uploadTo, $downloadFrom, $downloadTo, $port, $files, $usern
 				$recurse = ""
 				while($retry -le $maxRetry)
 				{
+					if ( $username -ne "root" )
+					{
+						$chown_cmd = "chown -Rf ${username}:${username} $testFile"
+						LogMsg "$chown_cmd"
+						$out = RunLinuxCmd -username $username -password $password -ip $downloadFrom -port $port -command "$chown_cmd" -runAsSudo
+					}
+
 					if($usePrivateKey)
 					{
 						LogMsg "Downloading $testFile from $username : $downloadFrom,port $port to $downloadTo using PrivateKey authentication"

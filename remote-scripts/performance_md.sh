@@ -116,7 +116,7 @@ TimeToSeconds()
 #######################################################################
 LinuxRelease()
 {
-    DISTRO=`grep -ihs "buntu\|Suse\|Fedora\|Debian\|CentOS\|Red Hat Enterprise Linux" /etc/{issue,*release,*version}`
+    DISTRO=`grep -ihs "buntu\|Suse\|Fedora\|Debian\|CentOS\|EulerOS\|Red Hat Enterprise Linux" /etc/{issue,*release,*version}`
 
     case $DISTRO in
         *buntu*)
@@ -125,6 +125,8 @@ LinuxRelease()
             echo "FEDORA";;
         CentOS*)
             echo "CENTOS";;
+        EulerOS*)
+            echo "EULEROS";;
         *SUSE*)
             echo "SLES";;
         Red*Hat*)
@@ -367,7 +369,7 @@ LogMsg "Info : testDurationSeconds = ${testDurationSeconds}"
 #
 distro=`LinuxRelease`
 case $distro in
-    "CENTOS" | "RHEL")
+    "CENTOS" | "EULEROS" | "RHEL")
         ConfigRhel
     ;;
     "UBUNTU")

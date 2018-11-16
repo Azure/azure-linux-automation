@@ -5,7 +5,7 @@ import sys
 from azuremodules import *
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--distro', help='UBUNTU/SUSE/SLES/CENTOS/ORACLE', required=True)
+parser.add_argument('-d', '--distro', help='UBUNTU/SUSE/SLES/CENTOS/ORACLE/EULEROS', required=True)
 args = parser.parse_args()
 DetectedDistro = args.distro
 
@@ -29,6 +29,12 @@ def SetNTPVariables(DetectedDistro):
                 ntp_installCommand = "zypper --non-interactive --no-gpg-checks install ntp"
                 ntp_status = "ntpdc -p"
         if DetectedDistro.upper() == 'CENTOS':
+                ntp_package = 'ntp'
+                ntp_service = 'ntpd'
+                ntp_query = "rpm -q ntp"
+                ntp_installCommand = "yum install --nogpgcheck -y ntp"
+                ntp_status = "ntpdc -p"
+        if DetectedDistro.upper() == 'EULEROS':
                 ntp_package = 'ntp'
                 ntp_service = 'ntpd'
                 ntp_query = "rpm -q ntp"
